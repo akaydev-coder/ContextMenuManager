@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Windows.Forms;
 
 namespace ContextMenuManager.Methods
@@ -45,7 +46,8 @@ namespace ContextMenuManager.Methods
         public static readonly bool SaveToAppDir = ConfigDir == AppConfigDir;
         public static readonly bool IsFirstRun = !Directory.Exists(ConfigDir);
         public static string ConfigIni = $@"{ConfigDir}\Config.ini";
-        public static string BackupDir = $@"{ConfigDir}\Backup";
+        public static string ComputerHostName = Dns.GetHostName();
+        public static string BackupDir = $@"{ConfigDir}\Backup\" + ComputerHostName;
         public static string LangsDir = $@"{ConfigDir}\Languages";
         public static string ProgramsDir = $@"{ConfigDir}\Programs";
         public static string DicsDir = $@"{ConfigDir}\Dictionaries";

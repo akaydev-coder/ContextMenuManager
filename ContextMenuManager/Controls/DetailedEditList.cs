@@ -10,7 +10,7 @@ using System.Xml;
 
 namespace ContextMenuManager.Controls
 {
-    sealed class DetailedEditList : SwitchDicList
+    sealed class DetailedEditList : SwitchDicList // 其他菜单 详细编辑
     {
         public Guid GroupGuid { get; set; }
 

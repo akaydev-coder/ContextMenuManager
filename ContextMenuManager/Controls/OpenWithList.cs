@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace ContextMenuManager.Controls
 {
-    sealed class OpenWithList : MyList
+    sealed class OpenWithList : MyList // 主页 打开方式
     {
         public void LoadItems()
         {

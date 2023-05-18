@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace ContextMenuManager.Controls
 {
-    sealed class GuidBlockedList : MyList
+    sealed class GuidBlockedList : MyList // 其他规则 GUID锁
     {
         public const string HKLMBLOCKED = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked";
         public const string HKCUBLOCKED = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked";

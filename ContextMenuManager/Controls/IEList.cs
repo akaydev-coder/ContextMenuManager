@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace ContextMenuManager.Controls
 {
-    sealed class IEList : MyList
+    sealed class IEList : MyList // 其他规则 IE浏览器
     {
         public const string IEPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Internet Explorer";
 

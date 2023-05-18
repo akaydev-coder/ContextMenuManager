@@ -14,7 +14,7 @@ using System.Xml;
 
 namespace ContextMenuManager.Controls
 {
-    sealed class ShellNewList : MyList
+    sealed class ShellNewList : MyList // 主页 新建菜单
     {
         public const string ShellNewPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Discardable\PostSetup\ShellNew";
 

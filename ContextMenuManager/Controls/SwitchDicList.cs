@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace ContextMenuManager.Controls
 {
-    class SwitchDicList : MyList
+    class SwitchDicList : MyList // 其他菜单 增强菜单
     {
         public bool UseUserDic { get; set; }
 

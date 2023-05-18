@@ -13,7 +13,7 @@ using System.Xml;
 
 namespace ContextMenuManager.Controls
 {
-    sealed class ShellList : MyList
+    sealed class ShellList : MyList // 文件类型 Ink文件 uwp Ink exe文件 未知格式 // 主页 第一栏
     {
         public const string MENUPATH_FILE = @"HKEY_CLASSES_ROOT\*";//文件
         public const string MENUPATH_FOLDER = @"HKEY_CLASSES_ROOT\Folder";//文件夹
@@ -25,6 +25,7 @@ namespace ContextMenuManager.Controls
         public const string MENUPATH_COMPUTER = @"HKEY_CLASSES_ROOT\CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}";//此电脑
         public const string MENUPATH_RECYCLEBIN = @"HKEY_CLASSES_ROOT\CLSID\{645FF040-5081-101B-9F08-00AA002F954E}";//回收站
         public const string MENUPATH_LIBRARY = @"HKEY_CLASSES_ROOT\LibraryFolder";//库
+
         public const string MENUPATH_LIBRARY_BACKGROUND = @"HKEY_CLASSES_ROOT\LibraryFolder\Background";//库背景
         public const string MENUPATH_LIBRARY_USER = @"HKEY_CLASSES_ROOT\UserLibraryFolder";//用户库
         public const string MENUPATH_UWPLNK = @"HKEY_CLASSES_ROOT\Launcher.ImmersiveApplication";//UWP快捷方式
