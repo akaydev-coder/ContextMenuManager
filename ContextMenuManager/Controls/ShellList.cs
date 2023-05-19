@@ -24,10 +24,11 @@ namespace ContextMenuManager.Controls
         public const string MENUPATH_ALLOBJECTS = @"HKEY_CLASSES_ROOT\AllFilesystemObjects";//所有对象
         public const string MENUPATH_COMPUTER = @"HKEY_CLASSES_ROOT\CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}";//此电脑
         public const string MENUPATH_RECYCLEBIN = @"HKEY_CLASSES_ROOT\CLSID\{645FF040-5081-101B-9F08-00AA002F954E}";//回收站
+        
         public const string MENUPATH_LIBRARY = @"HKEY_CLASSES_ROOT\LibraryFolder";//库
-
         public const string MENUPATH_LIBRARY_BACKGROUND = @"HKEY_CLASSES_ROOT\LibraryFolder\Background";//库背景
         public const string MENUPATH_LIBRARY_USER = @"HKEY_CLASSES_ROOT\UserLibraryFolder";//用户库
+
         public const string MENUPATH_UWPLNK = @"HKEY_CLASSES_ROOT\Launcher.ImmersiveApplication";//UWP快捷方式
         public const string MENUPATH_UNKNOWN = @"HKEY_CLASSES_ROOT\Unknown";//未知格式
         public const string SYSFILEASSPATH = @"HKEY_CLASSES_ROOT\SystemFileAssociations";//系统扩展名注册表父项路径
@@ -38,7 +39,12 @@ namespace ContextMenuManager.Controls
             File, Folder, Directory, Background, Desktop, Drive, AllObjects, Computer, RecycleBin, Library,
             LnkFile, UwpLnk, ExeFile, UnknownType, CustomExtension, PerceivedType, DirectoryType,
             CommandStore, DragDrop, CustomRegPath, MenuAnalysis, CustomExtensionPerceivedType
-        }
+        };
+
+        public enum BackupMode
+        {
+            Basic
+        };
 
         private static readonly List<string> DirectoryTypes = new List<string>
         {
@@ -177,61 +183,31 @@ namespace ContextMenuManager.Controls
         {
             string scenePath = null;
 #if DEBUG
-            string sceneName = "";
+            string sceneName = null;
 #endif
             switch (Scene)
             {
                 case Scenes.File:
-#if DEBUG
-                    sceneName = "File";
-#endif
                     scenePath = MENUPATH_FILE; break;
                 case Scenes.Folder:
-#if DEBUG
-                    sceneName = "Folder";
-#endif
                     scenePath = MENUPATH_FOLDER; break;
                 case Scenes.Directory:
-#if DEBUG
-                    sceneName = "Directory";
-#endif
                     scenePath = MENUPATH_DIRECTORY; break;
                 case Scenes.Background:
-#if DEBUG
-                    sceneName = "Background";
-#endif
                     scenePath = MENUPATH_BACKGROUND; break;
                 case Scenes.Desktop:
-#if DEBUG
-                    sceneName = "Desktop";
-#endif
                     //Vista系统没有这一项
                     if (WinOsVersion.Current == WinOsVersion.Vista) return;
                     scenePath = MENUPATH_DESKTOP; break;
                 case Scenes.Drive:
-#if DEBUG
-                    sceneName = "Drive";
-#endif
                     scenePath = MENUPATH_DRIVE; break;
                 case Scenes.AllObjects:
-#if DEBUG
-                    sceneName = "AllObjects";
-#endif
                     scenePath = MENUPATH_ALLOBJECTS; break;
                 case Scenes.Computer:
-#if DEBUG
-                    sceneName = "Computer";
-#endif
                     scenePath = MENUPATH_COMPUTER; break;
                 case Scenes.RecycleBin:
-#if DEBUG
-                    sceneName = "RecycleBin";
-#endif
                     scenePath = MENUPATH_RECYCLEBIN; break;
                 case Scenes.Library:
-#if DEBUG
-                    sceneName = "Library";
-#endif
                     //Vista系统没有这一项
                     if (WinOsVersion.Current == WinOsVersion.Vista) return;
                     scenePath = MENUPATH_LIBRARY; break;
@@ -280,8 +256,8 @@ namespace ContextMenuManager.Controls
 #if DEBUG
                     sceneName = "MenuAnalysis";
 #endif
-                    this.AddItem(new SelectItem(Scene));
-                    this.LoadAnalysisItems();
+                    AddItem(new SelectItem(Scene));
+                    LoadAnalysisItems();
                     return;
                 case Scenes.CustomRegPath:
 #if DEBUG
@@ -294,95 +270,96 @@ namespace ContextMenuManager.Controls
 #endif
                     //Vista系统没有这一项
                     if (WinOsVersion.Current == WinOsVersion.Vista) return;
-                    this.AddNewItem(RegistryEx.GetParentPath(ShellItem.CommandStorePath));
-                    this.LoadStoreItems();
+                    AddNewItem(RegistryEx.GetParentPath(ShellItem.CommandStorePath));
+                    LoadStoreItems();
                     return;
                 case Scenes.DragDrop:
 #if DEBUG
                     sceneName = "DragDrop";
 #endif
-                    this.AddItem(new SelectItem(Scene));
-                    this.AddNewItem(MENUPATH_FOLDER);
-                    this.LoadShellExItems(GetShellExPath(MENUPATH_FOLDER));
-                    this.LoadShellExItems(GetShellExPath(MENUPATH_DIRECTORY));
-                    this.LoadShellExItems(GetShellExPath(MENUPATH_DRIVE));
-                    this.LoadShellExItems(GetShellExPath(MENUPATH_ALLOBJECTS));
+                    AddItem(new SelectItem(Scene));
+                    AddNewItem(MENUPATH_FOLDER);
+                    LoadShellExItems(GetShellExPath(MENUPATH_FOLDER));
+                    LoadShellExItems(GetShellExPath(MENUPATH_DIRECTORY));
+                    LoadShellExItems(GetShellExPath(MENUPATH_DRIVE));
+                    LoadShellExItems(GetShellExPath(MENUPATH_ALLOBJECTS));
                     return;
             }
-            this.AddNewItem(scenePath); // 新建一个菜单项目
-            // here!
+            AddNewItem(scenePath); // 新建一个菜单项目
 #if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            if (sceneName != null)
             {
-                sw.WriteLine("LoadItems: " + sceneName);
+                using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                {
+                    sw.WriteLine("LoadItems: " + sceneName);
+                }
             }
 #endif
-            this.LoadItems(scenePath);
+            LoadItems(scenePath);
             if(WinOsVersion.Current >= WinOsVersion.Win10)
             {
-                this.LoadUwpModeItem();
+                LoadUwpModeItem();
             }
             switch(Scene)
             {
                 case Scenes.Background:
                     VisibleRegRuleItem item = new VisibleRegRuleItem(VisibleRegRuleItem.CustomFolder);
-                    this.AddItem(item);
-#if DEBUG
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                    {
-                        sw.WriteLine("\tLoadItems: " + sceneName);
-                        sw.WriteLine("\t\t0. " + item.Text);
-                    }
-#endif
+                    AddItem(item);
                     break;
                 case Scenes.Computer:
                     item = new VisibleRegRuleItem(VisibleRegRuleItem.NetworkDrive);
-                    this.AddItem(item);
-#if DEBUG
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                    {
-                        sw.WriteLine("\tLoadItems: " + sceneName);
-                        sw.WriteLine("\t\t0. " + item.Text);
-                    }
-#endif
+                    AddItem(item);
                     break;
                 case Scenes.RecycleBin:
                     item = new VisibleRegRuleItem(VisibleRegRuleItem.RecycleBinProperties);
-                    this.AddItem(item);
-#if DEBUG
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                    {
-                        sw.WriteLine("\tLoadItems: " + sceneName);
-                        sw.WriteLine("\t\t0. " + item.Text);
-                    }
-#endif
+                    AddItem(item);
                     break;
                 case Scenes.Library:
-                    this.LoadItems(MENUPATH_LIBRARY_BACKGROUND);
-                    this.LoadItems(MENUPATH_LIBRARY_USER);
+                    LoadItems(MENUPATH_LIBRARY_BACKGROUND);
+                    LoadItems(MENUPATH_LIBRARY_USER);
                     break;
                 case Scenes.ExeFile:
-                    this.LoadItems(GetOpenModePath(".exe"));
+                    LoadItems(GetOpenModePath(".exe"));
                     break;
                 case Scenes.CustomExtension:
                 case Scenes.PerceivedType:
                 case Scenes.DirectoryType:
                 case Scenes.CustomRegPath:
-                    this.InsertItem(new SelectItem(Scene), 0);
+                    InsertItem(new SelectItem(Scene), 0);
                     if(Scene == Scenes.CustomExtension && CurrentExtension != null)
                     {
-                        this.LoadItems(GetOpenModePath(CurrentExtension));
-                        this.InsertItem(new SelectItem(Scenes.CustomExtensionPerceivedType), 1);
+                        LoadItems(GetOpenModePath(CurrentExtension));
+                        InsertItem(new SelectItem(Scenes.CustomExtensionPerceivedType), 1);
                     }
                     break;
             }
+            // 仅作测试
+            BackupItems(BackupMode.Basic);
         }
 
-        public void BackupBasic(Scenes scene)
+        public void BackupItems(BackupMode mode)
+        {
+            Scenes[] BackupScenes = null;
+            switch (mode)
+            {
+                case BackupMode.Basic:
+                    BackupScenes = new Scenes[] {
+                        Scenes.File, Scenes.Folder, Scenes.Directory, Scenes.Background, Scenes.Desktop,
+                        Scenes.Drive, Scenes.AllObjects, Scenes.Computer, Scenes.RecycleBin, Scenes.Library
+                    };break;
+            }
+            for (int i = 0; i < BackupScenes.Length; i++)
+            {
+                Scenes scene = BackupScenes[i];
+                BackupItems(scene);
+            }
+        }
+
+        private void BackupItems(Scenes scene)
         {
             string scenePath = null;
-            string sceneName = "";
-            switch (Scene)
+            string sceneName = null;
+            switch (scene)
             {
                 case Scenes.File:
                     sceneName = "File";
@@ -419,46 +396,83 @@ namespace ContextMenuManager.Controls
                     if (WinOsVersion.Current == WinOsVersion.Vista) return;
                     scenePath = MENUPATH_LIBRARY; break;
             }
+#if DEBUG
+            if (sceneName != null)
+            {
+                using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                {
+                    sw.WriteLine("BackupItems: " + sceneName);
+                }
+            }
+            int i = 0;
+#endif
             GetBackupItems(scenePath);
             if (WinOsVersion.Current >= WinOsVersion.Win10)
             {
-                GetBackupUwpModeItem();
+                GetBackupUwpModeItem(scene);
             }
-            switch (Scene)
+            switch (scene)
             {
                 case Scenes.Background:
                     VisibleRegRuleItem item = new VisibleRegRuleItem(VisibleRegRuleItem.CustomFolder);
+                    string regPath = item.RegPath;
+                    string valueName = item.ValueName;
+                    string itemName = item.Text;
+                    bool ifItemInMenu = item.ItemVisible;
 #if DEBUG
+                    i++;
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
                     {
-                        sw.WriteLine("\tLoadItems: " + sceneName);
-                        sw.WriteLine("\t\t0. " + item.Text);
+                        sw.WriteLine("\tBackupAddedItems");
+                        sw.WriteLine("\t\t" + i.ToString() + ". " + valueName + " " + itemName + " " + ifItemInMenu + " " + regPath);
                     }
 #endif
                     break;
                 case Scenes.Computer:
                     item = new VisibleRegRuleItem(VisibleRegRuleItem.NetworkDrive);
+                    regPath = item.RegPath;
+                    valueName = item.ValueName;
+                    itemName = item.Text;
+                    ifItemInMenu = item.ItemVisible;
 #if DEBUG
+                    i++;
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
                     {
-                        sw.WriteLine("\tLoadItems: " + sceneName);
-                        sw.WriteLine("\t\t0. " + item.Text);
+                        sw.WriteLine("\tBackupAddedItems");
+                        sw.WriteLine("\t\t" + i.ToString() + ". " + valueName + " " + itemName + " " + ifItemInMenu + " " + regPath);
                     }
 #endif
                     break;
                 case Scenes.RecycleBin:
                     item = new VisibleRegRuleItem(VisibleRegRuleItem.RecycleBinProperties);
+                    regPath = item.RegPath;
+                    valueName = item.ValueName;
+                    itemName = item.Text;
+                    ifItemInMenu = item.ItemVisible;
 #if DEBUG
+                    i++;
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
                     {
-                        sw.WriteLine("\tLoadItems: " + sceneName);
-                        sw.WriteLine("\t\t0. " + item.Text);
+                        sw.WriteLine("\tBackupAddedItems");
+                        sw.WriteLine("\t\t" + i.ToString() + ". " + valueName + " " + itemName + " " + ifItemInMenu + " " + regPath);
                     }
 #endif
                     break;
                 case Scenes.Library:
-                    this.LoadItems(MENUPATH_LIBRARY_BACKGROUND);
-                    this.LoadItems(MENUPATH_LIBRARY_USER);
+#if DEBUG
+                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    {
+                        sw.WriteLine("\tBackupAddedItems");
+                    }
+#endif
+                    string[] AddedScenePathes = new string[] { MENUPATH_LIBRARY_BACKGROUND, MENUPATH_LIBRARY_USER };
+                    RegTrustedInstaller.TakeRegKeyOwnerShip(scenePath);
+                    for (int j = 0; j < AddedScenePathes.Length; j++)
+                    {
+                        scenePath = AddedScenePathes[j];
+                        GetBackupShellItems(GetShellPath(scenePath));
+                        GetBackupShellExItems(GetShellExPath(scenePath));
+                    }
                     break;
             }
         }
@@ -476,7 +490,7 @@ namespace ContextMenuManager.Controls
 #if DEBUG
             using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
             {
-                sw.WriteLine("\tLoadShellItems");
+                sw.WriteLine("\tGetBackupShellItems");
             }
             int i = 0;
 #endif
@@ -487,13 +501,15 @@ namespace ContextMenuManager.Controls
                 foreach (string keyName in shellKey.GetSubKeyNames())
                 {
                     // here!
-                    ShellItem item = new ShellItem($@"{shellPath}\{keyName}");
-                    this.AddItem(item);
+                    string regPath = $@"{shellPath}\{keyName}";
+                    ShellItem item = new ShellItem(regPath);
+                    string itemName = item.ItemText;
+                    bool ifItemInMenu = item.ItemVisible;
 #if DEBUG
                     i++;
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
                     {
-                        sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + item.ItemText);
+                        sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + itemName + " " + ifItemInMenu + " " + regPath);
                     }
 #endif
                 }
@@ -505,7 +521,7 @@ namespace ContextMenuManager.Controls
 #if DEBUG
             using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
             {
-                sw.WriteLine("\tLoadShellExItems");
+                sw.WriteLine("\tGetBackupShellExItems");
             }
             int i = 0;
 #endif
@@ -521,7 +537,6 @@ namespace ContextMenuManager.Controls
                 {
                     // here!
                     groupItem = GetDragDropGroupItem(shellExPath);
-                    this.AddItem(groupItem);
 #if DEBUG
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
                     {
@@ -535,18 +550,20 @@ namespace ContextMenuManager.Controls
                     if (!names.Contains(keyName))
                     {
                         // here!
+                        string regPath = path; // 随是否显示于右键菜单中而改变
                         ShellExItem item = new ShellExItem(dic[path], path);
+                        string itemName = item.ItemText;
+                        bool ifItemInMenu = item.ItemVisible;
                         if (groupItem != null)
                         {
                             item.FoldGroupItem = groupItem;
                             item.Indent();
                         }
-                        this.AddItem(item);
 #if DEBUG
                         i++;
                         using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
                         {
-                            sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + item.ItemText);
+                            sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + itemName + " " + ifItemInMenu + " " + regPath);
                         }
 #endif
                         names.Add(keyName);
@@ -556,12 +573,12 @@ namespace ContextMenuManager.Controls
             }
         }
 
-        private void GetBackupUwpModeItem()
+        private void GetBackupUwpModeItem(Scenes scene)
         {
 #if DEBUG
             using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
             {
-                sw.WriteLine("\tLoadUwpModeItem: ");
+                sw.WriteLine("\tGetBackupUwpModeItem");
             }
             int i = 0;
 #endif
@@ -570,26 +587,28 @@ namespace ContextMenuManager.Controls
                 if (doc?.DocumentElement == null) continue;
                 foreach (XmlNode sceneXN in doc.DocumentElement.ChildNodes)
                 {
-                    if (sceneXN.Name == Scene.ToString())
+                    if (sceneXN.Name == scene.ToString())
                     {
                         foreach (XmlElement itemXE in sceneXN.ChildNodes)
                         {
                             if (GuidEx.TryParse(itemXE.GetAttribute("Guid"), out Guid guid))
                             {
                                 bool isAdded = false;
-                                foreach (Control ctr in this.Controls)
+                                foreach (Control ctr in Controls)
                                 {
                                     if (ctr is UwpModeItem item && item.Guid == guid) { isAdded = true; break; }
                                 }
                                 if (isAdded) continue;
                                 if (GuidInfo.GetFilePath(guid) == null) continue;
-                                string uwpName = GuidInfo.GetUwpName(guid);
-                                this.AddItem(new UwpModeItem(uwpName, guid));
+                                string uwpName = GuidInfo.GetUwpName(guid); // uwp程序的名称
+                                UwpModeItem uwpItem = new UwpModeItem(uwpName, guid);
+                                string itemName = uwpItem.Text; // 右键菜单名称
+                                bool ifItemInMenu = uwpItem.ItemVisible;
 #if DEBUG
                                 i++;
                                 using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
                                 {
-                                    sw.WriteLine("\t\t" + i.ToString() + ". " + uwpName);
+                                    sw.WriteLine("\t\t" + i.ToString() + ". " + uwpName + " " + itemName + " " + ifItemInMenu + " " + guid);
                                 }
 #endif
                             }
@@ -604,51 +623,26 @@ namespace ContextMenuManager.Controls
         {
             if(scenePath == null) return;
             RegTrustedInstaller.TakeRegKeyOwnerShip(scenePath);
-            this.LoadShellItems(GetShellPath(scenePath));
-            this.LoadShellExItems(GetShellExPath(scenePath));
+            LoadShellItems(GetShellPath(scenePath));
+            LoadShellExItems(GetShellExPath(scenePath));
         }
-
-        // here!
+        
         private void LoadShellItems(string shellPath)
         {
-#if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-            {
-                sw.WriteLine("\tLoadShellItems");
-            }
-            int i = 0;
-#endif
             using (RegistryKey shellKey = RegistryEx.GetRegistryKey(shellPath))
             {
                 if (shellKey == null) return;
                 RegTrustedInstaller.TakeRegTreeOwnerShip(shellKey.Name);
                 foreach(string keyName in shellKey.GetSubKeyNames())
                 {
-                    // here!
                     ShellItem item = new ShellItem($@"{shellPath}\{keyName}");
-                    var a = item.ChkVisible;
-                    this.AddItem(item);
-#if DEBUG
-                    i++;
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                    {
-                        sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + item.ItemText);
-                    }
-#endif
+                    AddItem(item);
                 }
             }
         }
 
-        // here!
         private void LoadShellExItems(string shellExPath)
         {
-#if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-            {
-                sw.WriteLine("\tLoadShellExItems");
-            }
-            int i = 0;
-#endif
             List<string> names = new List<string>();
             using(RegistryKey shellExKey = RegistryEx.GetRegistryKey(shellExPath))
             {
@@ -659,36 +653,21 @@ namespace ContextMenuManager.Controls
                 FoldGroupItem groupItem = null;
                 if(isDragDrop)
                 {
-                    // here!
                     groupItem = GetDragDropGroupItem(shellExPath);
-                    this.AddItem(groupItem);
-#if DEBUG
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                    {
-                        sw.WriteLine("\t\t" + shellExPath + "(FoldGroupItem)");
-                    }
-#endif
+                    AddItem(groupItem);
                 }
                 foreach (string path in dic.Keys)
                 {
                     string keyName = RegistryEx.GetKeyName(path);
                     if(!names.Contains(keyName))
                     {
-                        // here!
                         ShellExItem item = new ShellExItem(dic[path], path);
                         if(groupItem != null)
                         {
                             item.FoldGroupItem = groupItem;
                             item.Indent();
                         }
-                        this.AddItem(item);
-#if DEBUG
-                        i++;
-                        using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                        {
-                            sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + item.ItemText);
-                        }
-#endif
+                        AddItem(item);
                         names.Add(keyName);
                     }
                 }
@@ -737,7 +716,7 @@ namespace ContextMenuManager.Controls
                 foreach(string itemName in shellKey.GetSubKeyNames())
                 {
                     if(AppConfig.HideSysStoreItems && itemName.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase)) continue;
-                    this.AddItem(new StoreShellItem($@"{ShellItem.CommandStorePath}\{itemName}", true, false));
+                    AddItem(new StoreShellItem($@"{ShellItem.CommandStorePath}\{itemName}", true, false));
 #if DEBUG
                     i++;
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -748,17 +727,9 @@ namespace ContextMenuManager.Controls
                 }
             }
         }
-
-        // here!
+        
         private void LoadUwpModeItem()
         {
-#if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-            {
-                sw.WriteLine("\tLoadUwpModeItem: ");
-            }
-            int i = 0;
-#endif
             foreach (XmlDocument doc in XmlDicHelper.UwpModeItemsDic)
             {
                 if(doc?.DocumentElement == null) continue;
@@ -771,22 +742,15 @@ namespace ContextMenuManager.Controls
                             if(GuidEx.TryParse(itemXE.GetAttribute("Guid"), out Guid guid))
                             {
                                 bool isAdded = false;
-                                foreach(Control ctr in this.Controls)
+                                foreach(Control ctr in Controls)
                                 {
                                     if(ctr is UwpModeItem item && item.Guid == guid) { isAdded = true; break; }
                                 }
                                 if(isAdded) continue;
                                 if(GuidInfo.GetFilePath(guid) == null) continue;
                                 string uwpName = GuidInfo.GetUwpName(guid);
-                                UwpModeItem item1 = new UwpModeItem(uwpName, guid);
-                                this.AddItem(item1);
-#if DEBUG
-                                i++;
-                                using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                                {
-                                    sw.WriteLine("\t\t" + i.ToString() + ". " + uwpName);
-                                }
-#endif
+                                UwpModeItem uwpItem = new UwpModeItem(uwpName, guid);
+                                AddItem(uwpItem);
                             }
                         }
                     }
@@ -814,27 +778,27 @@ namespace ContextMenuManager.Controls
                 JumpItem.TargetPath = filePath;
                 JumpItem.Extension = extension;
                 JumpItem.PerceivedType = perceivedType;
-                this.AddItem(new JumpItem(Scenes.File));
-                this.AddItem(new JumpItem(Scenes.AllObjects));
-                if(extension == ".exe") this.AddItem(new JumpItem(Scenes.ExeFile));
-                else this.AddItem(new JumpItem(Scenes.CustomExtension));
-                if(GetOpenMode(extension) == null) this.AddItem(new JumpItem(Scenes.UnknownType));
-                if(perceivedType != null) this.AddItem(new JumpItem(Scenes.PerceivedType));
+                AddItem(new JumpItem(Scenes.File));
+                AddItem(new JumpItem(Scenes.AllObjects));
+                if(extension == ".exe") AddItem(new JumpItem(Scenes.ExeFile));
+                else AddItem(new JumpItem(Scenes.CustomExtension));
+                if(GetOpenMode(extension) == null) AddItem(new JumpItem(Scenes.UnknownType));
+                if(perceivedType != null) AddItem(new JumpItem(Scenes.PerceivedType));
             }
 
             void AddDirItems(string dirPath)
             {
                 if(!dirPath.EndsWith(":\\"))
                 {
-                    this.AddItem(new JumpItem(Scenes.Folder));
-                    this.AddItem(new JumpItem(Scenes.Directory));
-                    this.AddItem(new JumpItem(Scenes.AllObjects));
-                    this.AddItem(new JumpItem(Scenes.DirectoryType));
+                    AddItem(new JumpItem(Scenes.Folder));
+                    AddItem(new JumpItem(Scenes.Directory));
+                    AddItem(new JumpItem(Scenes.AllObjects));
+                    AddItem(new JumpItem(Scenes.DirectoryType));
                 }
                 else
                 {
-                    this.AddItem(new JumpItem(Scenes.Folder));
-                    this.AddItem(new JumpItem(Scenes.Drive));
+                    AddItem(new JumpItem(Scenes.Folder));
+                    AddItem(new JumpItem(Scenes.Drive));
                 }
             }
 
@@ -849,7 +813,7 @@ namespace ContextMenuManager.Controls
                         if(File.Exists(targetPath)) AddFileItems(targetPath);
                         else if(Directory.Exists(targetPath)) AddDirItems(targetPath);
                     }
-                    this.AddItem(new JumpItem(Scenes.LnkFile));
+                    AddItem(new JumpItem(Scenes.LnkFile));
                 }
                 else AddFileItems(CurrentFileObjectPath);
             }
@@ -860,12 +824,12 @@ namespace ContextMenuManager.Controls
         {
             public SelectItem(Scenes scene)
             {
-                this.Scene = scene;
-                this.AddCtr(BtnSelect);
-                this.SetTextAndTip();
-                this.SetImage();
+                Scene = scene;
+                AddCtr(BtnSelect);
+                SetTextAndTip();
+                SetImage();
                 BtnSelect.MouseDown += (sender, e) => ShowSelectDialog();
-                this.MouseDoubleClick += (sender, e) => ShowSelectDialog();
+                MouseDoubleClick += (sender, e) => ShowSelectDialog();
             }
 
             readonly PictureButton BtnSelect = new PictureButton(AppImage.Select);
@@ -895,21 +859,21 @@ namespace ContextMenuManager.Controls
                         else text = AppString.Other.CurrentDirectoryType.Replace("%s", GetDirectoryTypeName(CurrentDirectoryType));
                         break;
                     case Scenes.CustomRegPath:
-                        this.SelectedPath = CurrentCustomRegPath;
+                        SelectedPath = CurrentCustomRegPath;
                         tip = AppString.Other.SelectRegPath;
-                        if(this.SelectedPath == null) text = tip;
-                        else text = AppString.Other.CurrentRegPath + "\n" + this.SelectedPath;
+                        if(SelectedPath == null) text = tip;
+                        else text = AppString.Other.CurrentRegPath + "\n" + SelectedPath;
                         break;
                     case Scenes.MenuAnalysis:
-                        this.SelectedPath = CurrentFileObjectPath;
+                        SelectedPath = CurrentFileObjectPath;
                         tip = AppString.Tip.DropOrSelectObject;
-                        if(this.SelectedPath == null) text = tip;
-                        else text = AppString.Other.CurrentFilePath + "\n" + this.SelectedPath;
+                        if(SelectedPath == null) text = tip;
+                        else text = AppString.Other.CurrentFilePath + "\n" + SelectedPath;
                         break;
                     case Scenes.DragDrop:
-                        this.SelectedPath = GetDropEffectName();
+                        SelectedPath = GetDropEffectName();
                         tip = AppString.Dialog.SelectDropEffect;
-                        text = AppString.Other.SetDefaultDropEffect + " " + this.SelectedPath;
+                        text = AppString.Other.SetDefaultDropEffect + " " + SelectedPath;
                         break;
                     case Scenes.CustomExtensionPerceivedType:
                         tip = AppString.Dialog.SelectPerceivedType;
@@ -917,7 +881,7 @@ namespace ContextMenuManager.Controls
                         break;
                 }
                 ToolTipBox.SetToolTip(BtnSelect, tip);
-                this.Text = text;
+                Text = text;
             }
 
             private void SetImage()
@@ -926,10 +890,10 @@ namespace ContextMenuManager.Controls
                 {
                     case Scenes.CustomExtensionPerceivedType:
                         using(Icon icon = ResourceIcon.GetExtensionIcon(CurrentExtension))
-                            this.Image = icon?.ToBitmap();
+                            Image = icon?.ToBitmap();
                         break;
                 }
-                if(this.Image == null) this.Image = AppImage.Custom;
+                if(Image == null) Image = AppImage.Custom;
             }
 
             private void ShowSelectDialog()
@@ -985,7 +949,7 @@ namespace ContextMenuManager.Controls
                     case Scenes.CustomRegPath:
                         if(AppMessageBox.Show(AppString.Message.SelectRegPath,
                             MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
-                        Form frm = this.FindForm();
+                        Form frm = FindForm();
                         frm.Hide();
                         using(Process process = Process.Start("regedit.exe", "-m"))
                         {
@@ -996,7 +960,7 @@ namespace ContextMenuManager.Controls
                         if(index == -1) return;
                         path = path.Substring(index + 1);
                         CurrentCustomRegPath = path;
-                        this.RefreshList();
+                        RefreshList();
                         frm.Show();
                         frm.Activate();
                         break;
@@ -1016,20 +980,20 @@ namespace ContextMenuManager.Controls
                 {
                     case Scenes.CustomExtension:
                         CurrentExtension = dlg.Selected;
-                        this.RefreshList();
+                        RefreshList();
                         break;
                     case Scenes.PerceivedType:
                         CurrentPerceivedType = PerceivedTypes[dlg.SelectedIndex];
-                        this.RefreshList();
+                        RefreshList();
                         break;
                     case Scenes.DirectoryType:
                         CurrentDirectoryType = DirectoryTypes[dlg.SelectedIndex];
-                        this.RefreshList();
+                        RefreshList();
                         break;
                     case Scenes.CustomExtensionPerceivedType:
                         string selected = PerceivedTypes[dlg.SelectedIndex];
                         CurrentExtensionPerceivedType = selected;
-                        this.Text = AppString.Other.SetPerceivedType.Replace("%s", CurrentExtension) + " " + GetPerceivedTypeName(selected);
+                        Text = AppString.Other.SetPerceivedType.Replace("%s", CurrentExtension) + " " + GetPerceivedTypeName(selected);
                         break;
                     case Scenes.DragDrop:
                         switch(dlg.SelectedIndex)
@@ -1039,7 +1003,7 @@ namespace ContextMenuManager.Controls
                             case 2: DefaultDropEffect = DropEffect.Move; break;
                             case 3: DefaultDropEffect = DropEffect.CreateLink; break;
                         }
-                        this.Text = AppString.Other.SetDefaultDropEffect + " " + GetDropEffectName();
+                        Text = AppString.Other.SetDefaultDropEffect + " " + GetDropEffectName();
                         break;
                     case Scenes.MenuAnalysis:
                         if(dlg.SelectedIndex == 0)
@@ -1059,14 +1023,14 @@ namespace ContextMenuManager.Controls
                                 CurrentFileObjectPath = dlg2.SelectedPath;
                             }
                         }
-                        this.RefreshList();
+                        RefreshList();
                         break;
                 }
             }
 
             private void RefreshList()
             {
-                ShellList list = (ShellList)this.Parent;
+                ShellList list = (ShellList)Parent;
                 list.ClearItems();
                 list.LoadItems();
             }
@@ -1076,7 +1040,7 @@ namespace ContextMenuManager.Controls
         {
             public JumpItem(Scenes scene)
             {
-                this.AddCtr(btnJump);
+                AddCtr(btnJump);
                 Image image = null;
                 int index1 = 0;
                 int index2 = 0;
@@ -1143,8 +1107,8 @@ namespace ContextMenuManager.Controls
                         index2 = 6;
                         break;
                 }
-                this.Text = "[ " + string.Join(" ]  ▶  [ ", txts) + " ]";
-                this.Image = image;
+                Text = "[ " + string.Join(" ]  ▶  [ ", txts) + " ]";
+                Image = image;
                 void SwitchTab()
                 {
                     switch(scene)
@@ -1154,10 +1118,10 @@ namespace ContextMenuManager.Controls
                         case Scenes.PerceivedType:
                             CurrentPerceivedType = PerceivedType; break;
                     }
-                    ((MainForm)this.FindForm()).JumpItem(index1, index2);
+                    ((MainForm)FindForm()).JumpItem(index1, index2);
                 };
                 btnJump.MouseDown += (sender, e) => SwitchTab();
-                this.DoubleClick += (sender, e) => SwitchTab();
+                DoubleClick += (sender, e) => SwitchTab();
             }
 
             readonly PictureButton btnJump = new PictureButton(AppImage.Jump);
@@ -1189,7 +1153,7 @@ namespace ContextMenuManager.Controls
             }
             if (!XmlDicHelper.EnhanceMenuPathDic.ContainsKey(scenePath)) btnEnhanceMenu.Visible = false;
             newItem.AddCtrs(new[] { btnAddExisting, btnEnhanceMenu });
-            this.AddItem(newItem);
+            AddItem(newItem);
 
             newItem.AddNewItem += () =>
             {
@@ -1206,8 +1170,8 @@ namespace ContextMenuManager.Controls
                         isShell = dlg.SelectedIndex == 0;
                     }
                 }
-                if (isShell) this.AddNewShellItem(scenePath);
-                else this.AddNewShellExItem(scenePath);
+                if (isShell) AddNewShellItem(scenePath);
+                else AddNewShellExItem(scenePath);
             };
 
             btnAddExisting.MouseDown += (sender, e) =>
@@ -1225,7 +1189,7 @@ namespace ContextMenuManager.Controls
                         string dstPath = ObjectPath.GetNewPathWithIndex($@"{shellPath}\{keyName}", ObjectPath.PathType.Registry);
 
                         RegistryEx.CopyTo(srcPath, dstPath);
-                        this.AddItem(new ShellItem(dstPath));
+                        AddItem(new ShellItem(dstPath));
                     }
                 }
             };
@@ -1247,7 +1211,7 @@ namespace ContextMenuManager.Controls
                 File.Delete(tempPath2);
                 if (!str1.Equals(str2))
                 {
-                    MainForm mainForm = (MainForm)this.FindForm();
+                    MainForm mainForm = (MainForm)FindForm();
                     mainForm.JumpItem(mainForm.ToolBar.SelectedIndex, mainForm.SideBar.SelectedIndex);
                 }
             };
@@ -1261,14 +1225,14 @@ namespace ContextMenuManager.Controls
                 dlg.ScenePath = scenePath;
                 dlg.ShellPath = shellPath;
                 if (dlg.ShowDialog() != DialogResult.OK) return;
-                for (int i = 0; i < this.Controls.Count; i++)
+                for (int i = 0; i < Controls.Count; i++)
                 {
-                    if (this.Controls[i] is NewItem)
+                    if (Controls[i] is NewItem)
                     {
                         ShellItem item;
                         if (Scene != Scenes.CommandStore) item = new ShellItem(dlg.NewItemRegPath);
                         else item = new StoreShellItem(dlg.NewItemRegPath, true, false);
-                        this.InsertItem(item, i + 1);
+                        InsertItem(item, i + 1);
                         break;
                     }
                 }
@@ -1316,15 +1280,15 @@ namespace ContextMenuManager.Controls
                         string regPath = $@"{shellExPath}\{part}\{guid:B}";
                         Registry.SetValue(regPath, "", guid.ToString("B"));
                         ShellExItem item = new ShellExItem(guid, regPath);
-                        for (int i = 0; i < this.Controls.Count; i++)
+                        for (int i = 0; i < Controls.Count; i++)
                         {
                             if (isDragDrop)
                             {
-                                if (this.Controls[i] is FoldGroupItem groupItem)
+                                if (Controls[i] is FoldGroupItem groupItem)
                                 {
                                     if (groupItem.GroupPath.Equals(shellExPath, StringComparison.OrdinalIgnoreCase))
                                     {
-                                        this.InsertItem(item, i + 1);
+                                        InsertItem(item, i + 1);
                                         item.FoldGroupItem = groupItem;
                                         groupItem.SetVisibleWithSubItemCount();
                                         item.Visible = !groupItem.IsFold;
@@ -1335,9 +1299,9 @@ namespace ContextMenuManager.Controls
                             }
                             else
                             {
-                                if (this.Controls[i] is NewItem)
+                                if (Controls[i] is NewItem)
                                 {
-                                    this.InsertItem(item, i + 1);
+                                    InsertItem(item, i + 1);
                                     break;
                                 }
                             }

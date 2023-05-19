@@ -13,18 +13,18 @@ namespace ContextMenuManager.Controls
     {
         public UwpModeItem(string uwpName, Guid guid)
         {
-            this.Guid = guid;
-            this.UwpName = uwpName;
-            this.InitializeComponents();
-            this.Visible = UwpHelper.GetPackageName(uwpName) != null;
-            this.Image = GuidInfo.GetImage(guid);
-            this.Text = this.ItemText;
+            Guid = guid;
+            UwpName = uwpName;
+            InitializeComponents();
+            Visible = UwpHelper.GetPackageName(uwpName) != null;
+            Image = GuidInfo.GetImage(guid);
+            Text = ItemText;
         }
 
         public Guid Guid { get; set; }
         public string UwpName { get; set; }
 
-        public bool ItemVisible
+        public bool ItemVisible // 是否显示于右键菜单中
         {
             get
             {
@@ -87,7 +87,7 @@ namespace ContextMenuManager.Controls
             TsiRegExport = new RegExportMenuItem(this);
             TsiHandleGuid = new HandleGuidMenuItem(this);
 
-            this.ContextMenuStrip.Items.AddRange(new ToolStripItem[] { TsiHandleGuid,
+            ContextMenuStrip.Items.AddRange(new ToolStripItem[] { TsiHandleGuid,
                 new ToolStripSeparator(), TsiDetails, new ToolStripSeparator(), TsiDeleteMe });
             TsiDetails.DropDownItems.AddRange(new ToolStripItem[] { TsiSearch, new ToolStripSeparator(),
                 TsiFileProperties, TsiFileLocation, TsiRegLocation, TsiRegExport });
@@ -95,7 +95,7 @@ namespace ContextMenuManager.Controls
 
         public void DeleteMe()
         {
-            RegistryEx.DeleteKeyTree(this.RegPath);
+            RegistryEx.DeleteKeyTree(RegPath);
         }
     }
 }

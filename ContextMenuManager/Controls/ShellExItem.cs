@@ -83,7 +83,7 @@ namespace ContextMenuManager.Controls
             }
         }
 
-        public bool ItemVisible
+        public bool ItemVisible // 是否显示于右键菜单中
         {
             get
             {
