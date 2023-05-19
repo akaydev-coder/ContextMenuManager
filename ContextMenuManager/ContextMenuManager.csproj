@@ -394,7 +394,6 @@
     <Compile Include="BluePointLilac.Methods\ResourceIcon.cs" />
     <Compile Include="BluePointLilac.Methods\ResourceString.cs" />
     <Compile Include="Methods\ObjectPath.cs" />
-    <Compile Include="Models\BackupItem.cs" />
     <Compile Include="Models\BackupList.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
