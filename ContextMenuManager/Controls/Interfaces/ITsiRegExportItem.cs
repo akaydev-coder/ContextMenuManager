@@ -28,8 +28,8 @@ namespace ContextMenuManager.Controls.Interfaces
                 using(SaveFileDialog dlg = new SaveFileDialog())
                 {
                     string date = DateTime.Today.ToString("yyyy-MM-dd");
-                    string time = DateTime.Now.ToString("HH.mm.ss");
-                    string filePath = $@"{AppConfig.BackupDir}\{date}\{item.Text} - {time}.reg";
+                    string time = DateTime.Now.ToString("HH-mm-ss");
+                    string filePath = $@"{AppConfig.RegBackupDir}\{date}\{item.Text} - {time}.reg";
                     string dirPath = Path.GetDirectoryName(filePath);
                     string fileName = Path.GetFileName(filePath);
                     Directory.CreateDirectory(dirPath);

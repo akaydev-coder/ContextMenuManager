@@ -13,7 +13,7 @@ using System.Xml;
 
 namespace ContextMenuManager.Controls
 {
-    sealed class ShellList : MyList // 文件类型 Ink文件 uwp Ink exe文件 未知格式 // 主页 第一栏
+    public sealed class ShellList : MyList // 文件类型 Ink文件 uwp Ink exe文件 未知格式 // 主页 第一栏
     {
         public const string MENUPATH_FILE = @"HKEY_CLASSES_ROOT\*";//文件
         public const string MENUPATH_FOLDER = @"HKEY_CLASSES_ROOT\Folder";//文件夹
@@ -39,11 +39,6 @@ namespace ContextMenuManager.Controls
             File, Folder, Directory, Background, Desktop, Drive, AllObjects, Computer, RecycleBin, Library,
             LnkFile, UwpLnk, ExeFile, UnknownType, CustomExtension, PerceivedType, DirectoryType,
             CommandStore, DragDrop, CustomRegPath, MenuAnalysis, CustomExtensionPerceivedType
-        };
-
-        public enum BackupMode
-        {
-            Basic
         };
 
         private static readonly List<string> DirectoryTypes = new List<string>
@@ -170,8 +165,8 @@ namespace ContextMenuManager.Controls
             }
         }
 
-        private static string GetShellPath(string scenePath) => $@"{scenePath}\shell";
-        private static string GetShellExPath(string scenePath) => $@"{scenePath}\ShellEx";
+        public static string GetShellPath(string scenePath) => $@"{scenePath}\shell";
+        public static string GetShellExPath(string scenePath) => $@"{scenePath}\ShellEx";
         private static string GetSysAssExtPath(string typeName) => typeName != null ? $@"{SYSFILEASSPATH}\{typeName}" : null;
         private static string GetOpenMode(string extension) => FileExtension.GetOpenMode(extension);
         private static string GetOpenModePath(string extension) => extension != null ? $@"{RegistryEx.CLASSES_ROOT}\{GetOpenMode(extension)}" : null;
@@ -333,292 +328,8 @@ namespace ContextMenuManager.Controls
                     }
                     break;
             }
-            // 仅作测试
-            BackupItems(BackupMode.Basic);
         }
 
-        public void BackupItems(BackupMode mode)
-        {
-            Scenes[] BackupScenes = null;
-            switch (mode)
-            {
-                case BackupMode.Basic:
-                    BackupScenes = new Scenes[] {
-                        Scenes.File, Scenes.Folder, Scenes.Directory, Scenes.Background, Scenes.Desktop,
-                        Scenes.Drive, Scenes.AllObjects, Scenes.Computer, Scenes.RecycleBin, Scenes.Library
-                    };break;
-            }
-            for (int i = 0; i < BackupScenes.Length; i++)
-            {
-                Scenes scene = BackupScenes[i];
-                BackupItems(scene);
-            }
-        }
-
-        private void BackupItems(Scenes scene)
-        {
-            string scenePath = null;
-            string sceneName = null;
-            switch (scene)
-            {
-                case Scenes.File:
-                    sceneName = "File";
-                    scenePath = MENUPATH_FILE; break;
-                case Scenes.Folder:
-                    sceneName = "Folder";
-                    scenePath = MENUPATH_FOLDER; break;
-                case Scenes.Directory:
-                    sceneName = "Directory";
-                    scenePath = MENUPATH_DIRECTORY; break;
-                case Scenes.Background:
-                    sceneName = "Background";
-                    scenePath = MENUPATH_BACKGROUND; break;
-                case Scenes.Desktop:
-                    sceneName = "Desktop";
-                    //Vista系统没有这一项
-                    if (WinOsVersion.Current == WinOsVersion.Vista) return;
-                    scenePath = MENUPATH_DESKTOP; break;
-                case Scenes.Drive:
-                    sceneName = "Drive";
-                    scenePath = MENUPATH_DRIVE; break;
-                case Scenes.AllObjects:
-                    sceneName = "AllObjects";
-                    scenePath = MENUPATH_ALLOBJECTS; break;
-                case Scenes.Computer:
-                    sceneName = "Computer";
-                    scenePath = MENUPATH_COMPUTER; break;
-                case Scenes.RecycleBin:
-                    sceneName = "RecycleBin";
-                    scenePath = MENUPATH_RECYCLEBIN; break;
-                case Scenes.Library:
-                    sceneName = "Library";
-                    //Vista系统没有这一项
-                    if (WinOsVersion.Current == WinOsVersion.Vista) return;
-                    scenePath = MENUPATH_LIBRARY; break;
-            }
-#if DEBUG
-            if (sceneName != null)
-            {
-                using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                {
-                    sw.WriteLine("BackupItems: " + sceneName);
-                }
-            }
-            int i = 0;
-#endif
-            GetBackupItems(scenePath);
-            if (WinOsVersion.Current >= WinOsVersion.Win10)
-            {
-                GetBackupUwpModeItem(scene);
-            }
-            switch (scene)
-            {
-                case Scenes.Background:
-                    VisibleRegRuleItem item = new VisibleRegRuleItem(VisibleRegRuleItem.CustomFolder);
-                    string regPath = item.RegPath;
-                    string valueName = item.ValueName;
-                    string itemName = item.Text;
-                    bool ifItemInMenu = item.ItemVisible;
-#if DEBUG
-                    i++;
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                    {
-                        sw.WriteLine("\tBackupAddedItems");
-                        sw.WriteLine("\t\t" + i.ToString() + ". " + valueName + " " + itemName + " " + ifItemInMenu + " " + regPath);
-                    }
-#endif
-                    break;
-                case Scenes.Computer:
-                    item = new VisibleRegRuleItem(VisibleRegRuleItem.NetworkDrive);
-                    regPath = item.RegPath;
-                    valueName = item.ValueName;
-                    itemName = item.Text;
-                    ifItemInMenu = item.ItemVisible;
-#if DEBUG
-                    i++;
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                    {
-                        sw.WriteLine("\tBackupAddedItems");
-                        sw.WriteLine("\t\t" + i.ToString() + ". " + valueName + " " + itemName + " " + ifItemInMenu + " " + regPath);
-                    }
-#endif
-                    break;
-                case Scenes.RecycleBin:
-                    item = new VisibleRegRuleItem(VisibleRegRuleItem.RecycleBinProperties);
-                    regPath = item.RegPath;
-                    valueName = item.ValueName;
-                    itemName = item.Text;
-                    ifItemInMenu = item.ItemVisible;
-#if DEBUG
-                    i++;
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                    {
-                        sw.WriteLine("\tBackupAddedItems");
-                        sw.WriteLine("\t\t" + i.ToString() + ". " + valueName + " " + itemName + " " + ifItemInMenu + " " + regPath);
-                    }
-#endif
-                    break;
-                case Scenes.Library:
-#if DEBUG
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                    {
-                        sw.WriteLine("\tBackupAddedItems");
-                    }
-#endif
-                    string[] AddedScenePathes = new string[] { MENUPATH_LIBRARY_BACKGROUND, MENUPATH_LIBRARY_USER };
-                    RegTrustedInstaller.TakeRegKeyOwnerShip(scenePath);
-                    for (int j = 0; j < AddedScenePathes.Length; j++)
-                    {
-                        scenePath = AddedScenePathes[j];
-                        GetBackupShellItems(GetShellPath(scenePath));
-                        GetBackupShellExItems(GetShellExPath(scenePath));
-                    }
-                    break;
-            }
-        }
-
-        private void GetBackupItems(string scenePath)
-        {
-            if (scenePath == null) return;
-            RegTrustedInstaller.TakeRegKeyOwnerShip(scenePath);
-            GetBackupShellItems(GetShellPath(scenePath));
-            GetBackupShellExItems(GetShellExPath(scenePath));
-        }
-
-        private void GetBackupShellItems(string shellPath)
-        {
-#if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-            {
-                sw.WriteLine("\tGetBackupShellItems");
-            }
-            int i = 0;
-#endif
-            using (RegistryKey shellKey = RegistryEx.GetRegistryKey(shellPath))
-            {
-                if (shellKey == null) return;
-                RegTrustedInstaller.TakeRegTreeOwnerShip(shellKey.Name);
-                foreach (string keyName in shellKey.GetSubKeyNames())
-                {
-                    // here!
-                    string regPath = $@"{shellPath}\{keyName}";
-                    ShellItem item = new ShellItem(regPath);
-                    string itemName = item.ItemText;
-                    bool ifItemInMenu = item.ItemVisible;
-#if DEBUG
-                    i++;
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                    {
-                        sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + itemName + " " + ifItemInMenu + " " + regPath);
-                    }
-#endif
-                }
-            }
-        }
-
-        private void GetBackupShellExItems(string shellExPath)
-        {
-#if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-            {
-                sw.WriteLine("\tGetBackupShellExItems");
-            }
-            int i = 0;
-#endif
-            List<string> names = new List<string>();
-            using (RegistryKey shellExKey = RegistryEx.GetRegistryKey(shellExPath))
-            {
-                if (shellExKey == null) return;
-                bool isDragDrop = Scene == Scenes.DragDrop;
-                RegTrustedInstaller.TakeRegTreeOwnerShip(shellExKey.Name);
-                Dictionary<string, Guid> dic = ShellExItem.GetPathAndGuids(shellExPath, isDragDrop);
-                FoldGroupItem groupItem = null;
-                if (isDragDrop)
-                {
-                    // here!
-                    groupItem = GetDragDropGroupItem(shellExPath);
-#if DEBUG
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                    {
-                        sw.WriteLine("\t\t" + shellExPath + "(FoldGroupItem)");
-                    }
-#endif
-                }
-                foreach (string path in dic.Keys)
-                {
-                    string keyName = RegistryEx.GetKeyName(path);
-                    if (!names.Contains(keyName))
-                    {
-                        // here!
-                        string regPath = path; // 随是否显示于右键菜单中而改变
-                        ShellExItem item = new ShellExItem(dic[path], path);
-                        string itemName = item.ItemText;
-                        bool ifItemInMenu = item.ItemVisible;
-                        if (groupItem != null)
-                        {
-                            item.FoldGroupItem = groupItem;
-                            item.Indent();
-                        }
-#if DEBUG
-                        i++;
-                        using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                        {
-                            sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + itemName + " " + ifItemInMenu + " " + regPath);
-                        }
-#endif
-                        names.Add(keyName);
-                    }
-                }
-                groupItem?.SetVisibleWithSubItemCount();
-            }
-        }
-
-        private void GetBackupUwpModeItem(Scenes scene)
-        {
-#if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-            {
-                sw.WriteLine("\tGetBackupUwpModeItem");
-            }
-            int i = 0;
-#endif
-            foreach (XmlDocument doc in XmlDicHelper.UwpModeItemsDic)
-            {
-                if (doc?.DocumentElement == null) continue;
-                foreach (XmlNode sceneXN in doc.DocumentElement.ChildNodes)
-                {
-                    if (sceneXN.Name == scene.ToString())
-                    {
-                        foreach (XmlElement itemXE in sceneXN.ChildNodes)
-                        {
-                            if (GuidEx.TryParse(itemXE.GetAttribute("Guid"), out Guid guid))
-                            {
-                                bool isAdded = false;
-                                foreach (Control ctr in Controls)
-                                {
-                                    if (ctr is UwpModeItem item && item.Guid == guid) { isAdded = true; break; }
-                                }
-                                if (isAdded) continue;
-                                if (GuidInfo.GetFilePath(guid) == null) continue;
-                                string uwpName = GuidInfo.GetUwpName(guid); // uwp程序的名称
-                                UwpModeItem uwpItem = new UwpModeItem(uwpName, guid);
-                                string itemName = uwpItem.Text; // 右键菜单名称
-                                bool ifItemInMenu = uwpItem.ItemVisible;
-#if DEBUG
-                                i++;
-                                using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
-                                {
-                                    sw.WriteLine("\t\t" + i.ToString() + ". " + uwpName + " " + itemName + " " + ifItemInMenu + " " + guid);
-                                }
-#endif
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // here!
         private void LoadItems(string scenePath)
         {
             if(scenePath == null) return;
@@ -641,6 +352,7 @@ namespace ContextMenuManager.Controls
             }
         }
 
+        // here!?
         private void LoadShellExItems(string shellExPath)
         {
             List<string> names = new List<string>();
@@ -727,7 +439,7 @@ namespace ContextMenuManager.Controls
                 }
             }
         }
-        
+
         private void LoadUwpModeItem()
         {
             foreach (XmlDocument doc in XmlDicHelper.UwpModeItemsDic)

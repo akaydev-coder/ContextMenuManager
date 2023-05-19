@@ -199,7 +199,6 @@ namespace ContextMenuManager.Controls
                         }
                     };
 
-                    // here!
                     if(value)
                     {
                         RegistryEx.DeleteValue(RegPath, "HideBasedOnVelocityId");

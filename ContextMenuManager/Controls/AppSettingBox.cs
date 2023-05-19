@@ -56,7 +56,7 @@ namespace ContextMenuManager.Controls
                 this.Cursor = Cursors.Default;
             };
             btnConfigDir.MouseDown += (sender, e) => ExternalProgram.OpenDirectory(AppConfig.ConfigDir);
-            btnBackupDir.MouseDown += (sender, e) => ExternalProgram.OpenDirectory(AppConfig.BackupDir);
+            btnBackupDir.MouseDown += (sender, e) => ExternalProgram.OpenDirectory(AppConfig.RegBackupDir);
             chkBackup.CheckChanged += () => AppConfig.AutoBackup = chkBackup.Checked;
             chkProtect.CheckChanged += () => AppConfig.ProtectOpenItem = chkProtect.Checked;
             chkWinXSortable.CheckChanged += () => AppConfig.WinXSortable = chkWinXSortable.Checked;

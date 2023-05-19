@@ -47,7 +47,8 @@ namespace ContextMenuManager.Methods
         public static readonly bool IsFirstRun = !Directory.Exists(ConfigDir);
         public static string ConfigIni = $@"{ConfigDir}\Config.ini";
         public static string ComputerHostName = Dns.GetHostName();
-        public static string BackupDir = $@"{ConfigDir}\Backup\" + ComputerHostName;
+        public static string RegBackupDir = $@"{ConfigDir}\RegBackup\" + ComputerHostName;
+        public static string MenuBackupDir = $@"{AppConfigDir}\MenuBackup\" + ComputerHostName;
         public static string LangsDir = $@"{ConfigDir}\Languages";
         public static string ProgramsDir = $@"{ConfigDir}\Programs";
         public static string DicsDir = $@"{ConfigDir}\Dictionaries";
@@ -113,7 +114,7 @@ namespace ContextMenuManager.Methods
 
         private static void CreateDirectory()
         {
-            foreach(string dirPath in new[] { AppDataDir, ConfigDir, ProgramsDir, BackupDir, LangsDir, DicsDir, WebDicsDir, UserDicsDir })
+            foreach(string dirPath in new[] { AppDataDir, ConfigDir, ProgramsDir, RegBackupDir, MenuBackupDir, LangsDir, DicsDir, WebDicsDir, UserDicsDir })
             {
                 Directory.CreateDirectory(dirPath);
                 Application.ApplicationExit += (sender, e) =>

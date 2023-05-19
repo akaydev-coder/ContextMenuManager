@@ -183,6 +183,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="BluePointLilac.Methods\ComboBoxExtension.cs" />
+    <Compile Include="Methods\BackupHelper.cs" />
     <Compile Include="Methods\DesktopIni.cs" />
     <Compile Include="BluePointLilac.Methods\DirectoryEx.cs" />
     <Compile Include="BluePointLilac.Methods\ElevatedFileDroper.cs" />
@@ -393,6 +394,8 @@
     <Compile Include="BluePointLilac.Methods\ResourceIcon.cs" />
     <Compile Include="BluePointLilac.Methods\ResourceString.cs" />
     <Compile Include="Methods\ObjectPath.cs" />
+    <Compile Include="Models\BackupItem.cs" />
+    <Compile Include="Models\BackupList.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

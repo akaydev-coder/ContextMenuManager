@@ -30,8 +30,8 @@ namespace ContextMenuManager.Controls.Interfaces
                     if(AppMessageBox.Show(AppString.Message.DeleteButCanRestore,
                      MessageBoxButtons.YesNo) != DialogResult.Yes) return;
                     string date = DateTime.Today.ToString("yyyy-MM-dd");
-                    string time = DateTime.Now.ToString("HH.mm.ss");
-                    string filePath = $@"{AppConfig.BackupDir}\{date}\{regItem.Text} - {time}.reg";
+                    string time = DateTime.Now.ToString("HH-mm-ss");
+                    string filePath = $@"{AppConfig.RegBackupDir}\{date}\{regItem.Text} - {time}.reg";
                     Directory.CreateDirectory(Path.GetDirectoryName(filePath));
                     ExternalProgram.ExportRegistry(regItem.RegPath, filePath);
                 }

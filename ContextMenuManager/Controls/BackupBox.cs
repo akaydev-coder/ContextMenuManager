@@ -1,6 +1,6 @@
-﻿using BluePointLilac.Controls;
-using BluePointLilac.Methods;
+﻿using BluePointLilac.Methods;
 using ContextMenuManager.Methods;
+using ContextMenuManager.Models;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -11,19 +11,21 @@ namespace ContextMenuManager.Controls
 {
     sealed class BackupBox : Panel
     {
+        private readonly BackupHelper helper = new BackupHelper();
+
         public BackupBox()
         {
-            this.SuspendLayout();
-            this.AutoScroll = true;
-            this.Dock = DockStyle.Fill;
-            this.BackColor = Color.White;
-            this.Font = SystemFonts.MenuFont;
-            this.Font = new Font(this.Font.FontFamily, this.Font.Size + 1F);
-            this.Controls.AddRange(new Control[] { Backup, Restore });
-            this.VisibleChanged += (sender, e) => this.SetEnabled(this.Visible);
-            Backup.Click += (sender, e) => { };
+            SuspendLayout();
+            AutoScroll = true;
+            Dock = DockStyle.Fill;
+            BackColor = Color.White;
+            Font = SystemFonts.MenuFont;
+            Font = new Font(Font.FontFamily, Font.Size + 1F);
+            Controls.AddRange(new Control[] { Backup, Restore });
+            VisibleChanged += (sender, e) => this.SetEnabled(Visible);
+            Backup.Click += (sender, e) => { helper.BackupItems(BackupList.BackupMode.Basic); };
             Restore.Click += (sender, e) => { };
-            this.ResumeLayout();
+            ResumeLayout();
         }
 
         readonly Label Backup = new Label
@@ -44,8 +46,8 @@ namespace ContextMenuManager.Controls
         {
             int margin = 40.DpiZoom();
             base.OnResize(e);
-            Backup.Top = Restore.Top = (this.Height - Backup.Height) / 2;
-            Backup.Left = (this.Width - margin) / 2 - Backup.Width;
+            Backup.Top = Restore.Top = (Height - Backup.Height) / 2;
+            Backup.Left = (Width - margin) / 2 - Backup.Width;
             Restore.Left = Backup.Right + margin;
         }
     }
