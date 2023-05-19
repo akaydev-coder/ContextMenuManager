@@ -176,65 +176,131 @@ namespace ContextMenuManager.Controls
         public void LoadItems()
         {
             string scenePath = null;
-            switch(Scene)
+#if DEBUG
+            string sceneName = "";
+#endif
+            switch (Scene)
             {
                 case Scenes.File:
+#if DEBUG
+                    sceneName = "File";
+#endif
                     scenePath = MENUPATH_FILE; break;
                 case Scenes.Folder:
+#if DEBUG
+                    sceneName = "Folder";
+#endif
                     scenePath = MENUPATH_FOLDER; break;
                 case Scenes.Directory:
+#if DEBUG
+                    sceneName = "Directory";
+#endif
                     scenePath = MENUPATH_DIRECTORY; break;
                 case Scenes.Background:
+#if DEBUG
+                    sceneName = "Background";
+#endif
                     scenePath = MENUPATH_BACKGROUND; break;
                 case Scenes.Desktop:
+#if DEBUG
+                    sceneName = "Desktop";
+#endif
                     //Vista系统没有这一项
-                    if(WinOsVersion.Current == WinOsVersion.Vista) return;
+                    if (WinOsVersion.Current == WinOsVersion.Vista) return;
                     scenePath = MENUPATH_DESKTOP; break;
                 case Scenes.Drive:
+#if DEBUG
+                    sceneName = "Drive";
+#endif
                     scenePath = MENUPATH_DRIVE; break;
                 case Scenes.AllObjects:
+#if DEBUG
+                    sceneName = "AllObjects";
+#endif
                     scenePath = MENUPATH_ALLOBJECTS; break;
                 case Scenes.Computer:
+#if DEBUG
+                    sceneName = "Computer";
+#endif
                     scenePath = MENUPATH_COMPUTER; break;
                 case Scenes.RecycleBin:
+#if DEBUG
+                    sceneName = "RecycleBin";
+#endif
                     scenePath = MENUPATH_RECYCLEBIN; break;
                 case Scenes.Library:
+#if DEBUG
+                    sceneName = "Library";
+#endif
                     //Vista系统没有这一项
-                    if(WinOsVersion.Current == WinOsVersion.Vista) return;
+                    if (WinOsVersion.Current == WinOsVersion.Vista) return;
                     scenePath = MENUPATH_LIBRARY; break;
                 case Scenes.LnkFile:
+#if DEBUG
+                    sceneName = "LnkFile";
+#endif
                     scenePath = GetOpenModePath(".lnk"); break;
                 case Scenes.UwpLnk:
+#if DEBUG
+                    sceneName = "UwpLnk";
+#endif
                     //Win8之前没有Uwp
-                    if(WinOsVersion.Current < WinOsVersion.Win8) return;
+                    if (WinOsVersion.Current < WinOsVersion.Win8) return;
                     scenePath = MENUPATH_UWPLNK; break;
                 case Scenes.ExeFile:
+#if DEBUG
+                    sceneName = "ExeFile";
+#endif
                     scenePath = GetSysAssExtPath(".exe"); break;
                 case Scenes.UnknownType:
+#if DEBUG
+                    sceneName = "UnknownType";
+#endif
                     scenePath = MENUPATH_UNKNOWN; break;
                 case Scenes.CustomExtension:
+#if DEBUG
+                    sceneName = "CustomExtention";
+#endif
                     bool isLnk = CurrentExtension?.ToLower() == ".lnk";
                     if(isLnk) scenePath = GetOpenModePath(".lnk");
                     else scenePath = GetSysAssExtPath(CurrentExtension);
                     break;
                 case Scenes.PerceivedType:
+#if DEBUG
+                    sceneName = "PerceivedType";
+#endif
                     scenePath = GetSysAssExtPath(CurrentPerceivedType); break;
                 case Scenes.DirectoryType:
-                    if(CurrentDirectoryType == null) scenePath = null;
+#if DEBUG
+                    sceneName = "DirectoryType";
+#endif
+                    if (CurrentDirectoryType == null) scenePath = null;
                     else scenePath = GetSysAssExtPath($"Directory.{CurrentDirectoryType}"); break;
                 case Scenes.MenuAnalysis:
+#if DEBUG
+                    sceneName = "MenuAnalysis";
+#endif
                     this.AddItem(new SelectItem(Scene));
                     this.LoadAnalysisItems();
                     return;
                 case Scenes.CustomRegPath:
+#if DEBUG
+                    sceneName = "CustomRegPath";
+#endif
                     scenePath = CurrentCustomRegPath; break;
                 case Scenes.CommandStore:
+#if DEBUG
+                    sceneName = "CommandStore";
+#endif
                     //Vista系统没有这一项
-                    if(WinOsVersion.Current == WinOsVersion.Vista) return;
+                    if (WinOsVersion.Current == WinOsVersion.Vista) return;
                     this.AddNewItem(RegistryEx.GetParentPath(ShellItem.CommandStorePath));
                     this.LoadStoreItems();
                     return;
                 case Scenes.DragDrop:
+#if DEBUG
+                    sceneName = "DragDrop";
+#endif
                     this.AddItem(new SelectItem(Scene));
                     this.AddNewItem(MENUPATH_FOLDER);
                     this.LoadShellExItems(GetShellExPath(MENUPATH_FOLDER));
@@ -243,7 +309,14 @@ namespace ContextMenuManager.Controls
                     this.LoadShellExItems(GetShellExPath(MENUPATH_ALLOBJECTS));
                     return;
             }
-            this.AddNewItem(scenePath);
+            this.AddNewItem(scenePath); // 新建一个菜单项目
+            // here!
+#if DEBUG
+            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            {
+                sw.WriteLine("LoadItems: " + sceneName);
+            }
+#endif
             this.LoadItems(scenePath);
             if(WinOsVersion.Current >= WinOsVersion.Win10)
             {
@@ -252,13 +325,37 @@ namespace ContextMenuManager.Controls
             switch(Scene)
             {
                 case Scenes.Background:
-                    this.AddItem(new VisibleRegRuleItem(VisibleRegRuleItem.CustomFolder));
+                    VisibleRegRuleItem item = new VisibleRegRuleItem(VisibleRegRuleItem.CustomFolder);
+                    this.AddItem(item);
+#if DEBUG
+                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    {
+                        sw.WriteLine("\tLoadItems: " + sceneName);
+                        sw.WriteLine("\t\t0. " + item.Text);
+                    }
+#endif
                     break;
                 case Scenes.Computer:
-                    this.AddItem(new VisibleRegRuleItem(VisibleRegRuleItem.NetworkDrive));
+                    item = new VisibleRegRuleItem(VisibleRegRuleItem.NetworkDrive);
+                    this.AddItem(item);
+#if DEBUG
+                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    {
+                        sw.WriteLine("\tLoadItems: " + sceneName);
+                        sw.WriteLine("\t\t0. " + item.Text);
+                    }
+#endif
                     break;
                 case Scenes.RecycleBin:
-                    this.AddItem(new VisibleRegRuleItem(VisibleRegRuleItem.RecycleBinProperties));
+                    item = new VisibleRegRuleItem(VisibleRegRuleItem.RecycleBinProperties);
+                    this.AddItem(item);
+#if DEBUG
+                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    {
+                        sw.WriteLine("\tLoadItems: " + sceneName);
+                        sw.WriteLine("\t\t0. " + item.Text);
+                    }
+#endif
                     break;
                 case Scenes.Library:
                     this.LoadItems(MENUPATH_LIBRARY_BACKGROUND);
@@ -281,6 +378,228 @@ namespace ContextMenuManager.Controls
             }
         }
 
+        public void BackupBasic(Scenes scene)
+        {
+            string scenePath = null;
+            string sceneName = "";
+            switch (Scene)
+            {
+                case Scenes.File:
+                    sceneName = "File";
+                    scenePath = MENUPATH_FILE; break;
+                case Scenes.Folder:
+                    sceneName = "Folder";
+                    scenePath = MENUPATH_FOLDER; break;
+                case Scenes.Directory:
+                    sceneName = "Directory";
+                    scenePath = MENUPATH_DIRECTORY; break;
+                case Scenes.Background:
+                    sceneName = "Background";
+                    scenePath = MENUPATH_BACKGROUND; break;
+                case Scenes.Desktop:
+                    sceneName = "Desktop";
+                    //Vista系统没有这一项
+                    if (WinOsVersion.Current == WinOsVersion.Vista) return;
+                    scenePath = MENUPATH_DESKTOP; break;
+                case Scenes.Drive:
+                    sceneName = "Drive";
+                    scenePath = MENUPATH_DRIVE; break;
+                case Scenes.AllObjects:
+                    sceneName = "AllObjects";
+                    scenePath = MENUPATH_ALLOBJECTS; break;
+                case Scenes.Computer:
+                    sceneName = "Computer";
+                    scenePath = MENUPATH_COMPUTER; break;
+                case Scenes.RecycleBin:
+                    sceneName = "RecycleBin";
+                    scenePath = MENUPATH_RECYCLEBIN; break;
+                case Scenes.Library:
+                    sceneName = "Library";
+                    //Vista系统没有这一项
+                    if (WinOsVersion.Current == WinOsVersion.Vista) return;
+                    scenePath = MENUPATH_LIBRARY; break;
+            }
+            GetBackupItems(scenePath);
+            if (WinOsVersion.Current >= WinOsVersion.Win10)
+            {
+                GetBackupUwpModeItem();
+            }
+            switch (Scene)
+            {
+                case Scenes.Background:
+                    VisibleRegRuleItem item = new VisibleRegRuleItem(VisibleRegRuleItem.CustomFolder);
+#if DEBUG
+                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    {
+                        sw.WriteLine("\tLoadItems: " + sceneName);
+                        sw.WriteLine("\t\t0. " + item.Text);
+                    }
+#endif
+                    break;
+                case Scenes.Computer:
+                    item = new VisibleRegRuleItem(VisibleRegRuleItem.NetworkDrive);
+#if DEBUG
+                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    {
+                        sw.WriteLine("\tLoadItems: " + sceneName);
+                        sw.WriteLine("\t\t0. " + item.Text);
+                    }
+#endif
+                    break;
+                case Scenes.RecycleBin:
+                    item = new VisibleRegRuleItem(VisibleRegRuleItem.RecycleBinProperties);
+#if DEBUG
+                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    {
+                        sw.WriteLine("\tLoadItems: " + sceneName);
+                        sw.WriteLine("\t\t0. " + item.Text);
+                    }
+#endif
+                    break;
+                case Scenes.Library:
+                    this.LoadItems(MENUPATH_LIBRARY_BACKGROUND);
+                    this.LoadItems(MENUPATH_LIBRARY_USER);
+                    break;
+            }
+        }
+
+        private void GetBackupItems(string scenePath)
+        {
+            if (scenePath == null) return;
+            RegTrustedInstaller.TakeRegKeyOwnerShip(scenePath);
+            GetBackupShellItems(GetShellPath(scenePath));
+            GetBackupShellExItems(GetShellExPath(scenePath));
+        }
+
+        private void GetBackupShellItems(string shellPath)
+        {
+#if DEBUG
+            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            {
+                sw.WriteLine("\tLoadShellItems");
+            }
+            int i = 0;
+#endif
+            using (RegistryKey shellKey = RegistryEx.GetRegistryKey(shellPath))
+            {
+                if (shellKey == null) return;
+                RegTrustedInstaller.TakeRegTreeOwnerShip(shellKey.Name);
+                foreach (string keyName in shellKey.GetSubKeyNames())
+                {
+                    // here!
+                    ShellItem item = new ShellItem($@"{shellPath}\{keyName}");
+                    this.AddItem(item);
+#if DEBUG
+                    i++;
+                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    {
+                        sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + item.ItemText);
+                    }
+#endif
+                }
+            }
+        }
+
+        private void GetBackupShellExItems(string shellExPath)
+        {
+#if DEBUG
+            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            {
+                sw.WriteLine("\tLoadShellExItems");
+            }
+            int i = 0;
+#endif
+            List<string> names = new List<string>();
+            using (RegistryKey shellExKey = RegistryEx.GetRegistryKey(shellExPath))
+            {
+                if (shellExKey == null) return;
+                bool isDragDrop = Scene == Scenes.DragDrop;
+                RegTrustedInstaller.TakeRegTreeOwnerShip(shellExKey.Name);
+                Dictionary<string, Guid> dic = ShellExItem.GetPathAndGuids(shellExPath, isDragDrop);
+                FoldGroupItem groupItem = null;
+                if (isDragDrop)
+                {
+                    // here!
+                    groupItem = GetDragDropGroupItem(shellExPath);
+                    this.AddItem(groupItem);
+#if DEBUG
+                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    {
+                        sw.WriteLine("\t\t" + shellExPath + "(FoldGroupItem)");
+                    }
+#endif
+                }
+                foreach (string path in dic.Keys)
+                {
+                    string keyName = RegistryEx.GetKeyName(path);
+                    if (!names.Contains(keyName))
+                    {
+                        // here!
+                        ShellExItem item = new ShellExItem(dic[path], path);
+                        if (groupItem != null)
+                        {
+                            item.FoldGroupItem = groupItem;
+                            item.Indent();
+                        }
+                        this.AddItem(item);
+#if DEBUG
+                        i++;
+                        using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                        {
+                            sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + item.ItemText);
+                        }
+#endif
+                        names.Add(keyName);
+                    }
+                }
+                groupItem?.SetVisibleWithSubItemCount();
+            }
+        }
+
+        private void GetBackupUwpModeItem()
+        {
+#if DEBUG
+            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            {
+                sw.WriteLine("\tLoadUwpModeItem: ");
+            }
+            int i = 0;
+#endif
+            foreach (XmlDocument doc in XmlDicHelper.UwpModeItemsDic)
+            {
+                if (doc?.DocumentElement == null) continue;
+                foreach (XmlNode sceneXN in doc.DocumentElement.ChildNodes)
+                {
+                    if (sceneXN.Name == Scene.ToString())
+                    {
+                        foreach (XmlElement itemXE in sceneXN.ChildNodes)
+                        {
+                            if (GuidEx.TryParse(itemXE.GetAttribute("Guid"), out Guid guid))
+                            {
+                                bool isAdded = false;
+                                foreach (Control ctr in this.Controls)
+                                {
+                                    if (ctr is UwpModeItem item && item.Guid == guid) { isAdded = true; break; }
+                                }
+                                if (isAdded) continue;
+                                if (GuidInfo.GetFilePath(guid) == null) continue;
+                                string uwpName = GuidInfo.GetUwpName(guid);
+                                this.AddItem(new UwpModeItem(uwpName, guid));
+#if DEBUG
+                                i++;
+                                using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                                {
+                                    sw.WriteLine("\t\t" + i.ToString() + ". " + uwpName);
+                                }
+#endif
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // here!
         private void LoadItems(string scenePath)
         {
             if(scenePath == null) return;
@@ -289,21 +608,47 @@ namespace ContextMenuManager.Controls
             this.LoadShellExItems(GetShellExPath(scenePath));
         }
 
+        // here!
         private void LoadShellItems(string shellPath)
         {
-            using(RegistryKey shellKey = RegistryEx.GetRegistryKey(shellPath))
+#if DEBUG
+            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
             {
-                if(shellKey == null) return;
+                sw.WriteLine("\tLoadShellItems");
+            }
+            int i = 0;
+#endif
+            using (RegistryKey shellKey = RegistryEx.GetRegistryKey(shellPath))
+            {
+                if (shellKey == null) return;
                 RegTrustedInstaller.TakeRegTreeOwnerShip(shellKey.Name);
                 foreach(string keyName in shellKey.GetSubKeyNames())
                 {
-                    this.AddItem(new ShellItem($@"{shellPath}\{keyName}"));
+                    // here!
+                    ShellItem item = new ShellItem($@"{shellPath}\{keyName}");
+                    var a = item.ChkVisible;
+                    this.AddItem(item);
+#if DEBUG
+                    i++;
+                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    {
+                        sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + item.ItemText);
+                    }
+#endif
                 }
             }
         }
 
+        // here!
         private void LoadShellExItems(string shellExPath)
         {
+#if DEBUG
+            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            {
+                sw.WriteLine("\tLoadShellExItems");
+            }
+            int i = 0;
+#endif
             List<string> names = new List<string>();
             using(RegistryKey shellExKey = RegistryEx.GetRegistryKey(shellExPath))
             {
@@ -314,14 +659,22 @@ namespace ContextMenuManager.Controls
                 FoldGroupItem groupItem = null;
                 if(isDragDrop)
                 {
+                    // here!
                     groupItem = GetDragDropGroupItem(shellExPath);
                     this.AddItem(groupItem);
+#if DEBUG
+                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    {
+                        sw.WriteLine("\t\t" + shellExPath + "(FoldGroupItem)");
+                    }
+#endif
                 }
-                foreach(string path in dic.Keys)
+                foreach (string path in dic.Keys)
                 {
                     string keyName = RegistryEx.GetKeyName(path);
                     if(!names.Contains(keyName))
                     {
+                        // here!
                         ShellExItem item = new ShellExItem(dic[path], path);
                         if(groupItem != null)
                         {
@@ -329,6 +682,13 @@ namespace ContextMenuManager.Controls
                             item.Indent();
                         }
                         this.AddItem(item);
+#if DEBUG
+                        i++;
+                        using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                        {
+                            sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + item.ItemText);
+                        }
+#endif
                         names.Add(keyName);
                     }
                 }
@@ -363,205 +723,43 @@ namespace ContextMenuManager.Controls
             return new FoldGroupItem(shellExPath, ObjectPath.PathType.Registry) { Text = text, Image = image };
         }
 
-        private void AddNewItem(string scenePath)
-        {
-            if(scenePath == null) return;
-            string shellPath = GetShellPath(scenePath);
-            NewItem newItem = new NewItem();
-            PictureButton btnAddExisting = new PictureButton(AppImage.AddExisting);
-            PictureButton btnEnhanceMenu = new PictureButton(AppImage.Enhance);
-            ToolTipBox.SetToolTip(btnAddExisting, AppString.Tip.AddFromPublic);
-            ToolTipBox.SetToolTip(btnEnhanceMenu, AppString.StatusBar.EnhanceMenu);
-            if(Scene == Scenes.DragDrop || ShellItem.CommandStorePath.Equals(shellPath,
-                StringComparison.OrdinalIgnoreCase)) btnAddExisting.Visible = false;
-            else
-            {
-                using(RegistryKey key = RegistryEx.GetRegistryKey(ShellItem.CommandStorePath))
-                {
-                    List<string> subKeyNames = key.GetSubKeyNames().ToList();
-                    if(AppConfig.HideSysStoreItems) subKeyNames.RemoveAll(name => name.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase));
-                    if(subKeyNames.Count == 0) btnAddExisting.Visible = false;
-                }
-            }
-            if(!XmlDicHelper.EnhanceMenuPathDic.ContainsKey(scenePath)) btnEnhanceMenu.Visible = false;
-            newItem.AddCtrs(new[] { btnAddExisting, btnEnhanceMenu });
-            this.AddItem(newItem);
-
-            newItem.AddNewItem += () =>
-            {
-                bool isShell;
-                if(Scene == Scenes.CommandStore) isShell = true;
-                else if(Scene == Scenes.DragDrop) isShell = false;
-                else
-                {
-                    using(SelectDialog dlg = new SelectDialog())
-                    {
-                        dlg.Items = new[] { "Shell", "ShellEx" };
-                        dlg.Title = AppString.Dialog.SelectNewItemType;
-                        if(dlg.ShowDialog() != DialogResult.OK) return;
-                        isShell = dlg.SelectedIndex == 0;
-                    }
-                }
-                if(isShell) this.AddNewShellItem(scenePath);
-                else this.AddNewShellExItem(scenePath);
-            };
-
-            btnAddExisting.MouseDown += (sender, e) =>
-            {
-                using(ShellStoreDialog dlg = new ShellStoreDialog())
-                {
-                    dlg.IsReference = false;
-                    dlg.ShellPath = ShellItem.CommandStorePath;
-                    dlg.Filter = new Func<string, bool>(itemName => !(AppConfig.HideSysStoreItems
-                        && itemName.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase)));
-                    if(dlg.ShowDialog() != DialogResult.OK) return;
-                    foreach(string keyName in dlg.SelectedKeyNames)
-                    {
-                        string srcPath = $@"{dlg.ShellPath}\{keyName}";
-                        string dstPath = ObjectPath.GetNewPathWithIndex($@"{shellPath}\{keyName}", ObjectPath.PathType.Registry);
-
-                        RegistryEx.CopyTo(srcPath, dstPath);
-                        this.AddItem(new ShellItem(dstPath));
-                    }
-                }
-            };
-
-            btnEnhanceMenu.MouseDown += (sender, e) =>
-            {
-                string tempPath1 = Path.GetTempFileName();
-                string tempPath2 = Path.GetTempFileName();
-                ExternalProgram.ExportRegistry(scenePath, tempPath1);
-                using(EnhanceMenusDialog dlg = new EnhanceMenusDialog())
-                {
-                    dlg.ScenePath = scenePath;
-                    dlg.ShowDialog();
-                }
-                ExternalProgram.ExportRegistry(scenePath, tempPath2);
-                string str1 = File.ReadAllText(tempPath1);
-                string str2 = File.ReadAllText(tempPath2);
-                File.Delete(tempPath1);
-                File.Delete(tempPath2);
-                if(!str1.Equals(str2))
-                {
-                    MainForm mainForm = (MainForm)this.FindForm();
-                    mainForm.JumpItem(mainForm.ToolBar.SelectedIndex, mainForm.SideBar.SelectedIndex);
-                }
-            };
-        }
-
-        private void AddNewShellItem(string scenePath)
-        {
-            string shellPath = GetShellPath(scenePath);
-            using(NewShellDialog dlg = new NewShellDialog())
-            {
-                dlg.ScenePath = scenePath;
-                dlg.ShellPath = shellPath;
-                if(dlg.ShowDialog() != DialogResult.OK) return;
-                for(int i = 0; i < this.Controls.Count; i++)
-                {
-                    if(this.Controls[i] is NewItem)
-                    {
-                        ShellItem item;
-                        if(Scene != Scenes.CommandStore) item = new ShellItem(dlg.NewItemRegPath);
-                        else item = new StoreShellItem(dlg.NewItemRegPath, true, false);
-                        this.InsertItem(item, i + 1);
-                        break;
-                    }
-                }
-            }
-        }
-
-        private void AddNewShellExItem(string scenePath)
-        {
-            bool isDragDrop = Scene == Scenes.DragDrop;
-            using(InputDialog dlg1 = new InputDialog { Title = AppString.Dialog.InputGuid })
-            {
-                if(GuidEx.TryParse(Clipboard.GetText(), out Guid guid)) dlg1.Text = guid.ToString();
-                if(dlg1.ShowDialog() != DialogResult.OK) return;
-                if(GuidEx.TryParse(dlg1.Text, out guid))
-                {
-                    if(isDragDrop)
-                    {
-                        using(SelectDialog dlg2 = new SelectDialog())
-                        {
-                            dlg2.Title = AppString.Dialog.SelectGroup;
-                            dlg2.Items = new[] { AppString.SideBar.Folder, AppString.SideBar.Directory,
-                                        AppString.SideBar.Drive, AppString.SideBar.AllObjects };
-                            if(dlg2.ShowDialog() != DialogResult.OK) return;
-                            switch(dlg2.SelectedIndex)
-                            {
-                                case 0:
-                                    scenePath = MENUPATH_FOLDER; break;
-                                case 1:
-                                    scenePath = MENUPATH_DIRECTORY; break;
-                                case 2:
-                                    scenePath = MENUPATH_DRIVE; break;
-                                case 3:
-                                    scenePath = MENUPATH_ALLOBJECTS; break;
-                            }
-                        }
-                    }
-                    string shellExPath = GetShellExPath(scenePath);
-                    if(ShellExItem.GetPathAndGuids(shellExPath, isDragDrop).Values.Contains(guid))
-                    {
-                        AppMessageBox.Show(AppString.Message.HasBeenAdded);
-                    }
-                    else
-                    {
-                        string part = isDragDrop ? ShellExItem.DdhParts[0] : ShellExItem.CmhParts[0];
-                        string regPath = $@"{shellExPath}\{part}\{guid:B}";
-                        Registry.SetValue(regPath, "", guid.ToString("B"));
-                        ShellExItem item = new ShellExItem(guid, regPath);
-                        for(int i = 0; i < this.Controls.Count; i++)
-                        {
-                            if(isDragDrop)
-                            {
-                                if(this.Controls[i] is FoldGroupItem groupItem)
-                                {
-                                    if(groupItem.GroupPath.Equals(shellExPath, StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        this.InsertItem(item, i + 1);
-                                        item.FoldGroupItem = groupItem;
-                                        groupItem.SetVisibleWithSubItemCount();
-                                        item.Visible = !groupItem.IsFold;
-                                        item.Indent();
-                                        break;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if(this.Controls[i] is NewItem)
-                                {
-                                    this.InsertItem(item, i + 1);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    AppMessageBox.Show(AppString.Message.MalformedGuid);
-                }
-            }
-        }
-
         private void LoadStoreItems()
         {
-            using(RegistryKey shellKey = RegistryEx.GetRegistryKey(ShellItem.CommandStorePath))
+#if DEBUG
+            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            {
+                sw.WriteLine("\tLoadStoreItems: ");
+            }
+            int i = 0;
+#endif
+            using (RegistryKey shellKey = RegistryEx.GetRegistryKey(ShellItem.CommandStorePath))
             {
                 foreach(string itemName in shellKey.GetSubKeyNames())
                 {
                     if(AppConfig.HideSysStoreItems && itemName.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase)) continue;
                     this.AddItem(new StoreShellItem($@"{ShellItem.CommandStorePath}\{itemName}", true, false));
+#if DEBUG
+                    i++;
+                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    {
+                        sw.WriteLine("\t\t" + i.ToString() + ". " + itemName);
+                    }
+#endif
                 }
             }
         }
 
+        // here!
         private void LoadUwpModeItem()
         {
-            foreach(XmlDocument doc in XmlDicHelper.UwpModeItemsDic)
+#if DEBUG
+            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            {
+                sw.WriteLine("\tLoadUwpModeItem: ");
+            }
+            int i = 0;
+#endif
+            foreach (XmlDocument doc in XmlDicHelper.UwpModeItemsDic)
             {
                 if(doc?.DocumentElement == null) continue;
                 foreach(XmlNode sceneXN in doc.DocumentElement.ChildNodes)
@@ -580,7 +778,15 @@ namespace ContextMenuManager.Controls
                                 if(isAdded) continue;
                                 if(GuidInfo.GetFilePath(guid) == null) continue;
                                 string uwpName = GuidInfo.GetUwpName(guid);
-                                this.AddItem(new UwpModeItem(uwpName, guid));
+                                UwpModeItem item1 = new UwpModeItem(uwpName, guid);
+                                this.AddItem(item1);
+#if DEBUG
+                                i++;
+                                using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                                {
+                                    sw.WriteLine("\t\t" + i.ToString() + ". " + uwpName);
+                                }
+#endif
                             }
                         }
                     }
@@ -590,7 +796,14 @@ namespace ContextMenuManager.Controls
 
         private void LoadAnalysisItems()
         {
-            if(CurrentFileObjectPath == null) return;
+#if DEBUG
+            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            {
+                sw.WriteLine("\tLoadAnalysisItems: ");
+            }
+            int i = 0;
+#endif
+            if (CurrentFileObjectPath == null) return;
 
             void AddFileItems(string filePath)
             {
@@ -952,6 +1165,190 @@ namespace ContextMenuManager.Controls
             public static string Extension = null;
             public static string PerceivedType = null;
             public static string TargetPath = null;
+        }
+
+        private void AddNewItem(string scenePath)
+        {
+            if (scenePath == null) return;
+            string shellPath = GetShellPath(scenePath);
+            NewItem newItem = new NewItem();
+            PictureButton btnAddExisting = new PictureButton(AppImage.AddExisting);
+            PictureButton btnEnhanceMenu = new PictureButton(AppImage.Enhance);
+            ToolTipBox.SetToolTip(btnAddExisting, AppString.Tip.AddFromPublic);
+            ToolTipBox.SetToolTip(btnEnhanceMenu, AppString.StatusBar.EnhanceMenu);
+            if (Scene == Scenes.DragDrop || ShellItem.CommandStorePath.Equals(shellPath,
+                StringComparison.OrdinalIgnoreCase)) btnAddExisting.Visible = false;
+            else
+            {
+                using (RegistryKey key = RegistryEx.GetRegistryKey(ShellItem.CommandStorePath))
+                {
+                    List<string> subKeyNames = key.GetSubKeyNames().ToList();
+                    if (AppConfig.HideSysStoreItems) subKeyNames.RemoveAll(name => name.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase));
+                    if (subKeyNames.Count == 0) btnAddExisting.Visible = false;
+                }
+            }
+            if (!XmlDicHelper.EnhanceMenuPathDic.ContainsKey(scenePath)) btnEnhanceMenu.Visible = false;
+            newItem.AddCtrs(new[] { btnAddExisting, btnEnhanceMenu });
+            this.AddItem(newItem);
+
+            newItem.AddNewItem += () =>
+            {
+                bool isShell;
+                if (Scene == Scenes.CommandStore) isShell = true;
+                else if (Scene == Scenes.DragDrop) isShell = false;
+                else
+                {
+                    using (SelectDialog dlg = new SelectDialog())
+                    {
+                        dlg.Items = new[] { "Shell", "ShellEx" };
+                        dlg.Title = AppString.Dialog.SelectNewItemType;
+                        if (dlg.ShowDialog() != DialogResult.OK) return;
+                        isShell = dlg.SelectedIndex == 0;
+                    }
+                }
+                if (isShell) this.AddNewShellItem(scenePath);
+                else this.AddNewShellExItem(scenePath);
+            };
+
+            btnAddExisting.MouseDown += (sender, e) =>
+            {
+                using (ShellStoreDialog dlg = new ShellStoreDialog())
+                {
+                    dlg.IsReference = false;
+                    dlg.ShellPath = ShellItem.CommandStorePath;
+                    dlg.Filter = new Func<string, bool>(itemName => !(AppConfig.HideSysStoreItems
+                        && itemName.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase)));
+                    if (dlg.ShowDialog() != DialogResult.OK) return;
+                    foreach (string keyName in dlg.SelectedKeyNames)
+                    {
+                        string srcPath = $@"{dlg.ShellPath}\{keyName}";
+                        string dstPath = ObjectPath.GetNewPathWithIndex($@"{shellPath}\{keyName}", ObjectPath.PathType.Registry);
+
+                        RegistryEx.CopyTo(srcPath, dstPath);
+                        this.AddItem(new ShellItem(dstPath));
+                    }
+                }
+            };
+
+            btnEnhanceMenu.MouseDown += (sender, e) =>
+            {
+                string tempPath1 = Path.GetTempFileName();
+                string tempPath2 = Path.GetTempFileName();
+                ExternalProgram.ExportRegistry(scenePath, tempPath1);
+                using (EnhanceMenusDialog dlg = new EnhanceMenusDialog())
+                {
+                    dlg.ScenePath = scenePath;
+                    dlg.ShowDialog();
+                }
+                ExternalProgram.ExportRegistry(scenePath, tempPath2);
+                string str1 = File.ReadAllText(tempPath1);
+                string str2 = File.ReadAllText(tempPath2);
+                File.Delete(tempPath1);
+                File.Delete(tempPath2);
+                if (!str1.Equals(str2))
+                {
+                    MainForm mainForm = (MainForm)this.FindForm();
+                    mainForm.JumpItem(mainForm.ToolBar.SelectedIndex, mainForm.SideBar.SelectedIndex);
+                }
+            };
+        }
+
+        private void AddNewShellItem(string scenePath)
+        {
+            string shellPath = GetShellPath(scenePath);
+            using (NewShellDialog dlg = new NewShellDialog())
+            {
+                dlg.ScenePath = scenePath;
+                dlg.ShellPath = shellPath;
+                if (dlg.ShowDialog() != DialogResult.OK) return;
+                for (int i = 0; i < this.Controls.Count; i++)
+                {
+                    if (this.Controls[i] is NewItem)
+                    {
+                        ShellItem item;
+                        if (Scene != Scenes.CommandStore) item = new ShellItem(dlg.NewItemRegPath);
+                        else item = new StoreShellItem(dlg.NewItemRegPath, true, false);
+                        this.InsertItem(item, i + 1);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void AddNewShellExItem(string scenePath)
+        {
+            bool isDragDrop = Scene == Scenes.DragDrop;
+            using (InputDialog dlg1 = new InputDialog { Title = AppString.Dialog.InputGuid })
+            {
+                if (GuidEx.TryParse(Clipboard.GetText(), out Guid guid)) dlg1.Text = guid.ToString();
+                if (dlg1.ShowDialog() != DialogResult.OK) return;
+                if (GuidEx.TryParse(dlg1.Text, out guid))
+                {
+                    if (isDragDrop)
+                    {
+                        using (SelectDialog dlg2 = new SelectDialog())
+                        {
+                            dlg2.Title = AppString.Dialog.SelectGroup;
+                            dlg2.Items = new[] { AppString.SideBar.Folder, AppString.SideBar.Directory,
+                                        AppString.SideBar.Drive, AppString.SideBar.AllObjects };
+                            if (dlg2.ShowDialog() != DialogResult.OK) return;
+                            switch (dlg2.SelectedIndex)
+                            {
+                                case 0:
+                                    scenePath = MENUPATH_FOLDER; break;
+                                case 1:
+                                    scenePath = MENUPATH_DIRECTORY; break;
+                                case 2:
+                                    scenePath = MENUPATH_DRIVE; break;
+                                case 3:
+                                    scenePath = MENUPATH_ALLOBJECTS; break;
+                            }
+                        }
+                    }
+                    string shellExPath = GetShellExPath(scenePath);
+                    if (ShellExItem.GetPathAndGuids(shellExPath, isDragDrop).Values.Contains(guid))
+                    {
+                        AppMessageBox.Show(AppString.Message.HasBeenAdded);
+                    }
+                    else
+                    {
+                        string part = isDragDrop ? ShellExItem.DdhParts[0] : ShellExItem.CmhParts[0];
+                        string regPath = $@"{shellExPath}\{part}\{guid:B}";
+                        Registry.SetValue(regPath, "", guid.ToString("B"));
+                        ShellExItem item = new ShellExItem(guid, regPath);
+                        for (int i = 0; i < this.Controls.Count; i++)
+                        {
+                            if (isDragDrop)
+                            {
+                                if (this.Controls[i] is FoldGroupItem groupItem)
+                                {
+                                    if (groupItem.GroupPath.Equals(shellExPath, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        this.InsertItem(item, i + 1);
+                                        item.FoldGroupItem = groupItem;
+                                        groupItem.SetVisibleWithSubItemCount();
+                                        item.Visible = !groupItem.IsFold;
+                                        item.Indent();
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (this.Controls[i] is NewItem)
+                                {
+                                    this.InsertItem(item, i + 1);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    AppMessageBox.Show(AppString.Message.MalformedGuid);
+                }
+            }
         }
     }
 }

@@ -148,6 +148,9 @@
     <Compile Include="Controls\DictionariesBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\BackupBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\DonateBox.cs">
       <SubType>Component</SubType>
     </Compile>

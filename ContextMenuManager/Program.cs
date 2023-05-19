@@ -1,6 +1,7 @@
 ﻿using BluePointLilac.Methods;
 using ContextMenuManager.Methods;
 using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace ContextMenuManager
@@ -11,6 +12,12 @@ namespace ContextMenuManager
         [STAThread]
         static void Main()
         {
+#if DEBUG
+            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            {
+                sw.WriteLine("--------------------" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + "--------------------");
+            }
+#endif
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             if(SingleInstance.IsRunning()) return;
