@@ -37,18 +37,24 @@ namespace ContextMenuManager.Controls
             VisibleChanged += (sender, e) => this.SetEnabled(Visible);
             Backup.Click += (sender, e) => {
                 Cursor = Cursors.WaitCursor; 
-                helper.BackupItems(BackupList.BackupMode.Basic); 
+                helper.BackupItems(BackupList.BackupTarget.Basic); 
                 Cursor = Cursors.Default;
                 MessageBox("备份完成！", "备份");
             };
             Restore.Click += (sender, e) => {
-                UpdateRestoreFileList();
-                using (RestoreListDialog dlg = new RestoreListDialog())
+                if (UpdateRestoreFileList())
                 {
-                    dlg.BackupBox = this;
-                    dlg.RestoreList = restoreFileList;
-                    dlg.ShowDialog();
-                };
+                    using (RestoreListDialog dlg = new RestoreListDialog())
+                    {
+                        dlg.BackupBox = this;
+                        dlg.RestoreList = restoreFileList;
+                        dlg.ShowDialog();
+                    };
+                }
+                else
+                {
+                    MessageBox("不存在任何备份！", "备份");
+                }
             };
             ResumeLayout();
         }
@@ -76,17 +82,17 @@ namespace ContextMenuManager.Controls
             Restore.Left = Backup.Right + margin;
         }
 
-        public void RestoreItems(int restoreIndex)
+        public void RestoreItems(int restoreFilePathIndex, int restoreModeIndex)
         {
-            if (restoreIndex == -1) return;
+            if (restoreFilePathIndex == -1) return;
             Cursor = Cursors.WaitCursor;
-            BackupList.ReadBackupList(restoreFileList[restoreIndex].FilePath);
-            helper.RestoreItems(BackupList.BackupMode.Basic);
+            helper.RestoreItems(BackupList.BackupTarget.Basic, restoreFileList[restoreFilePathIndex].FilePath, 
+                restoreModeIndex == 0 ? BackupList.RestoreMode.EnableDiableOnList : BackupList.RestoreMode.JustEnableOnList);
             Cursor = Cursors.Default;
             MessageBox("恢复完成！", "恢复");
         }
 
-        private void UpdateRestoreFileList()
+        private bool UpdateRestoreFileList()
         {
             restoreFileList.Clear();
             string rootPath = AppConfig.MenuBackupRootDir;
@@ -116,6 +122,9 @@ namespace ContextMenuManager.Controls
                     });
                 }
             }
+
+            // 如果存在备份返回true
+            return restoreFileList.Count > 0;
         }
 
         class RestoreFileItem
@@ -182,15 +191,23 @@ namespace ContextMenuManager.Controls
                     dgvRestore.ColumnHeadersDefaultCellStyle.Alignment
                         = dgvRestore.RowsDefaultCellStyle.Alignment
                         = DataGridViewContentAlignment.BottomCenter;
-                    Controls.AddRange(new Control[] { dgvRestore, lblConfirm });
+                    Controls.AddRange(new Control[] { dgvRestore, lblBackupMode, cmbBackupMode, lblConfirm });
+                    cmbBackupMode.Items.AddRange(new[] { "不处理不存在于备份列表上的菜单项", "仅启用备份列表上可见的菜单项" });
+                    cmbBackupMode.Width = 200.DpiZoom();
+                    cmbBackupMode.DropDownStyle = ComboBoxStyle.DropDownList;
+                    cmbBackupMode.AutosizeDropDownWidth();
+                    cmbBackupMode.SelectedIndex = 0;
                     lblConfirm.MouseEnter += (sender, e) => lblConfirm.ForeColor = Color.FromArgb(0, 162, 255);
-                    lblConfirm.MouseLeave += (sender, e) => lblConfirm.ForeColor = Color.DimGray;
+                    lblConfirm.MouseLeave += (sender, e) => lblConfirm.ForeColor = Color.Black;
                     lblConfirm.Click += (sender, e) => {
-                        int restoreIndex = GetSelectedRowIndex(dgvRestore);
-                        BackupBox.RestoreItems(restoreIndex);
+                        int restoreFilePathIndex = GetSelectedRowIndex(dgvRestore);
+                        int restoreModeIndex = cmbBackupMode.SelectedIndex;
+                        BackupBox.RestoreItems(restoreFilePathIndex, restoreModeIndex);
                     };
                     this.AddEscapeButton();
                 }
+
+                readonly ComboBox cmbBackupMode = new ComboBox();
 
                 readonly DataGridView dgvRestore = new DataGridView
                 {
@@ -206,6 +223,12 @@ namespace ContextMenuManager.Controls
                     ReadOnly = true
                 };
 
+                readonly Label lblBackupMode = new Label
+                {
+                    Text = "恢复方式：",
+                    AutoSize = true,
+                };
+
                 readonly Label lblConfirm = new Label
                 {
                     Text = "确定",
@@ -217,11 +240,14 @@ namespace ContextMenuManager.Controls
                 {
                     base.OnResize(e);
                     int margin = 20.DpiZoom();
+                    int a = 6.DpiZoom();
                     dgvRestore.Location = new Point(margin, margin);
                     dgvRestore.Width = ClientSize.Width - 2 * margin;
                     dgvRestore.Height = ClientSize.Height - 3 * margin - lblConfirm.Height;
-                    lblConfirm.Top = dgvRestore.Bottom + margin;
-                    lblConfirm.Left = (ClientSize.Width - lblConfirm.Width) / 2;
+                    lblBackupMode.Top = cmbBackupMode.Top = lblConfirm.Top = dgvRestore.Bottom + margin;
+                    lblBackupMode.Left = margin;
+                    cmbBackupMode.Left = lblBackupMode.Right + a;
+                    lblConfirm.Left = ClientSize.Width - margin - lblConfirm.Width;
                 }
 
                 public void ShowRestoreList(List<RestoreFileItem> restoreFileItems)

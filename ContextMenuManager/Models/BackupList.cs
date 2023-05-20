@@ -14,7 +14,10 @@ namespace ContextMenuManager.Models
     public static class BackupList
     {
         // 备份列表缓存区
-        public static List<BackupItem> backupList = new List<BackupItem>();
+        private static List<BackupItem> backupList = new List<BackupItem>();
+
+        // 恢复列表暂存区
+        public static List<BackupItem> tempRestoreList = new List<BackupItem>();
 
         // 创建一个XmlSerializer对象
         private static readonly XmlSerializer serializer = new XmlSerializer(typeof(List<BackupItem>));
@@ -24,9 +27,15 @@ namespace ContextMenuManager.Models
             ShellItem, ShellExItem, UwpModelItem, VisibleRegRuleItem
         }
 
-        public enum BackupMode
+        public enum BackupTarget
         {
             Basic
+        };
+
+        public enum RestoreMode
+        {
+            EnableDiableOnList,     // 启用备份列表上可见的菜单项，禁用备份列表上不可见的菜单项，不处理不存在于备份列表上的菜单项
+            JustEnableOnList,       // 仅启用备份列表上可见的菜单项，禁用备份列表上不可见以及不存在于备份列表上的菜单项
         };
 
         static BackupList() { }
@@ -42,7 +51,7 @@ namespace ContextMenuManager.Models
             });
         }
 
-        public static void ClearItems()
+        public static void ClearBackupList()
         {
             backupList.Clear();
         }
@@ -56,13 +65,25 @@ namespace ContextMenuManager.Models
             }
         }
 
-        public static void ReadBackupList(string filePath)
+        public static void LoadBackupList(string filePath)
         {
-            ClearItems();
             // 反序列化到List<BackupItem>对象
             using (StreamReader sr = new StreamReader(filePath))
             {
                 backupList = serializer.Deserialize(sr) as List<BackupItem>;
+            }
+        }
+
+        public static void LoadTempRestoreList(Scenes scene)
+        {
+            tempRestoreList.Clear();
+            // 根据backupScene加载列表
+            foreach (BackupItem item in backupList)
+            {
+                if (item.BackupScene == scene)
+                {
+                    tempRestoreList.Add(item);
+                }
             }
         }
     }

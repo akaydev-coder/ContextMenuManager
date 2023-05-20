@@ -18,34 +18,39 @@ namespace ContextMenuManager.Methods
     internal class BackupHelper
     {
         private Scenes currentScene;
-        private List<BackupItem> currentRestoreItems = new List<BackupItem>();
+        private RestoreMode restoreMode;
 
-        public void BackupItems(BackupMode mode)
+        public void BackupItems(BackupTarget mode)
         {
+            ClearBackupList();
             string date = DateTime.Today.ToString("yyyy-MM-dd");
             string time = DateTime.Now.ToString("HH-mm-ss");
             string filePath = $@"{AppConfig.MenuBackupDir}\{date} {time}.xml";
+            // 加载备份文件到缓冲区
             BackupRestoreItems(mode, true);
-            if (!Directory.Exists($@"{AppConfig.MenuBackupDir}"))
-            {
-                Directory.CreateDirectory($@"{AppConfig.MenuBackupDir}");
-            }
+            // 保存缓冲区的备份文件
             SaveBackupList(filePath);
-            ClearItems();
+            ClearBackupList();
         }
 
-        public void RestoreItems(BackupMode mode)
+        public void RestoreItems(BackupTarget mode, string filePath, RestoreMode restoreMode)
         {
+            ClearBackupList();
+            // 初始化恢复模式
+            this.restoreMode = restoreMode;
+            // 加载备份文件到缓冲区
+            LoadBackupList(filePath);
+            // 还原缓冲区的备份文件
             BackupRestoreItems(mode, false);
-            ClearItems();
+            ClearBackupList();
         }
 
-        private void BackupRestoreItems(BackupMode mode, bool backup)
+        private void BackupRestoreItems(BackupTarget mode, bool backup)
         {
             Scenes[] scenes = null;
             switch (mode)
             {
-                case BackupMode.Basic:
+                case BackupTarget.Basic:
                     scenes = new Scenes[] {
                         Scenes.File, Scenes.Folder, Scenes.Directory, Scenes.Background, Scenes.Desktop,
                         Scenes.Drive, Scenes.AllObjects, Scenes.Computer, Scenes.RecycleBin, Scenes.Library
@@ -54,35 +59,40 @@ namespace ContextMenuManager.Methods
             for (int i = 0; i < scenes.Length; i++)
             {
                 currentScene = scenes[i];
-                // 通过Scene筛选目前恢复项目
+                // 加载某个Scene的恢复列表
                 if (!backup)
                 {
-                    currentRestoreItems.Clear();
-                    foreach(BackupItem item in backupList)
-                    {
-                        if (item.BackupScene == currentScene)
-                        {
-                            currentRestoreItems.Add(item);
-                        }
-                    }
+                    LoadTempRestoreList(currentScene);
                 }
                 GetBackupItems(backup);
             }
         }
 
-        private bool IfItemNeedChange(string keyName, BackupItemType itemType, bool itemVisible)
+        private bool CheckItemNeedChange(string keyName, BackupItemType itemType, bool itemVisible)
         {
-            foreach(BackupItem item in currentRestoreItems)
+            foreach(BackupItem item in tempRestoreList)
             {
+                // 成功匹配到后的处理方式
                 if(item.KeyName == keyName && item.ItemType == itemType)
                 {
                     if (item.ItemVisible != itemVisible)
                     {
                         return true;
                     }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
-            return false;
+            switch(restoreMode)
+            {
+                case RestoreMode.JustEnableOnList:
+                    return itemVisible;
+                case RestoreMode.EnableDiableOnList:
+                default:
+                    return false;
+            }
         }
 
         private void GetBackupItems(bool backup)
@@ -145,7 +155,7 @@ namespace ContextMenuManager.Methods
                     else
                     {
                         // 恢复备份列表
-                        if (IfItemNeedChange(valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu))
+                        if (CheckItemNeedChange(valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu))
                         {
                             item.ItemVisible = !ifItemInMenu;
                         }
@@ -173,7 +183,7 @@ namespace ContextMenuManager.Methods
                     else
                     {
                         // 恢复备份列表
-                        if (IfItemNeedChange(valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu))
+                        if (CheckItemNeedChange(valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu))
                         {
                             item.ItemVisible = !ifItemInMenu;
                         }
@@ -202,7 +212,7 @@ namespace ContextMenuManager.Methods
                     else
                     {
                         // 恢复备份列表
-                        if (IfItemNeedChange(valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu))
+                        if (CheckItemNeedChange(valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu))
                         {
                             item.ItemVisible = !ifItemInMenu;
                         }
@@ -270,7 +280,7 @@ namespace ContextMenuManager.Methods
                     else
                     {
                         // 恢复备份列表
-                        if (IfItemNeedChange(keyName, BackupItemType.ShellItem, ifItemInMenu))
+                        if (CheckItemNeedChange(keyName, BackupItemType.ShellItem, ifItemInMenu))
                         {
                             item.ItemVisible = !ifItemInMenu;
                         }
@@ -337,7 +347,7 @@ namespace ContextMenuManager.Methods
                         else
                         {
                             // 恢复备份列表
-                            if (IfItemNeedChange(keyName, BackupItemType.ShellExItem, ifItemInMenu))
+                            if (CheckItemNeedChange(keyName, BackupItemType.ShellExItem, ifItemInMenu))
                             {
                                 item.ItemVisible = !ifItemInMenu;
                             }
@@ -392,7 +402,7 @@ namespace ContextMenuManager.Methods
                                 else
                                 {
                                     // 恢复备份列表
-                                    if (IfItemNeedChange(itemName, BackupItemType.UwpModelItem, ifItemInMenu))
+                                    if (CheckItemNeedChange(itemName, BackupItemType.UwpModelItem, ifItemInMenu))
                                     {
                                         uwpItem.ItemVisible = !ifItemInMenu;
                                     }
