@@ -56,7 +56,7 @@ namespace ContextMenuManager.Models
             }
         }
 
-        public static void ReadBackupList(string filePath)
+        public static void LoadBackupList(string filePath)
         {
             ClearItems();
             // 反序列化到List<BackupItem>对象

@@ -107,9 +107,11 @@ namespace ContextMenuManager.Methods
             }
             int i = 0;
 #endif
+            // 获取ShellItem与ShellExItem类的备份项目
             GetBackupItems(scenePath);
             if (WinOsVersion.Current >= WinOsVersion.Win10)
             {
+                // 获取UwpModeItem类的备份项目
                 GetBackupUwpModeItem();
             }
             switch (backupScene)
@@ -121,7 +123,7 @@ namespace ContextMenuManager.Methods
                     string itemName = item.Text;
                     bool ifItemInMenu = item.ItemVisible;
                     // 加入备份列表
-                    BackupList.AddItem(itemName, BackupList.BackupItemType.VisibleRegRuleItem, ifItemInMenu, backupScene);
+                    BackupList.AddItem(valueName, BackupList.BackupItemType.VisibleRegRuleItem, ifItemInMenu, backupScene);
 #if DEBUG
                     i++;
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -138,7 +140,7 @@ namespace ContextMenuManager.Methods
                     itemName = item.Text;
                     ifItemInMenu = item.ItemVisible;
                     // 加入备份列表
-                    BackupList.AddItem(itemName, BackupList.BackupItemType.VisibleRegRuleItem, ifItemInMenu, backupScene);
+                    BackupList.AddItem(valueName, BackupList.BackupItemType.VisibleRegRuleItem, ifItemInMenu, backupScene);
 #if DEBUG
                     i++;
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -155,7 +157,7 @@ namespace ContextMenuManager.Methods
                     itemName = item.Text;
                     ifItemInMenu = item.ItemVisible;
                     // 加入备份列表
-                    BackupList.AddItem(itemName, BackupList.BackupItemType.VisibleRegRuleItem, ifItemInMenu, backupScene);
+                    BackupList.AddItem(valueName, BackupList.BackupItemType.VisibleRegRuleItem, ifItemInMenu, backupScene);
 #if DEBUG
                     i++;
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -212,7 +214,7 @@ namespace ContextMenuManager.Methods
                     string itemName = item.ItemText;
                     bool ifItemInMenu = item.ItemVisible;
                     // 加入备份列表
-                    BackupList.AddItem(itemName, BackupList.BackupItemType.ShellItem, ifItemInMenu, backupScene);
+                    BackupList.AddItem(keyName, BackupList.BackupItemType.ShellItem, ifItemInMenu, backupScene);
 #if DEBUG
                     i++;
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -268,7 +270,7 @@ namespace ContextMenuManager.Methods
                             item.Indent();
                         }
                         // 加入备份列表
-                        BackupList.AddItem(itemName, BackupList.BackupItemType.ShellExItem, ifItemInMenu, backupScene);
+                        BackupList.AddItem(keyName, BackupList.BackupItemType.ShellExItem, ifItemInMenu, backupScene);
 #if DEBUG
                         i++;
                         using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -279,7 +281,6 @@ namespace ContextMenuManager.Methods
                         names.Add(keyName);
                     }
                 }
-                groupItem?.SetVisibleWithSubItemCount();
             }
         }
 
