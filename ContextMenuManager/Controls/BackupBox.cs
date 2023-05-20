@@ -89,7 +89,8 @@ namespace ContextMenuManager.Controls
             helper.RestoreItems(BackupList.BackupTarget.Basic, restoreFileList[restoreFilePathIndex].FilePath, 
                 restoreModeIndex == 0 ? BackupList.RestoreMode.EnableDiableOnList : BackupList.RestoreMode.JustEnableOnList);
             Cursor = Cursors.Default;
-            MessageBox("恢复完成！", "恢复");
+            int changeCount = helper.changeCount;
+            MessageBox("恢复完成！共处理了" + changeCount.ToString() + "个菜单项目！", "恢复");
         }
 
         private bool UpdateRestoreFileList()

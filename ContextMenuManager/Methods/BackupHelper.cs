@@ -19,6 +19,7 @@ namespace ContextMenuManager.Methods
     {
         private Scenes currentScene;
         private RestoreMode restoreMode;
+        public int changeCount = 0;
 
         public void BackupItems(BackupTarget mode)
         {
@@ -36,7 +37,7 @@ namespace ContextMenuManager.Methods
         public void RestoreItems(BackupTarget mode, string filePath, RestoreMode restoreMode)
         {
             ClearBackupList();
-            // 初始化恢复模式
+            changeCount = 0;
             this.restoreMode = restoreMode;
             // 加载备份文件到缓冲区
             LoadBackupList(filePath);
@@ -77,6 +78,7 @@ namespace ContextMenuManager.Methods
                 {
                     if (item.ItemVisible != itemVisible)
                     {
+                        changeCount++;
                         return true;
                     }
                     else
@@ -88,6 +90,7 @@ namespace ContextMenuManager.Methods
             switch(restoreMode)
             {
                 case RestoreMode.JustEnableOnList:
+                    if (itemVisible) changeCount++;
                     return itemVisible;
                 case RestoreMode.EnableDiableOnList:
                 default:
