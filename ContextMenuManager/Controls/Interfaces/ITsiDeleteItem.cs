@@ -21,23 +21,27 @@ namespace ContextMenuManager.Controls.Interfaces
 
     sealed class DeleteMeMenuItem : ToolStripMenuItem
     {
-        public DeleteMeMenuItem(ITsiDeleteItem item) : base(AppString.Menu.Delete)
+        public DeleteMeMenuItem(ITsiDeleteItem item) : base(item is RestoreItem ? "删除备份" : AppString.Menu.Delete)
         {
             Click += (sender, e) =>
             {
-                if(item is ITsiRegDeleteItem regItem && AppConfig.AutoBackup)
+                if (item is ITsiRegDeleteItem regItem && AppConfig.AutoBackup)
                 {
-                    if(AppMessageBox.Show(AppString.Message.DeleteButCanRestore,
-                     MessageBoxButtons.YesNo) != DialogResult.Yes) return;
+                    if (AppMessageBox.Show(AppString.Message.DeleteButCanRestore, MessageBoxButtons.YesNo) != DialogResult.Yes)
+                    {
+                        return;
+                    }
                     string date = DateTime.Today.ToString("yyyy-MM-dd");
                     string time = DateTime.Now.ToString("HH-mm-ss");
                     string filePath = $@"{AppConfig.RegBackupDir}\{date}\{regItem.Text} - {time}.reg";
                     Directory.CreateDirectory(Path.GetDirectoryName(filePath));
                     ExternalProgram.ExportRegistry(regItem.RegPath, filePath);
                 }
-                else if(AppMessageBox.Show(AppString.Message.ConfirmDeletePermanently,
-                     MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-
+                else if (AppMessageBox.Show(item is RestoreItem ? "确认是否永久删除此备份？" : AppString.Message.ConfirmDeletePermanently, 
+                    MessageBoxButtons.YesNo) != DialogResult.Yes)
+                {
+                    return;
+                }
                 MyListItem listItem = (MyListItem)item;
                 MyList list = (MyList)listItem.Parent;
                 int index = list.GetItemIndex(listItem);

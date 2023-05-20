@@ -29,7 +29,7 @@ namespace ContextMenuManager.Models
 
         public enum BackupTarget
         {
-            Basic
+            Basic, AllHomePage
         };
 
         public enum RestoreMode

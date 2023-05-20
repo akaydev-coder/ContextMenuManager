@@ -46,6 +46,8 @@ namespace ContextMenuManager.Methods
         public static readonly Image Down = Up.RotateImage(RotateFlipType.Rotate180FlipNone);
         ///<summary>新建项目</summary>
         public static readonly Image NewItem = Resources.NewItem.ResizeImage(Scale);
+        ///<summary>备份项目</summary>
+        public static readonly Image BackupItem = Resources.BackupItem.ResizeImage(Scale);
         ///<summary>新建文件夹</summary>
         public static readonly Image NewFolder = Resources.NewFolder.ResizeImage(Scale);
         ///<summary>自定义</summary>

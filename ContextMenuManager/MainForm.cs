@@ -48,7 +48,7 @@ namespace ContextMenuManager
             shellList, shellNewList, sendToList, openWithList, winXList,
             enhanceMenusList, detailedEditList, guidBlockedList, iEList,
             appSettingBox, languagesBox, dictionariesBox, aboutMeBox, 
-            donateBox, backupBox
+            donateBox, backupBox, backupListBox
         };
 
         readonly ShellList shellList = new ShellList();
@@ -68,6 +68,7 @@ namespace ContextMenuManager
         readonly ReadOnlyRichTextBox aboutMeBox = new ReadOnlyRichTextBox();
         readonly DonateBox donateBox = new DonateBox();
         readonly BackupBox backupBox = new BackupBox();
+        readonly BackupListBox backupListBox = new BackupListBox();
         readonly ExplorerRestarter explorerRestarter = new ExplorerRestarter();
 
         static readonly string[] GeneralItems =
@@ -168,6 +169,7 @@ namespace ContextMenuManager
             AppString.SideBar.Dictionaries,
             AppString.SideBar.AboutApp,
             AppString.SideBar.Donate,
+            "备份恢复",
             "备份恢复"
         };
 
@@ -390,6 +392,8 @@ namespace ContextMenuManager
                     donateBox.Visible = true; break;
                 case 5:
                     backupBox.Visible = true; break;
+                case 6:
+                    backupListBox.LoadItems(); backupListBox.Visible = true; break;
             }
         }
 
