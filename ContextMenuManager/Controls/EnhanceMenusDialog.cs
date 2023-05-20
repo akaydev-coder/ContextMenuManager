@@ -20,8 +20,8 @@ namespace ContextMenuManager.Controls
                 frm.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
                 frm.TopMost = AppConfig.TopMost;
                 frm.AddList(list);
-                list.ScenePath = this.ScenePath;
-                list.UseUserDic = XmlDicHelper.EnhanceMenuPathDic[this.ScenePath];
+                list.ScenePath = ScenePath;
+                list.UseUserDic = XmlDicHelper.EnhanceMenuPathDic[ScenePath];
                 list.LoadItems();
                 frm.ShowDialog();
             }

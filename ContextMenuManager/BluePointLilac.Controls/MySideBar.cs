@@ -9,17 +9,17 @@ namespace BluePointLilac.Controls
     {
         public MySideBar()
         {
-            this.Dock = DockStyle.Left;
-            this.ItemHeight = 30.DpiZoom();
-            this.Font = SystemFonts.MenuFont;
-            this.Font = new Font(this.Font.FontFamily, this.Font.Size + 1F);
-            this.ForeColor = Color.FromArgb(80, 80, 80);
-            this.BackColor = Color.FromArgb(245, 245, 245);
-            this.BackgroundImageLayout = ImageLayout.None;
-            this.Controls.AddRange(new Control[] { LblSeparator, PnlSelected, PnlHovered });
+            Dock = DockStyle.Left;
+            ItemHeight = 30.DpiZoom();
+            Font = SystemFonts.MenuFont;
+            Font = new Font(Font.FontFamily, Font.Size + 1F);
+            ForeColor = Color.FromArgb(80, 80, 80);
+            BackColor = Color.FromArgb(245, 245, 245);
+            BackgroundImageLayout = ImageLayout.None;
+            Controls.AddRange(new Control[] { LblSeparator, PnlSelected, PnlHovered });
             PnlHovered.Paint += PaintItem;
             PnlSelected.Paint += PaintItem;
-            this.SelectedIndex = -1;
+            SelectedIndex = -1;
         }
 
         private string[] itemNames;
@@ -33,9 +33,9 @@ namespace BluePointLilac.Controls
                 {
                     int maxWidth = 0;
                     Array.ForEach(value, str => maxWidth = Math.Max(maxWidth, GetItemWidth(str)));
-                    this.Width = maxWidth + 2 * HorizontalSpace;
+                    Width = maxWidth + 2 * HorizontalSpace;
                 }
-                PnlHovered.Width = PnlSelected.Width = this.Width;
+                PnlHovered.Width = PnlSelected.Width = Width;
                 PaintItems();
                 SelectedIndex = -1;
             }
@@ -107,7 +107,7 @@ namespace BluePointLilac.Controls
         /// <summary>绘制所有项目作为底图</summary>
         private void PaintItems()
         {
-            this.BackgroundImage = new Bitmap(Width, ItemHeight * ItemNames.Length);
+            BackgroundImage = new Bitmap(Width, ItemHeight * ItemNames.Length);
             using(Graphics g = Graphics.FromImage(BackgroundImage))
             {
                 g.Clear(BackColor);
@@ -155,12 +155,12 @@ namespace BluePointLilac.Controls
             int index = (e.Y - TopSpace) / ItemHeight;
             if(index >= itemNames.Length || index < 0 || string.IsNullOrEmpty(itemNames[index]) || index == SelectedIndex)
             {
-                this.Cursor = Cursors.Default;
+                Cursor = Cursors.Default;
                 HoveredIndex = SelectedIndex;
             }
             else
             {
-                this.Cursor = Cursors.Hand;
+                Cursor = Cursors.Hand;
                 if(panel == PnlSelected) SelectedIndex = index;
                 else HoveredIndex = index;
             }

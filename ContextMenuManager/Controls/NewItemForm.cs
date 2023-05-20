@@ -11,15 +11,15 @@ namespace ContextMenuManager.Controls
     {
         public NewItemForm()
         {
-            this.AcceptButton = btnOK;
-            this.CancelButton = btnCancel;
-            this.Text = AppString.Other.NewItem;
-            this.Font = SystemFonts.MenuFont;
-            this.MaximizeBox = this.MinimizeBox = false;
-            this.ShowIcon = this.ShowInTaskbar = false;
-            this.StartPosition = FormStartPosition.CenterParent;
-            this.SizeGripStyle = SizeGripStyle.Hide;
-            this.VerticalResizable = false;
+            AcceptButton = btnOK;
+            CancelButton = btnCancel;
+            Text = AppString.Other.NewItem;
+            Font = SystemFonts.MenuFont;
+            MaximizeBox = MinimizeBox = false;
+            ShowIcon = ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterParent;
+            SizeGripStyle = SizeGripStyle.Hide;
+            VerticalResizable = false;
             InitializeComponents();
         }
 
@@ -77,7 +77,7 @@ namespace ContextMenuManager.Controls
 
         protected virtual void InitializeComponents()
         {
-            this.Controls.AddRange(new Control[] { lblText, lblCommand, lblArguments,
+            Controls.AddRange(new Control[] { lblText, lblCommand, lblArguments,
                 txtText, txtFilePath, txtArguments, btnBrowse, btnOK, btnCancel });
             int a = 20.DpiZoom();
             btnBrowse.Anchor = btnOK.Anchor = btnCancel.Anchor = AnchorStyles.Right | AnchorStyles.Top;
@@ -85,17 +85,17 @@ namespace ContextMenuManager.Controls
             btnBrowse.Top = txtFilePath.Top = lblCommand.Top = txtText.Bottom + a;
             lblArguments.Top = txtArguments.Top = txtFilePath.Bottom + a;
             btnOK.Top = btnCancel.Top = txtArguments.Bottom + a;
-            btnCancel.Left = btnBrowse.Left = this.ClientSize.Width - btnCancel.Width - a;
+            btnCancel.Left = btnBrowse.Left = ClientSize.Width - btnCancel.Width - a;
             btnOK.Left = btnCancel.Left - btnOK.Width - a;
             int b = Math.Max(Math.Max(lblText.Width, lblCommand.Width), lblArguments.Width) + btnBrowse.Width + 4 * a;
-            this.ClientSize = new Size(320.DpiZoom() + b, btnOK.Bottom + a);
-            this.MinimumSize = this.Size;
-            this.Resize += (sender, e) =>
+            ClientSize = new Size(320.DpiZoom() + b, btnOK.Bottom + a);
+            MinimumSize = Size;
+            Resize += (sender, e) =>
             {
-                txtText.Width = txtFilePath.Width = txtArguments.Width = this.ClientSize.Width - b;
+                txtText.Width = txtFilePath.Width = txtArguments.Width = ClientSize.Width - b;
                 txtText.Left = txtFilePath.Left = txtArguments.Left = btnBrowse.Left - txtFilePath.Width - a;
             };
-            this.OnResize(null);
+            OnResize(null);
         }
     }
 }

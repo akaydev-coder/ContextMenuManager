@@ -32,7 +32,7 @@ namespace ContextMenuManager.Controls
             {
                 string newPath = $@"{WinXList.WinXPath}\{ObjectPath.RemoveIllegalChars(value)}";
                 Directory.Move(GroupPath, newPath);
-                this.GroupPath = newPath;
+                GroupPath = newPath;
                 ExplorerRestarter.Show();
             }
         }
@@ -47,12 +47,12 @@ namespace ContextMenuManager.Controls
         private void InitializeComponents()
         {
             ChkVisible = new VisibleCheckBox(this);
-            this.SetCtrIndex(ChkVisible, 1);
+            SetCtrIndex(ChkVisible, 1);
             TsiDeleteMe = new DeleteMeMenuItem(this);
             TsiChangeText = new ChangeTextMenuItem(this);
-            this.ContextMenuStrip.Items.AddRange(new ToolStripItem[] { new ToolStripSeparator(),
+            ContextMenuStrip.Items.AddRange(new ToolStripItem[] { new ToolStripSeparator(),
                 TsiChangeText, TsiRestoreDefault, new ToolStripSeparator(), TsiDeleteMe });
-            this.ContextMenuStrip.Opening += (sender, e) => TsiRestoreDefault.Enabled = Directory.Exists(DefaultGroupPath);
+            ContextMenuStrip.Opening += (sender, e) => TsiRestoreDefault.Enabled = Directory.Exists(DefaultGroupPath);
             TsiRestoreDefault.Click += (sender, e) => RestoreDefault();
         }
 
@@ -69,7 +69,7 @@ namespace ContextMenuManager.Controls
                     string dstPath = $@"{GroupPath}\{Path.GetFileName(srcPath)}";
                     File.Copy(srcPath, dstPath);
                 }
-                WinXList list = (WinXList)this.Parent;
+                WinXList list = (WinXList)Parent;
                 list.ClearItems();
                 list.LoadItems();
                 ExplorerRestarter.Show();
@@ -84,7 +84,7 @@ namespace ContextMenuManager.Controls
             Directory.Delete(GroupPath, true);
             if(flag)
             {
-                WinXList list = (WinXList)this.Parent;
+                WinXList list = (WinXList)Parent;
                 list.ClearItems();
                 list.LoadItems();
                 ExplorerRestarter.Show();

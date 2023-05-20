@@ -17,7 +17,7 @@ namespace ContextMenuManager.Controls
             {
                 frm.TopMost = AppConfig.TopMost;
                 bool flag = frm.ShowDialog() == DialogResult.OK;
-                if(flag) this.RegPath = frm.RegPath;
+                if(flag) RegPath = frm.RegPath;
                 return flag;
             }
         }
@@ -50,15 +50,15 @@ namespace ContextMenuManager.Controls
                     using(OpenFileDialog dlg = new OpenFileDialog())
                     {
                         if(dlg.ShowDialog() != DialogResult.OK) return;
-                        this.ItemFilePath = dlg.FileName;
-                        this.ItemText = Path.GetFileNameWithoutExtension(dlg.FileName);
+                        ItemFilePath = dlg.FileName;
+                        ItemText = Path.GetFileNameWithoutExtension(dlg.FileName);
                     }
                 };
             }
 
             private void AddNewItem()
             {
-                this.RegPath = $@"{IEList.IEPath}\{IEItem.MeParts[0]}\{ItemText.Replace("\\", "")}";
+                RegPath = $@"{IEList.IEPath}\{IEItem.MeParts[0]}\{ItemText.Replace("\\", "")}";
                 Microsoft.Win32.Registry.SetValue(RegPath, "", ItemCommand);
             }
         }

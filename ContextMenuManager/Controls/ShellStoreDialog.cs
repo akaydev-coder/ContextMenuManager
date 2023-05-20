@@ -19,11 +19,11 @@ namespace ContextMenuManager.Controls
 
         protected override bool RunDialog(IntPtr hwndOwner)
         {
-            using(ShellStoreForm frm = new ShellStoreForm(this.ShellPath, this.Filter, this.IsReference))
+            using(ShellStoreForm frm = new ShellStoreForm(ShellPath, Filter, IsReference))
             {
                 frm.TopMost = AppConfig.TopMost;
                 bool flag = frm.ShowDialog() == DialogResult.OK;
-                if(flag) this.SelectedKeyNames = frm.SelectedKeyNames;
+                if(flag) SelectedKeyNames = frm.SelectedKeyNames;
                 return flag;
             }
         }
@@ -36,18 +36,18 @@ namespace ContextMenuManager.Controls
 
             public ShellStoreForm(string shellPath, Func<string, bool> filter, bool isReference)
             {
-                this.SuspendLayout();
-                this.Filter = filter;
-                this.ShellPath = shellPath;
-                this.AcceptButton = btnOK;
-                this.CancelButton = btnCancel;
-                this.Font = SystemFonts.MessageBoxFont;
-                this.SizeGripStyle = SizeGripStyle.Hide;
-                this.ShowIcon = this.ShowInTaskbar = false;
-                this.MinimizeBox = this.MaximizeBox = false;
-                this.StartPosition = FormStartPosition.CenterParent;
-                this.MinimumSize = this.Size = new Size(652, 422).DpiZoom();
-                this.Text = isReference ? AppString.Dialog.CheckReference : AppString.Dialog.CheckCopy;
+                SuspendLayout();
+                Filter = filter;
+                ShellPath = shellPath;
+                AcceptButton = btnOK;
+                CancelButton = btnCancel;
+                Font = SystemFonts.MessageBoxFont;
+                SizeGripStyle = SizeGripStyle.Hide;
+                ShowIcon = ShowInTaskbar = false;
+                MinimizeBox = MaximizeBox = false;
+                StartPosition = FormStartPosition.CenterParent;
+                MinimumSize = Size = new Size(652, 422).DpiZoom();
+                Text = isReference ? AppString.Dialog.CheckReference : AppString.Dialog.CheckCopy;
                 btnOK.Click += (sender, e) => GetSelectedItems();
                 chkSelectAll.Click += (sender, e) =>
                 {
@@ -60,7 +60,7 @@ namespace ContextMenuManager.Controls
                 list.Owner = listBox;
                 InitializeComponents();
                 LoadItems(isReference);
-                this.ResumeLayout();
+                ResumeLayout();
             }
 
             readonly MyList list = new MyList();
@@ -93,15 +93,15 @@ namespace ContextMenuManager.Controls
 
             private void InitializeComponents()
             {
-                this.Controls.AddRange(new Control[] { listBox, pnlBorder, btnOK, btnCancel, chkSelectAll });
+                Controls.AddRange(new Control[] { listBox, pnlBorder, btnOK, btnCancel, chkSelectAll });
                 int a = 20.DpiZoom();
                 listBox.Location = new Point(a, a);
                 pnlBorder.Location = new Point(a - 1, a - 1);
-                chkSelectAll.Top = btnOK.Top = btnCancel.Top = this.ClientSize.Height - btnCancel.Height - a;
-                btnCancel.Left = this.ClientSize.Width - btnCancel.Width - a;
+                chkSelectAll.Top = btnOK.Top = btnCancel.Top = ClientSize.Height - btnCancel.Height - a;
+                btnCancel.Left = ClientSize.Width - btnCancel.Width - a;
                 btnOK.Left = btnCancel.Left - btnOK.Width - a;
                 chkSelectAll.Left = a;
-                this.OnResize(null);
+                OnResize(null);
             }
 
             protected override void OnResize(EventArgs e)
@@ -144,7 +144,7 @@ namespace ContextMenuManager.Controls
                 List<string> names = new List<string>();
                 foreach(StoreShellItem item in list.Controls)
                     if(item.IsSelected) names.Add(item.KeyName);
-                this.SelectedKeyNames = names.ToArray();
+                SelectedKeyNames = names.ToArray();
             }
         }
     }
@@ -153,13 +153,13 @@ namespace ContextMenuManager.Controls
     {
         public StoreShellItem(string regPath, bool isPublic, bool isSelect = true) : base(regPath)
         {
-            this.IsPublic = isPublic;
+            IsPublic = isPublic;
             if(isSelect)
             {
-                this.ContextMenuStrip = null;
-                this.AddCtr(chkSelected);
+                ContextMenuStrip = null;
+                AddCtr(chkSelected);
                 ChkVisible.Visible = BtnShowMenu.Visible = BtnSubItems.Visible = false;
-                this.MouseClick += (sender, e) => chkSelected.Checked = !chkSelected.Checked;
+                MouseClick += (sender, e) => chkSelected.Checked = !chkSelected.Checked;
                 chkSelected.CheckedChanged += (sender, e) => SelectedChanged?.Invoke();
             }
             RegTrustedInstaller.TakeRegTreeOwnerShip(regPath);

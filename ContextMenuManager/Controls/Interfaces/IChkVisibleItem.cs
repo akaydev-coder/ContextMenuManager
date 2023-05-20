@@ -15,15 +15,15 @@ namespace ContextMenuManager.Controls.Interfaces
         {
             MyListItem listItem = (MyListItem)item;
             listItem.AddCtr(this);
-            this.CheckChanged += () => item.ItemVisible = this.Checked;
+            CheckChanged += () => item.ItemVisible = Checked;
             listItem.ParentChanged += (sender, e) =>
             {
                 if(listItem.IsDisposed) return;
                 if(listItem.Parent == null) return;
-                this.Checked = item.ItemVisible;
+                Checked = item.ItemVisible;
                 if(listItem is FoldSubItem subItem && subItem.FoldGroupItem != null) return;
                 if(listItem.FindForm() is ShellStoreDialog.ShellStoreForm) return;
-                if(AppConfig.HideDisabledItems) listItem.Visible = this.Checked;
+                if(AppConfig.HideDisabledItems) listItem.Visible = Checked;
             };
         }
     }

@@ -17,7 +17,7 @@ namespace ContextMenuManager.Controls.Interfaces
             item.ContextMenuStrip = new ContextMenuStrip();
             ((MyListItem)item).AddCtr(this);
             bool isShow = false;
-            this.MouseDown += (sender, e) =>
+            MouseDown += (sender, e) =>
             {
                 if(!isShow) item.ContextMenuStrip.Show(this, 0, Height);
                 else item.ContextMenuStrip.Close();

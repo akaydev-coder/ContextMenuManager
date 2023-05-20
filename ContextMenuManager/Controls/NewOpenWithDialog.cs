@@ -18,7 +18,7 @@ namespace ContextMenuManager.Controls
             {
                 frm.TopMost = AppConfig.TopMost;
                 bool flag = frm.ShowDialog() == DialogResult.OK;
-                if(flag) this.RegPath = frm.RegPath;
+                if(flag) RegPath = frm.RegPath;
                 return flag;
             }
         }
@@ -65,7 +65,7 @@ namespace ContextMenuManager.Controls
                         }
                     }
                     AddNewItem();
-                    this.DialogResult = DialogResult.OK;
+                    DialogResult = DialogResult.OK;
                 };
             }
 

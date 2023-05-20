@@ -18,7 +18,7 @@ namespace ContextMenuManager.Controls
         public OpenWithItem(string regPath)
         {
             InitializeComponents();
-            this.RegPath = regPath;
+            RegPath = regPath;
         }
 
         private string regPath;
@@ -28,9 +28,9 @@ namespace ContextMenuManager.Controls
             set
             {
                 regPath = value;
-                this.ItemFilePath = ObjectPath.ExtractFilePath(ItemCommand);
-                this.Text = this.ItemText;
-                this.Image = this.ItemIcon.ToBitmap();
+                ItemFilePath = ObjectPath.ExtractFilePath(ItemCommand);
+                Text = ItemText;
+                Image = ItemIcon.ToBitmap();
             }
         }
         public string ValueName => null;
@@ -56,7 +56,7 @@ namespace ContextMenuManager.Controls
             set
             {
                 Registry.SetValue(AppPath, "FriendlyAppName", value);
-                this.Text = ResourceString.GetDirectString(value);
+                Text = ResourceString.GetDirectString(value);
             }
         }
 
@@ -118,15 +118,15 @@ namespace ContextMenuManager.Controls
             TsiDetails.DropDownItems.AddRange(new ToolStripItem[] { TsiSearch, new ToolStripSeparator(),
                 TsiChangeCommand, TsiFileProperties, TsiFileLocation, TsiRegLocation, TsiRegExport });
 
-            ContextMenuStrip.Opening += (sender, e) => TsiChangeText.Enabled = this.NameEquals;
+            ContextMenuStrip.Opening += (sender, e) => TsiChangeText.Enabled = NameEquals;
         }
 
         public void DeleteMe()
         {
-            RegistryEx.DeleteKeyTree(this.RegPath);
+            RegistryEx.DeleteKeyTree(RegPath);
             using(RegistryKey key = RegistryEx.GetRegistryKey(ShellPath))
             {
-                if(key.GetSubKeyNames().Length == 0) RegistryEx.DeleteKeyTree(this.AppPath);
+                if(key.GetSubKeyNames().Length == 0) RegistryEx.DeleteKeyTree(AppPath);
             }
         }
     }

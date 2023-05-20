@@ -15,7 +15,7 @@ namespace ContextMenuManager.Controls
         public SendToItem(string filePath)
         {
             InitializeComponents();
-            this.FilePath = filePath;
+            FilePath = filePath;
         }
 
         private string filePath;
@@ -25,9 +25,9 @@ namespace ContextMenuManager.Controls
             set
             {
                 filePath = value;
-                if(IsShortcut) this.ShellLink = new ShellLink(value);
-                this.Text = this.ItemText;
-                this.Image = this.ItemImage;
+                if(IsShortcut) ShellLink = new ShellLink(value);
+                Text = ItemText;
+                Image = ItemImage;
             }
         }
 
@@ -87,7 +87,7 @@ namespace ContextMenuManager.Controls
             set
             {
                 DesktopIni.SetLocalizedFileNames(FilePath, value);
-                this.Text = ResourceString.GetDirectString(value);
+                Text = ResourceString.GetDirectString(value);
                 ExplorerRestarter.Show();
             }
         }
@@ -146,8 +146,8 @@ namespace ContextMenuManager.Controls
                 {
                     ShellLink.IconLocation = new ShellLink.ICONLOCATION
                     {
-                        IconPath = this.IconPath,
-                        IconIndex = this.IconIndex
+                        IconPath = IconPath,
+                        IconIndex = IconIndex
                     };
                     ShellLink.Save();
                 }
@@ -211,16 +211,16 @@ namespace ContextMenuManager.Controls
             {
                 if(TsiChangeCommand.ChangeCommand(ShellLink))
                 {
-                    Image = this.ItemImage;
+                    Image = ItemImage;
                 }
             };
         }
 
         public void DeleteMe()
         {
-            File.Delete(this.FilePath);
+            File.Delete(FilePath);
             DesktopIni.DeleteLocalizedFileNames(FilePath);
-            this.ShellLink?.Dispose();
+            ShellLink?.Dispose();
         }
     }
 }

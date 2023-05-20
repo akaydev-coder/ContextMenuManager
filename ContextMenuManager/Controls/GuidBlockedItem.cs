@@ -13,19 +13,19 @@ namespace ContextMenuManager.Controls
         public GuidBlockedItem(string value)
         {
             InitializeComponents();
-            this.Value = value;
+            Value = value;
             if(GuidEx.TryParse(value, out Guid guid))
             {
-                this.Guid = guid;
-                this.Image = GuidInfo.GetImage(guid);
-                this.ItemFilePath = GuidInfo.GetFilePath(Guid);
+                Guid = guid;
+                Image = GuidInfo.GetImage(guid);
+                ItemFilePath = GuidInfo.GetFilePath(Guid);
             }
             else
             {
-                this.Guid = Guid.Empty;
-                this.Image = AppImage.SystemFile;
+                Guid = Guid.Empty;
+                Image = AppImage.SystemFile;
             }
-            this.Text = this.ItemText;
+            Text = ItemText;
         }
 
         public string Value { get; set; }
@@ -93,12 +93,12 @@ namespace ContextMenuManager.Controls
         public void DeleteMe()
         {
             if(AppMessageBox.Show(AppString.Message.ConfirmDelete, MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-            Array.ForEach(GuidBlockedList.BlockedPaths, path => RegistryEx.DeleteValue(path, this.Value));
-            if(!this.Guid.Equals(Guid.Empty)) ExplorerRestarter.Show();
-            int index = this.Parent.Controls.GetChildIndex(this);
-            index -= (index < this.Parent.Controls.Count - 1) ? 0 : 1;
-            this.Parent.Controls[index].Focus();
-            this.Dispose();
+            Array.ForEach(GuidBlockedList.BlockedPaths, path => RegistryEx.DeleteValue(path, Value));
+            if(!Guid.Equals(Guid.Empty)) ExplorerRestarter.Show();
+            int index = Parent.Controls.GetChildIndex(this);
+            index -= (index < Parent.Controls.Count - 1) ? 0 : 1;
+            Parent.Controls[index].Focus();
+            Dispose();
         }
     }
 }

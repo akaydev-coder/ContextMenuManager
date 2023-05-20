@@ -14,7 +14,7 @@ namespace ContextMenuManager.Controls.Interfaces
     {
         public WebSearchMenuItem(ITsiWebSearchItem item) : base(AppString.Menu.WebSearch)
         {
-            this.Click += (sender, e) =>
+            Click += (sender, e) =>
             {
                 string url = AppConfig.EngineUrl.Replace("%s", item.SearchText);
                 ExternalProgram.OpenWebUrl(url);

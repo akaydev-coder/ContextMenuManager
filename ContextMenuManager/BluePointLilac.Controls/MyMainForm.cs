@@ -9,20 +9,20 @@ namespace BluePointLilac.Controls
     {
         public MyMainForm()
         {
-            this.SuspendLayout();
-            this.Text = Application.ProductName;
-            this.ForeColor = Color.FromArgb(80, 80, 80);
-            this.BackColor = Color.FromArgb(250, 250, 250);
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-            this.Controls.AddRange(new Control[] { MainBody, SideBar, StatusBar, ToolBar });
-            SideBar.Resize += (sender, e) => this.OnResize(null);
-            this.ClientSize = new Size(850, 610).DpiZoom();
-            this.MinimumSize = this.Size;
+            SuspendLayout();
+            Text = Application.ProductName;
+            ForeColor = Color.FromArgb(80, 80, 80);
+            BackColor = Color.FromArgb(250, 250, 250);
+            StartPosition = FormStartPosition.CenterScreen;
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            Controls.AddRange(new Control[] { MainBody, SideBar, StatusBar, ToolBar });
+            SideBar.Resize += (sender, e) => OnResize(null);
+            ClientSize = new Size(850, 610).DpiZoom();
+            MinimumSize = Size;
             MainBody.Dock = DockStyle.Left;
             StatusBar.CanMoveForm();
             ToolBar.CanMoveForm();
-            this.ResumeLayout();
+            ResumeLayout();
         }
 
         public readonly MyToolBar ToolBar = new MyToolBar();
@@ -38,7 +38,7 @@ namespace BluePointLilac.Controls
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            MainBody.Width = this.ClientSize.Width - SideBar.Width;
+            MainBody.Width = ClientSize.Width - SideBar.Width;
         }
 
         protected override void WndProc(ref Message m)
@@ -61,12 +61,12 @@ namespace BluePointLilac.Controls
                         case SC_MOVE:
                         //解决控件过多调整窗体大小时延迟问题
                         case SC_SIZE:
-                            suspend = this.SuspendMainBodyWhenMove; break;
+                            suspend = SuspendMainBodyWhenMove; break;
                         //解决控件过多最大化、最小化、还原重绘卡顿问题
                         case SC_RESTORE:
                         case SC_MINIMIZE:
                         case SC_MAXIMIZE:
-                            suspend = this.SuspendMainBodyWhenResize; break;
+                            suspend = SuspendMainBodyWhenResize; break;
                     }
                     break;
                 case WM_NCLBUTTONDBLCLK:
@@ -74,20 +74,20 @@ namespace BluePointLilac.Controls
                     {
                         //双击标题栏最大化和还原窗口
                         case HT_CAPTION:
-                            suspend = this.SuspendMainBodyWhenResize; break;
+                            suspend = SuspendMainBodyWhenResize; break;
                     }
                     break;
             }
             if(suspend)
             {
-                this.SuspendLayout();
+                SuspendLayout();
                 MainBody.SuspendLayout();
-                this.Controls.Remove(MainBody);
+                Controls.Remove(MainBody);
                 base.WndProc(ref m);
-                this.Controls.Add(MainBody);
+                Controls.Add(MainBody);
                 MainBody.BringToFront();
                 MainBody.ResumeLayout();
-                this.ResumeLayout();
+                ResumeLayout();
             }
             else base.WndProc(ref m);
         }

@@ -9,10 +9,10 @@ namespace BluePointLilac.Controls
     {
         public MyToolBar()
         {
-            this.Height = 80.DpiZoom();
-            this.Dock = DockStyle.Top;
-            this.DoubleBuffered = true;
-            this.BackColor = Color.FromArgb(85, 145, 215);
+            Height = 80.DpiZoom();
+            Dock = DockStyle.Top;
+            DoubleBuffered = true;
+            BackColor = Color.FromArgb(85, 145, 215);
         }
 
         private MyToolBarButton selectedButton;
@@ -48,14 +48,14 @@ namespace BluePointLilac.Controls
             }
             set
             {
-                if(value < 0 || value >= this.Controls.Count) SelectedButton = null;
+                if(value < 0 || value >= Controls.Count) SelectedButton = null;
                 else SelectedButton = (MyToolBarButton)Controls[value];
             }
         }
 
         public void AddButton(MyToolBarButton button)
         {
-            this.SuspendLayout();
+            SuspendLayout();
             button.Parent = this;
             button.Margin = new Padding(12, 4, 0, 0).DpiZoom();
             button.MouseDown += (sender, e) =>
@@ -70,7 +70,7 @@ namespace BluePointLilac.Controls
             {
                 if(button != SelectedButton) button.Opacity = 0;
             };
-            this.ResumeLayout();
+            ResumeLayout();
         }
 
         public void AddButtons(MyToolBarButton[] buttons)
@@ -85,18 +85,18 @@ namespace BluePointLilac.Controls
     {
         public MyToolBarButton(Image image, string text)
         {
-            this.SuspendLayout();
-            this.DoubleBuffered = true;
-            this.Cursor = Cursors.Hand;
-            this.Size = new Size(72, 72).DpiZoom();
-            this.Controls.AddRange(new Control[] { picImage, lblText });
-            lblText.Resize += (sender, e) => this.OnResize(null);
+            SuspendLayout();
+            DoubleBuffered = true;
+            Cursor = Cursors.Hand;
+            Size = new Size(72, 72).DpiZoom();
+            Controls.AddRange(new Control[] { picImage, lblText });
+            lblText.Resize += (sender, e) => OnResize(null);
             picImage.Top = 6.DpiZoom();
             lblText.Top = 52.DpiZoom();
             lblText.SetEnabled(false);
-            this.Image = image;
-            this.Text = text;
-            this.ResumeLayout();
+            Image = image;
+            Text = text;
+            ResumeLayout();
         }
 
         readonly PictureBox picImage = new PictureBox
@@ -135,8 +135,8 @@ namespace BluePointLilac.Controls
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            lblText.Left = (this.Width - lblText.Width) / 2;
-            picImage.Left = (this.Width - picImage.Width) / 2;
+            lblText.Left = (Width - lblText.Width) / 2;
+            picImage.Left = (Width - picImage.Width) / 2;
         }
     }
 }

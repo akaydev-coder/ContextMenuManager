@@ -16,13 +16,13 @@ namespace ContextMenuManager.Controls
             using(SubItemsForm frm = new SubItemsForm())
             using(DetailedEditList list = new DetailedEditList())
             {
-                var location = GuidInfo.GetIconLocation(this.GroupGuid);
+                var location = GuidInfo.GetIconLocation(GroupGuid);
                 frm.Icon = ResourceIcon.GetIcon(location.IconPath, location.IconIndex);
-                frm.Text = AppString.Dialog.DetailedEdit.Replace("%s", GuidInfo.GetText(this.GroupGuid));
+                frm.Text = AppString.Dialog.DetailedEdit.Replace("%s", GuidInfo.GetText(GroupGuid));
                 frm.TopMost = AppConfig.TopMost;
                 frm.AddList(list);
-                list.GroupGuid = this.GroupGuid;
-                list.UseUserDic = XmlDicHelper.DetailedEditGuidDic[this.GroupGuid];
+                list.GroupGuid = GroupGuid;
+                list.UseUserDic = XmlDicHelper.DetailedEditGuidDic[GroupGuid];
                 list.LoadItems();
                 frm.ShowDialog();
             }

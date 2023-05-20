@@ -16,11 +16,11 @@ namespace ContextMenuManager.Controls.Interfaces
     {
         public RegLocationMenuItem(ITsiRegPathItem item) : base(AppString.Menu.RegistryLocation)
         {
-            this.Click += (sender, e) => ExternalProgram.JumpRegEdit(item.RegPath, item.ValueName, AppConfig.OpenMoreRegedit);
+            Click += (sender, e) => ExternalProgram.JumpRegEdit(item.RegPath, item.ValueName, AppConfig.OpenMoreRegedit);
             item.ContextMenuStrip.Opening += (sender, e) =>
             {
                 using(var key = RegistryEx.GetRegistryKey(item.RegPath))
-                    this.Visible = key != null;
+                    Visible = key != null;
             };
         }
     }

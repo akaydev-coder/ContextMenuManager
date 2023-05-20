@@ -16,7 +16,7 @@ namespace ContextMenuManager.Controls.Interfaces
     {
         public ChangeTextMenuItem(ITsiTextItem item) : base(AppString.Menu.ChangeText)
         {
-            this.Click += (sender, e) =>
+            Click += (sender, e) =>
             {
                 string name = ChangeText(item.Text);
                 if(name != null) item.ItemText = name;

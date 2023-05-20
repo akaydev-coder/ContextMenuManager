@@ -11,12 +11,12 @@ namespace ContextMenuManager.Controls
 
         public NewItem(string text)
         {
-            this.Text = text;
-            this.Image = AppImage.NewItem;
-            this.AddCtr(BtnAddNewItem);
+            Text = text;
+            Image = AppImage.NewItem;
+            AddCtr(BtnAddNewItem);
             ToolTipBox.SetToolTip(BtnAddNewItem, text);
             BtnAddNewItem.MouseDown += (sender, e) => AddNewItem?.Invoke();
-            this.MouseDoubleClick += (sender, e) => AddNewItem?.Invoke();
+            MouseDoubleClick += (sender, e) => AddNewItem?.Invoke();
 
         }
         public Action AddNewItem;

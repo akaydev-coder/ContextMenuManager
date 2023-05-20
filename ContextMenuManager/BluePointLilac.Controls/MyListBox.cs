@@ -10,8 +10,8 @@ namespace BluePointLilac.Controls
     {
         public MyListBox()
         {
-            this.AutoScroll = true;
-            this.BackColor = Color.FromArgb(250, 250, 250);
+            AutoScroll = true;
+            BackColor = Color.FromArgb(250, 250, 250);
         }
 
         protected override void OnMouseWheel(MouseEventArgs e)
@@ -25,22 +25,22 @@ namespace BluePointLilac.Controls
     {
         public MyListBox Owner
         {
-            get => (MyListBox)this.Parent;
-            set => this.Parent = value;
+            get => (MyListBox)Parent;
+            set => Parent = value;
         }
 
         public MyList(MyListBox owner) : this()
         {
-            this.Owner = owner;
+            Owner = owner;
         }
 
         public MyList()
         {
-            this.AutoSize = true;
-            this.WrapContents = true;
-            this.Dock = DockStyle.Top;
-            this.DoubleBuffered = true;
-            this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            AutoSize = true;
+            WrapContents = true;
+            Dock = DockStyle.Top;
+            DoubleBuffered = true;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
         }
 
         private MyListItem hoveredItem;
@@ -72,14 +72,14 @@ namespace BluePointLilac.Controls
 
         public void AddItem(MyListItem item)
         {
-            this.SuspendLayout();
+            SuspendLayout();
             item.Parent = this;
             item.MouseEnter += (sender, e) => HoveredItem = item;
-            this.MouseWheel += (sender, e) => item.ContextMenuStrip?.Close();
+            MouseWheel += (sender, e) => item.ContextMenuStrip?.Close();
             void ResizeItem() => item.Width = Owner.Width - item.Margin.Horizontal;
             Owner.Resize += (sender, e) => ResizeItem();
             ResizeItem();
-            this.ResumeLayout();
+            ResumeLayout();
         }
 
         public void AddItems(MyListItem[] items)
@@ -94,7 +94,7 @@ namespace BluePointLilac.Controls
 
         public void SetItemIndex(MyListItem item, int newIndex)
         {
-            this.Controls.SetChildIndex(item, newIndex);
+            Controls.SetChildIndex(item, newIndex);
         }
 
         public int GetItemIndex(MyListItem item)
@@ -105,30 +105,30 @@ namespace BluePointLilac.Controls
         public void InsertItem(MyListItem item, int index)
         {
             if(item == null) return;
-            this.AddItem(item);
-            this.SetItemIndex(item, index);
+            AddItem(item);
+            SetItemIndex(item, index);
         }
 
         public virtual void ClearItems()
         {
-            if(this.Controls.Count == 0) return;
-            this.SuspendLayout();
-            for(int i = this.Controls.Count - 1; i >= 0; i--)
+            if(Controls.Count == 0) return;
+            SuspendLayout();
+            for(int i = Controls.Count - 1; i >= 0; i--)
             {
-                Control ctr = this.Controls[i];
-                this.Controls.Remove(ctr);
+                Control ctr = Controls[i];
+                Controls.Remove(ctr);
                 ctr.Dispose();
             }
-            this.ResumeLayout();
+            ResumeLayout();
         }
 
         public void SortItemByText()
         {
             List<MyListItem> items = new List<MyListItem>();
-            foreach(MyListItem item in this.Controls) items.Add(item);
-            this.Controls.Clear();
+            foreach(MyListItem item in Controls) items.Add(item);
+            Controls.Clear();
             items.Sort(new TextComparer());
-            items.ForEach(item => this.AddItem(item));
+            items.ForEach(item => AddItem(item));
         }
 
         public class TextComparer : IComparer<MyListItem>
@@ -148,25 +148,25 @@ namespace BluePointLilac.Controls
     {
         public MyListItem()
         {
-            this.SuspendLayout();
-            this.HasImage = true;
-            this.DoubleBuffered = true;
-            this.Height = 50.DpiZoom();
-            this.Margin = new Padding(0);
-            this.Font = SystemFonts.IconTitleFont;
-            this.ForeColor = Color.FromArgb(80, 80, 80);
-            this.BackColor = Color.FromArgb(250, 250, 250);
-            this.Controls.AddRange(new Control[] { lblSeparator, flpControls, lblText, picImage });
-            this.Resize += (Sender, e) => pnlScrollbar.Height = this.ClientSize.Height;
-            flpControls.MouseClick += (sender, e) => this.OnMouseClick(e);
-            flpControls.MouseEnter += (sender, e) => this.OnMouseEnter(e);
-            flpControls.MouseDown += (sender, e) => this.OnMouseDown(e);
+            SuspendLayout();
+            HasImage = true;
+            DoubleBuffered = true;
+            Height = 50.DpiZoom();
+            Margin = new Padding(0);
+            Font = SystemFonts.IconTitleFont;
+            ForeColor = Color.FromArgb(80, 80, 80);
+            BackColor = Color.FromArgb(250, 250, 250);
+            Controls.AddRange(new Control[] { lblSeparator, flpControls, lblText, picImage });
+            Resize += (Sender, e) => pnlScrollbar.Height = ClientSize.Height;
+            flpControls.MouseClick += (sender, e) => OnMouseClick(e);
+            flpControls.MouseEnter += (sender, e) => OnMouseEnter(e);
+            flpControls.MouseDown += (sender, e) => OnMouseDown(e);
             lblSeparator.SetEnabled(false);
             lblText.SetEnabled(false);
             CenterControl(lblText);
             CenterControl(picImage);
             AddCtr(pnlScrollbar, 0);
-            this.ResumeLayout();
+            ResumeLayout();
         }
 
         public Image Image
@@ -245,7 +245,7 @@ namespace BluePointLilac.Controls
             void reSize()
             {
                 if(ctr.Parent == null) return;
-                int top = (this.ClientSize.Height - ctr.Height) / 2;
+                int top = (ClientSize.Height - ctr.Height) / 2;
                 ctr.Top = top;
                 if(ctr.Parent == flpControls)
                 {
@@ -264,13 +264,13 @@ namespace BluePointLilac.Controls
 
         public void AddCtr(Control ctr, int space)
         {
-            this.SuspendLayout();
+            SuspendLayout();
             ctr.Parent = flpControls;
             ctr.Margin = new Padding(0, 0, space, 0);
-            ctr.MouseEnter += (sender, e) => this.OnMouseEnter(e);
-            ctr.MouseDown += (sender, e) => this.OnMouseEnter(e);
+            ctr.MouseEnter += (sender, e) => OnMouseEnter(e);
+            ctr.MouseDown += (sender, e) => OnMouseEnter(e);
             CenterControl(ctr);
-            this.ResumeLayout();
+            ResumeLayout();
         }
 
         public void AddCtrs(Control[] ctrs)

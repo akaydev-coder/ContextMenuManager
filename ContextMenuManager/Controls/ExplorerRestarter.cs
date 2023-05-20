@@ -10,20 +10,20 @@ namespace ContextMenuManager.Controls
     {
         public ExplorerRestarter()
         {
-            this.Visible = false;
-            this.DoubleBuffered = false;
-            this.Dock = DockStyle.Bottom;
-            this.Image = AppImage.Explorer;
-            this.Text = AppString.Other.RestartExplorer;
+            Visible = false;
+            DoubleBuffered = false;
+            Dock = DockStyle.Bottom;
+            Image = AppImage.Explorer;
+            Text = AppString.Other.RestartExplorer;
             ToolTipBox.SetToolTip(BtnRestart, AppString.Tip.RestartExplorer);
-            this.AddCtr(BtnRestart);
+            AddCtr(BtnRestart);
             this.CanMoveForm();
-            ShowHandler += () => this.Visible = true;
-            HideHandler += () => this.Visible = false;
+            ShowHandler += () => Visible = true;
+            HideHandler += () => Visible = false;
             BtnRestart.MouseDown += (sender, e) =>
             {
                 ExternalProgram.RestartExplorer();
-                this.Visible = false;
+                Visible = false;
             };
         }
 
@@ -32,9 +32,9 @@ namespace ContextMenuManager.Controls
             get => base.Visible;
             set
             {
-                bool flag = base.Visible != value && this.Parent != null;
+                bool flag = base.Visible != value && Parent != null;
                 base.Visible = value;
-                if(flag) this.Parent.Height += value ? Height : -Height;
+                if(flag) Parent.Height += value ? Height : -Height;
             }
         }
 

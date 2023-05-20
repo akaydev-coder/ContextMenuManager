@@ -13,11 +13,11 @@ namespace ContextMenuManager.Controls
     {
         public DictionariesBox()
         {
-            this.SuspendLayout();
-            this.Dock = DockStyle.Fill;
-            this.Controls.AddRange(pages);
-            this.Font = SystemFonts.MenuFont;
-            this.Font = new Font(this.Font.FontFamily, this.Font.Size + 1F);
+            SuspendLayout();
+            Dock = DockStyle.Fill;
+            Controls.AddRange(pages);
+            Font = SystemFonts.MenuFont;
+            Font = new Font(Font.FontFamily, Font.Size + 1F);
             cms.Items.AddRange(items);
             for(int i = 0; i < 6; i++)
             {
@@ -30,9 +30,9 @@ namespace ContextMenuManager.Controls
             btnOpenDir.Top = boxs[0].Height - btnOpenDir.Height;
             ToolTipBox.SetToolTip(btnOpenDir, AppString.Menu.FileLocation);
             btnOpenDir.MouseDown += (sender, e) => ExternalProgram.OpenDirectory(AppConfig.DicsDir);
-            this.SelectedIndexChanged += (sender, e) => LoadText();
-            this.VisibleChanged += (sender, e) => this.SetEnabled(this.Visible);
-            this.ResumeLayout();
+            SelectedIndexChanged += (sender, e) => LoadText();
+            VisibleChanged += (sender, e) => this.SetEnabled(Visible);
+            ResumeLayout();
         }
 
         readonly TabPage[] pages =
@@ -94,7 +94,7 @@ namespace ContextMenuManager.Controls
 
         private string GetInitialText()
         {
-            switch(this.SelectedIndex)
+            switch(SelectedIndex)
             {
                 case 0:
                     return AppString.Other.Dictionaries;
@@ -115,7 +115,7 @@ namespace ContextMenuManager.Controls
 
         public void LoadText()
         {
-            int index = this.SelectedIndex;
+            int index = SelectedIndex;
             if(boxs[index].Text.Length > 0) return;
             Action<string> action = null;
             switch(index)
@@ -129,7 +129,7 @@ namespace ContextMenuManager.Controls
                 case 5:
                     action = boxs[index].LoadXml; break;
             }
-            this.BeginInvoke(action, new[] { GetInitialText() });
+            BeginInvoke(action, new[] { GetInitialText() });
         }
     }
 }

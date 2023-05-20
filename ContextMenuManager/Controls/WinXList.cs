@@ -18,8 +18,8 @@ namespace ContextMenuManager.Controls
         {
             if(WinOsVersion.Current >= WinOsVersion.Win8)
             {
-                this.AddNewItem();
-                this.LoadWinXItems();
+                AddNewItem();
+                LoadWinXItems();
             }
         }
 
@@ -31,7 +31,7 @@ namespace ContextMenuManager.Controls
             foreach(string dirPath in dirPaths)
             {
                 WinXGroupItem groupItem = new WinXGroupItem(dirPath);
-                this.AddItem(groupItem);
+                AddItem(groupItem);
                 string[] lnkPaths;
                 if(AppConfig.WinXSortable)
                 {
@@ -47,7 +47,7 @@ namespace ContextMenuManager.Controls
                 {
                     WinXItem winXItem = new WinXItem(path, groupItem);
                     winXItem.BtnMoveDown.Visible = winXItem.BtnMoveUp.Visible = AppConfig.WinXSortable;
-                    this.AddItem(winXItem);
+                    AddItem(winXItem);
                 }
             }
             if(sorted)
@@ -60,7 +60,7 @@ namespace ContextMenuManager.Controls
         private void AddNewItem()
         {
             NewItem newItem = new NewItem();
-            this.AddItem(newItem);
+            AddItem(newItem);
             PictureButton btnCreateDir = new PictureButton(AppImage.NewFolder);
             ToolTipBox.SetToolTip(btnCreateDir, AppString.Tip.CreateGroup);
             newItem.AddCtr(btnCreateDir);
@@ -104,13 +104,13 @@ namespace ContextMenuManager.Controls
                             shellLink.Save();
                         }
                         DesktopIni.SetLocalizedFileNames(lnkPath, itemText);
-                        foreach(MyListItem ctr in this.Controls)
+                        foreach(MyListItem ctr in Controls)
                         {
                             if(ctr is WinXGroupItem groupItem && groupItem.Text == dirName)
                             {
                                 WinXItem item = new WinXItem(lnkPath, groupItem) { Visible = !groupItem.IsFold };
                                 item.BtnMoveDown.Visible = item.BtnMoveUp.Visible = AppConfig.WinXSortable;
-                                this.InsertItem(item, this.GetItemIndex(groupItem) + 1);
+                                InsertItem(item, GetItemIndex(groupItem) + 1);
                                 break;
                             }
                         }
@@ -129,7 +129,7 @@ namespace ContextMenuManager.Controls
             File.WriteAllText(iniPath, string.Empty, Encoding.Unicode);
             File.SetAttributes(dirPath, File.GetAttributes(dirPath) | FileAttributes.ReadOnly);
             File.SetAttributes(iniPath, File.GetAttributes(iniPath) | FileAttributes.Hidden | FileAttributes.System);
-            this.InsertItem(new WinXGroupItem(dirPath), 1);
+            InsertItem(new WinXGroupItem(dirPath), 1);
         }
 
         public static string[] GetGroupNames()

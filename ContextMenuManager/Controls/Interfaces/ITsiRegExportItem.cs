@@ -21,9 +21,9 @@ namespace ContextMenuManager.Controls.Interfaces
             item.ContextMenuStrip.Opening += (sender, e) =>
             {
                 using(var key = RegistryEx.GetRegistryKey(item.RegPath))
-                    this.Visible = key != null;
+                    Visible = key != null;
             };
-            this.Click += (sender, e) =>
+            Click += (sender, e) =>
             {
                 using(SaveFileDialog dlg = new SaveFileDialog())
                 {

@@ -12,9 +12,9 @@ namespace ContextMenuManager.Controls
     {
         public AppSettingBox()
         {
-            this.SuspendLayout();
-            this.Font = SystemFonts.MenuFont;
-            this.Font = new Font(this.Font.FontFamily, this.Font.Size + 1F);
+            SuspendLayout();
+            Font = SystemFonts.MenuFont;
+            Font = new Font(Font.FontFamily, Font.Size + 1F);
             mliConfigDir.AddCtrs(new Control[] { cmbConfigDir, btnConfigDir });
             mliBackup.AddCtrs(new Control[] { chkBackup, btnBackupDir });
             mliUpdate.AddCtrs(new Control[] { cmbUpdate, btnUpdate });
@@ -51,9 +51,9 @@ namespace ContextMenuManager.Controls
 
             btnUpdate.MouseDown += (sender, e) =>
             {
-                this.Cursor = Cursors.WaitCursor;
+                Cursor = Cursors.WaitCursor;
                 Updater.Update(true);
-                this.Cursor = Cursors.Default;
+                Cursor = Cursors.Default;
             };
             btnConfigDir.MouseDown += (sender, e) => ExternalProgram.OpenDirectory(AppConfig.ConfigDir);
             btnBackupDir.MouseDown += (sender, e) => ExternalProgram.OpenDirectory(AppConfig.RegBackupDir);
@@ -61,7 +61,7 @@ namespace ContextMenuManager.Controls
             chkProtect.CheckChanged += () => AppConfig.ProtectOpenItem = chkProtect.Checked;
             chkWinXSortable.CheckChanged += () => AppConfig.WinXSortable = chkWinXSortable.Checked;
             chkOpenMoreRegedit.CheckChanged += () => AppConfig.OpenMoreRegedit = chkOpenMoreRegedit.Checked;
-            chkTopMost.CheckChanged += () => AppConfig.TopMost = this.FindForm().TopMost = chkTopMost.Checked;
+            chkTopMost.CheckChanged += () => AppConfig.TopMost = FindForm().TopMost = chkTopMost.Checked;
             chkOpenMoreExplorer.CheckChanged += () => AppConfig.OpenMoreExplorer = chkOpenMoreExplorer.Checked;
             chkHideDisabledItems.CheckChanged += () => AppConfig.HideDisabledItems = chkHideDisabledItems.Checked;
             chkHideSysStoreItems.CheckChanged += () => AppConfig.HideSysStoreItems = chkHideSysStoreItems.Checked;
@@ -70,7 +70,7 @@ namespace ContextMenuManager.Controls
             cmbUpdate.SelectionChangeCommitted += (sender, e) => ChangeUpdateFrequency();
             cmbConfigDir.SelectionChangeCommitted += (sender, e) => ChangeConfigDir();
             cmbEngine.SelectionChangeCommitted += (sender, e) => ChangeEngineUrl();
-            this.ResumeLayout();
+            ResumeLayout();
         }
 
         readonly MyListItem mliConfigDir = new MyListItem
@@ -158,20 +158,20 @@ namespace ContextMenuManager.Controls
 
         public override void ClearItems()
         {
-            this.Controls.Clear();
+            Controls.Clear();
         }
 
         public void LoadItems()
         {
-            this.AddItems(new[] { mliConfigDir, mliUpdate, mliRepo, mliEngine, mliBackup, mliTopMost, mliProtect, mliShowFilePath,
+            AddItems(new[] { mliConfigDir, mliUpdate, mliRepo, mliEngine, mliBackup, mliTopMost, mliProtect, mliShowFilePath,
                 mliHideDisabledItems, mliHideSysStoreItems, mliOpenMoreRegedit, mliOpenMoreExplorer, mliWinXSortable });
-            foreach(MyListItem item in this.Controls) item.HasImage = false;
+            foreach(MyListItem item in Controls) item.HasImage = false;
             cmbConfigDir.SelectedIndex = AppConfig.SaveToAppDir ? 1 : 0;
             cmbRepo.SelectedIndex = AppConfig.RequestUseGithub ? 0 : 1;
             cmbUpdate.SelectedIndex = GetUpdateSelectIndex();
             cmbEngine.SelectedIndex = GetEngineSelectIndex();
             chkBackup.Checked = AppConfig.AutoBackup;
-            chkTopMost.Checked = this.FindForm().TopMost;
+            chkTopMost.Checked = FindForm().TopMost;
             chkProtect.Checked = AppConfig.ProtectOpenItem;
             chkWinXSortable.Checked = AppConfig.WinXSortable;
             chkShowFilePath.Checked = AppConfig.ShowFilePath;

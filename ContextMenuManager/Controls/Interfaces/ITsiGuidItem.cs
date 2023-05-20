@@ -19,8 +19,8 @@ namespace ContextMenuManager.Controls.Interfaces
     {
         public HandleGuidMenuItem(ITsiGuidItem item) : base(AppString.Menu.HandleGuid)
         {
-            this.Item = item;
-            this.DropDownItems.AddRange(new ToolStripItem[] { TsiAddGuidDic,
+            Item = item;
+            DropDownItems.AddRange(new ToolStripItem[] { TsiAddGuidDic,
                 new ToolStripSeparator(), TsiCopyGuid, TsiBlockGuid, TsiClsidLocation });
             TsiCopyGuid.Click += (sender, e) => CopyGuid();
             TsiBlockGuid.Click += (sender, e) => BlockGuid();
@@ -159,20 +159,20 @@ namespace ContextMenuManager.Controls.Interfaces
             {
                 using(AddGuidDicForm frm = new AddGuidDicForm())
                 {
-                    frm.ItemText = this.ItemText;
-                    frm.ItemIcon = this.ItemIcon;
-                    frm.ItemIconPath = this.ItemIconPath;
-                    frm.ItemIconIndex = this.ItemIconIndex;
+                    frm.ItemText = ItemText;
+                    frm.ItemIcon = ItemIcon;
+                    frm.ItemIconPath = ItemIconPath;
+                    frm.ItemIconIndex = ItemIconIndex;
                     frm.TopMost = AppConfig.TopMost;
                     bool flag = frm.ShowDialog() == DialogResult.OK;
                     if(flag)
                     {
-                        this.ItemText = frm.ItemText;
-                        this.ItemIcon = frm.ItemIcon;
-                        this.ItemIconPath = frm.ItemIconPath;
-                        this.ItemIconIndex = frm.ItemIconIndex;
+                        ItemText = frm.ItemText;
+                        ItemIcon = frm.ItemIcon;
+                        ItemIconPath = frm.ItemIconPath;
+                        ItemIconIndex = frm.ItemIconIndex;
                     }
-                    this.IsDelete = frm.IsDelete;
+                    IsDelete = frm.IsDelete;
                     return flag;
                 }
             }
@@ -181,14 +181,14 @@ namespace ContextMenuManager.Controls.Interfaces
             {
                 public AddGuidDicForm()
                 {
-                    this.AcceptButton = btnOK;
-                    this.CancelButton = btnCancel;
-                    this.Font = SystemFonts.MenuFont;
-                    this.Text = AppString.Dialog.AddGuidDic;
-                    this.ShowIcon = this.ShowInTaskbar = false;
-                    this.MaximizeBox = this.MinimizeBox = false;
-                    this.FormBorderStyle = FormBorderStyle.FixedSingle;
-                    this.StartPosition = FormStartPosition.CenterParent;
+                    AcceptButton = btnOK;
+                    CancelButton = btnCancel;
+                    Font = SystemFonts.MenuFont;
+                    Text = AppString.Dialog.AddGuidDic;
+                    ShowIcon = ShowInTaskbar = false;
+                    MaximizeBox = MinimizeBox = false;
+                    FormBorderStyle = FormBorderStyle.FixedSingle;
+                    StartPosition = FormStartPosition.CenterParent;
                     InitializeComponents();
                 }
 
@@ -247,7 +247,7 @@ namespace ContextMenuManager.Controls.Interfaces
 
                 private void InitializeComponents()
                 {
-                    this.Controls.AddRange(new Control[] { lblName, txtName, lblIcon, picIcon, btnBrowse, btnDelete, btnOK, btnCancel });
+                    Controls.AddRange(new Control[] { lblName, txtName, lblIcon, picIcon, btnBrowse, btnDelete, btnOK, btnCancel });
                     int a = 20.DpiZoom();
                     lblName.Left = lblName.Top = lblIcon.Left = btnDelete.Left = txtName.Top = a;
                     txtName.Left = lblName.Right + a;
@@ -260,26 +260,26 @@ namespace ContextMenuManager.Controls.Interfaces
                     picIcon.Top = btnBrowse.Top + (btnBrowse.Height - picIcon.Height) / 2;
                     lblIcon.Top = btnBrowse.Top + (btnBrowse.Height - lblIcon.Height) / 2;
                     btnDelete.Top = btnOK.Top = btnCancel.Top = btnBrowse.Bottom + a;
-                    this.ClientSize = new Size(btnCancel.Right + a, btnCancel.Bottom + a);
+                    ClientSize = new Size(btnCancel.Right + a, btnCancel.Bottom + a);
                     ToolTipBox.SetToolTip(btnDelete, AppString.Tip.DeleteGuidDic);
                     btnBrowse.Click += (sender, e) => SelectIcon();
-                    btnDelete.Click += (sender, e) => this.IsDelete = true;
+                    btnDelete.Click += (sender, e) => IsDelete = true;
                 }
 
                 private void SelectIcon()
                 {
                     using(IconDialog dlg = new IconDialog())
                     {
-                        dlg.IconPath = this.ItemIconPath;
-                        dlg.IconIndex = this.ItemIconIndex;
+                        dlg.IconPath = ItemIconPath;
+                        dlg.IconIndex = ItemIconIndex;
                         if(dlg.ShowDialog() != DialogResult.OK) return;
                         using(Icon icon = ResourceIcon.GetIcon(dlg.IconPath, dlg.IconIndex))
                         {
                             Image image = icon?.ToBitmap();
                             if(image == null) return;
                             picIcon.Image = image;
-                            this.ItemIconPath = dlg.IconPath;
-                            this.ItemIconIndex = dlg.IconIndex;
+                            ItemIconPath = dlg.IconPath;
+                            ItemIconIndex = dlg.IconIndex;
                         }
                     }
                 }
@@ -298,9 +298,9 @@ namespace ContextMenuManager.Controls.Interfaces
             {
                 if(listItem.IsDisposed) return;
                 if(listItem.Parent == null) return;
-                this.Visible = XmlDicHelper.DetailedEditGuidDic.ContainsKey(item.Guid);
+                Visible = XmlDicHelper.DetailedEditGuidDic.ContainsKey(item.Guid);
             };
-            this.MouseDown += (sender, e) =>
+            MouseDown += (sender, e) =>
             {
                 using(DetailedEditDialog dlg = new DetailedEditDialog())
                 {

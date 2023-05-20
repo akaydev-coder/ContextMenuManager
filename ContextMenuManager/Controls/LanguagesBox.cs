@@ -17,21 +17,21 @@ namespace ContextMenuManager.Controls
     {
         public LanguagesBox()
         {
-            this.SuspendLayout();
-            this.Dock = DockStyle.Fill;
-            this.Font = SystemFonts.MenuFont;
-            this.Font = new Font(this.Font.FontFamily, this.Font.Size + 1F);
-            this.Controls.AddRange(new Control[] { cmbLanguages, btnOpenDir, btnDownLoad, btnTranslate, lblThank, pnlTranslators });
-            this.VisibleChanged += (sender, e) => this.SetEnabled(this.Visible);
+            SuspendLayout();
+            Dock = DockStyle.Fill;
+            Font = SystemFonts.MenuFont;
+            Font = new Font(Font.FontFamily, Font.Size + 1F);
+            Controls.AddRange(new Control[] { cmbLanguages, btnOpenDir, btnDownLoad, btnTranslate, lblThank, pnlTranslators });
+            VisibleChanged += (sender, e) => this.SetEnabled(Visible);
             cmbLanguages.SelectionChangeCommitted += (sender, e) => ChangeLanguage();
             btnOpenDir.MouseDown += (sender, e) => ExternalProgram.OpenDirectory(AppConfig.LangsDir);
             lblThank.MouseEnter += (sender, e) => lblThank.ForeColor = Color.FromArgb(0, 162, 255);
             lblThank.MouseLeave += (sender, e) => lblThank.ForeColor = Color.DimGray;
             btnDownLoad.MouseDown += (sender, e) =>
             {
-                this.Cursor = Cursors.WaitCursor;
-                this.ShowLanguageDialog();
-                this.Cursor = Cursors.Default;
+                Cursor = Cursors.WaitCursor;
+                ShowLanguageDialog();
+                Cursor = Cursors.Default;
             };
             btnTranslate.MouseDown += (sender, e) =>
             {
@@ -43,10 +43,10 @@ namespace ContextMenuManager.Controls
             ToolTipBox.SetToolTip(btnOpenDir, AppString.Menu.FileLocation);
             ToolTipBox.SetToolTip(btnDownLoad, AppString.Dialog.DownloadLanguages);
             ToolTipBox.SetToolTip(btnTranslate, AppString.Dialog.TranslateTool);
-            lblHeader.Font = new Font(this.Font, FontStyle.Bold);
+            lblHeader.Font = new Font(Font, FontStyle.Bold);
             cmbLanguages.AutosizeDropDownWidth();
-            this.OnResize(null);
-            this.ResumeLayout();
+            OnResize(null);
+            ResumeLayout();
         }
 
         readonly ComboBox cmbLanguages = new ComboBox
@@ -83,8 +83,8 @@ namespace ContextMenuManager.Controls
         {
             base.OnResize(e);
             int a = 20.DpiZoom();
-            pnlTranslators.Width = this.ClientSize.Width - 2 * a;
-            pnlTranslators.Height = this.ClientSize.Height - pnlTranslators.Top - a;
+            pnlTranslators.Width = ClientSize.Width - 2 * a;
+            pnlTranslators.Height = ClientSize.Height - pnlTranslators.Top - a;
             cmbLanguages.Margin = pnlTranslators.Margin = lblThank.Margin = btnOpenDir.Margin
                 = btnDownLoad.Margin = btnTranslate.Margin = new Padding(a, a, 0, 0);
         }
@@ -120,7 +120,7 @@ namespace ContextMenuManager.Controls
                         ForeColor = Color.DodgerBlue,
                         Text = language,
                         AutoSize = true,
-                        Font = this.Font
+                        Font = Font
                     };
                     Label[] ctrTranslators = new Label[translators.Length];
                     for(int i = 0; i < translators.Length; i++)
@@ -128,7 +128,7 @@ namespace ContextMenuManager.Controls
                         ctrTranslators[i] = new Label
                         {
                             AutoSize = true,
-                            Font = this.Font,
+                            Font = Font,
                             Text = translators[i],
                             ForeColor = Color.DimGray,
                         };
@@ -246,7 +246,7 @@ namespace ContextMenuManager.Controls
                         }
                         else
                         {
-                            this.LoadLanguages();
+                            LoadLanguages();
                             string language = new IniWriter(filePath).GetValue("General", "Language");
                             if(language == "") language = dlg.Selected;
                             cmbLanguages.Text = language;
@@ -274,16 +274,16 @@ namespace ContextMenuManager.Controls
             {
                 public TranslateForm()
                 {
-                    this.SuspendLayout();
-                    this.CancelButton = btnCancel;
-                    this.Font = SystemFonts.MessageBoxFont;
-                    this.SizeGripStyle = SizeGripStyle.Hide;
-                    this.Text = AppString.Dialog.TranslateTool;
-                    this.ShowInTaskbar = this.MinimizeBox = false;
-                    this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-                    this.StartPosition = FormStartPosition.CenterParent;
-                    this.InitializeComponents();
-                    this.ResumeLayout();
+                    SuspendLayout();
+                    CancelButton = btnCancel;
+                    Font = SystemFonts.MessageBoxFont;
+                    SizeGripStyle = SizeGripStyle.Hide;
+                    Text = AppString.Dialog.TranslateTool;
+                    ShowInTaskbar = MinimizeBox = false;
+                    Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+                    StartPosition = FormStartPosition.CenterParent;
+                    InitializeComponents();
+                    ResumeLayout();
                 }
 
                 readonly Label lblSections = new Label
@@ -373,7 +373,7 @@ namespace ContextMenuManager.Controls
 
                 private void InitializeComponents()
                 {
-                    this.Controls.AddRange(new Control[] { lblSections, cmbSections, lblKeys,
+                    Controls.AddRange(new Control[] { lblSections, cmbSections, lblKeys,
                     cmbKeys, lblDefault, txtDefault, lblOld, txtOld, lblNew,
                     txtNew, btnBrowse, btnSave, btnCancel });
 
@@ -401,24 +401,24 @@ namespace ContextMenuManager.Controls
 
                     cmbSections.Left = cmbKeys.Left = txtDefault.Left = txtOld.Left = txtNew.Left = w + 2 * a;
 
-                    this.Resize += (sender, e) =>
+                    Resize += (sender, e) =>
                     {
                         txtDefault.Height = txtOld.Height = txtNew.Height
-                            = (this.ClientSize.Height - h - 7 * a) / 3;
+                            = (ClientSize.Height - h - 7 * a) / 3;
 
                         lblOld.Top = txtOld.Top = txtDefault.Bottom + a;
                         lblNew.Top = txtNew.Top = txtOld.Bottom + a;
                         btnBrowse.Top = btnSave.Top = btnCancel.Top = txtNew.Bottom + a;
 
                         cmbSections.Width = cmbKeys.Width = txtDefault.Width = txtOld.Width = txtNew.Width
-                            = this.ClientSize.Width - (w + 3 * a);
+                            = ClientSize.Width - (w + 3 * a);
 
-                        btnCancel.Left = this.ClientSize.Width - btnCancel.Width - a;
+                        btnCancel.Left = ClientSize.Width - btnCancel.Width - a;
                         btnSave.Left = btnCancel.Left - btnSave.Width - a;
                         btnBrowse.Left = btnSave.Left - btnBrowse.Width - a;
                     };
-                    this.ClientSize = new Size(w + 23 * a, h + 3 * 4 * a + 7 * a);
-                    this.MinimumSize = this.Size;
+                    ClientSize = new Size(w + 23 * a, h + 3 * 4 * a + 7 * a);
+                    MinimumSize = Size;
 
                     cmbSections.Items.AddRange(AppString.DefLangReader.Sections);
                     cmbSections.SelectedIndexChanged += (sender, e) =>

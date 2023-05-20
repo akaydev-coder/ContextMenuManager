@@ -12,9 +12,9 @@ namespace BluePointLilac.Controls
     {
         public MyCheckBox()
         {
-            this.Image = TurnOff;
-            this.Cursor = Cursors.Hand;
-            this.SizeMode = PictureBoxSizeMode.AutoSize;
+            Image = TurnOff;
+            Cursor = Cursors.Hand;
+            SizeMode = PictureBoxSizeMode.AutoSize;
         }
 
         private bool? _Checked = null;
@@ -24,7 +24,7 @@ namespace BluePointLilac.Controls
             set
             {
                 if(_Checked == value) return;
-                this.Image = SwitchImage(value);
+                Image = SwitchImage(value);
                 if(_Checked == null)
                 {
                     _Checked = value;
@@ -32,13 +32,13 @@ namespace BluePointLilac.Controls
                 }
                 if(PreCheckChanging != null && !PreCheckChanging.Invoke())
                 {
-                    this.Image = SwitchImage(!value);
+                    Image = SwitchImage(!value);
                     return;
                 }
                 else CheckChanging?.Invoke();
                 if(PreCheckChanged != null && !PreCheckChanged.Invoke())
                 {
-                    this.Image = SwitchImage(!value);
+                    Image = SwitchImage(!value);
                     return;
                 }
                 else
@@ -65,7 +65,7 @@ namespace BluePointLilac.Controls
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            if(e.Button == MouseButtons.Left) this.Checked = !this.Checked;
+            if(e.Button == MouseButtons.Left) Checked = !Checked;
         }
 
         private static readonly Image TurnOn = DrawImage(true);

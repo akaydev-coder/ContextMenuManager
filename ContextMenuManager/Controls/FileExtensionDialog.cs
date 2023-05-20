@@ -16,8 +16,8 @@ namespace ContextMenuManager.Controls
 
         public FileExtensionDialog()
         {
-            this.CanEdit = true;
-            this.Title = AppString.Dialog.SelectExtension;
+            CanEdit = true;
+            Title = AppString.Dialog.SelectExtension;
             List<string> items = new List<string>();
             using(var key = RegistryEx.GetRegistryKey(FileExtension.FILEEXTSPATH))
             {
@@ -29,7 +29,7 @@ namespace ContextMenuManager.Controls
                     }
                 }
             }
-            this.Items = items.ToArray();
+            Items = items.ToArray();
         }
 
         protected override bool RunDialog(IntPtr hwndOwner)
@@ -37,10 +37,10 @@ namespace ContextMenuManager.Controls
             bool flag = base.RunDialog(hwndOwner);
             if(flag)
             {
-                string extension = ObjectPath.RemoveIllegalChars(this.Extension);
+                string extension = ObjectPath.RemoveIllegalChars(Extension);
                 int index = extension.LastIndexOf('.');
-                if(index >= 0) this.Extension = extension.Substring(index);
-                else this.Extension = $".{extension}";
+                if(index >= 0) Extension = extension.Substring(index);
+                else Extension = $".{extension}";
             }
             return flag;
         }

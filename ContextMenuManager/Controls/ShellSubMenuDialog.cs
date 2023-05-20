@@ -21,7 +21,7 @@ namespace ContextMenuManager.Controls
         protected override bool RunDialog(IntPtr hwndOwner)
         {
             bool isPublic = true;
-            string value = Microsoft.Win32.Registry.GetValue(this.ParentPath, "SubCommands", null)?.ToString();
+            string value = Microsoft.Win32.Registry.GetValue(ParentPath, "SubCommands", null)?.ToString();
             if(value == null) isPublic = false;
             else if(value.IsNullOrWhiteSpace())
             {
@@ -42,8 +42,8 @@ namespace ContextMenuManager.Controls
 
             using(SubItemsForm frm = new SubItemsForm())
             {
-                frm.Text = this.Text;
-                frm.Icon = this.Icon;
+                frm.Text = Text;
+                frm.Icon = Icon;
                 frm.TopMost = AppConfig.TopMost;
 
                 if(isPublic)
@@ -51,7 +51,7 @@ namespace ContextMenuManager.Controls
                     frm.Text += $"({AppString.Dialog.Public})";
                     PulicMultiItemsList list = new PulicMultiItemsList();
                     frm.AddList(list);
-                    list.ParentPath = this.ParentPath;
+                    list.ParentPath = ParentPath;
                     list.LoadItems();
                 }
                 else
@@ -59,7 +59,7 @@ namespace ContextMenuManager.Controls
                     frm.Text += $"({AppString.Dialog.Private})";
                     PrivateMultiItemsList list = new PrivateMultiItemsList();
                     frm.AddList(list);
-                    list.ParentPath = this.ParentPath;
+                    list.ParentPath = ParentPath;
                     list.LoadItems();
                 }
 
@@ -81,7 +81,7 @@ namespace ContextMenuManager.Controls
             /// <param name="parentPath">子菜单的父菜单的注册表路径</param>
             public void LoadItems()
             {
-                this.AddItem(subNewItem);
+                AddItem(subNewItem);
                 subNewItem.AddNewItem += () => AddNewItem();
                 subNewItem.AddExisting += () => AddReference();
                 subNewItem.AddSeparator += () => AddSeparator();
@@ -100,7 +100,7 @@ namespace ContextMenuManager.Controls
                             if(key != null) item = new SubShellItem(this, keyName);
                             else if(keyName == "|") item = new SeparatorItem(this);
                             else item = new InvalidItem(this, keyName);
-                            this.AddItem(item);
+                            AddItem(item);
                         }
                     }
                 }
@@ -111,12 +111,12 @@ namespace ContextMenuManager.Controls
                 if(!SubShellTypeItem.CanAddMore(this)) return;
                 using(NewShellDialog dlg = new NewShellDialog())
                 {
-                    dlg.ScenePath = this.ScenePath;
+                    dlg.ScenePath = ScenePath;
                     dlg.ShellPath = ShellItem.CommandStorePath;
                     if(dlg.ShowDialog() != DialogResult.OK) return;
                     SubKeyNames.Add(dlg.NewItemKeyName);
-                    this.SaveSorting();
-                    this.AddItem(new SubShellItem(this, dlg.NewItemKeyName));
+                    SaveSorting();
+                    AddItem(new SubShellItem(this, dlg.NewItemKeyName));
                 }
             }
 
@@ -133,19 +133,19 @@ namespace ContextMenuManager.Controls
                     foreach(string keyName in dlg.SelectedKeyNames)
                     {
                         if(!SubShellTypeItem.CanAddMore(this)) return;
-                        this.AddItem(new SubShellItem(this, keyName));
-                        this.SubKeyNames.Add(keyName);
-                        this.SaveSorting();
+                        AddItem(new SubShellItem(this, keyName));
+                        SubKeyNames.Add(keyName);
+                        SaveSorting();
                     }
                 }
             }
 
             private void AddSeparator()
             {
-                if(this.Controls[this.Controls.Count - 1] is SeparatorItem) return;
-                this.SubKeyNames.Add("|");
-                this.SaveSorting();
-                this.AddItem(new SeparatorItem(this));
+                if(Controls[Controls.Count - 1] is SeparatorItem) return;
+                SubKeyNames.Add("|");
+                SaveSorting();
+                AddItem(new SeparatorItem(this));
             }
 
             private void SaveSorting()
@@ -155,34 +155,34 @@ namespace ContextMenuManager.Controls
 
             private void MoveItem(MyListItem item, bool isUp)
             {
-                int index = this.GetItemIndex(item);
+                int index = GetItemIndex(item);
                 if(isUp)
                 {
                     if(index > 1)
                     {
-                        this.SetItemIndex(item, index - 1);
-                        this.SubKeyNames.Reverse(index - 2, 2);
+                        SetItemIndex(item, index - 1);
+                        SubKeyNames.Reverse(index - 2, 2);
                     }
                 }
                 else
                 {
-                    if(index < this.Controls.Count - 1)
+                    if(index < Controls.Count - 1)
                     {
-                        this.SetItemIndex(item, index + 1);
-                        this.SubKeyNames.Reverse(index - 1, 2);
+                        SetItemIndex(item, index + 1);
+                        SubKeyNames.Reverse(index - 1, 2);
                     }
                 }
-                this.SaveSorting();
+                SaveSorting();
             }
 
             private void DeleteItem(MyListItem item)
             {
-                int index = this.GetItemIndex(item);
-                this.SubKeyNames.RemoveAt(index - 1);
-                if(index == this.Controls.Count - 1) index--;
-                this.Controls.Remove(item);
-                this.Controls[index].Focus();
-                this.SaveSorting();
+                int index = GetItemIndex(item);
+                SubKeyNames.RemoveAt(index - 1);
+                if(index == Controls.Count - 1) index--;
+                Controls.Remove(item);
+                Controls[index].Focus();
+                SaveSorting();
                 item.Dispose();
             }
 
@@ -190,7 +190,7 @@ namespace ContextMenuManager.Controls
             {
                 public SubShellItem(PulicMultiItemsList list, string keyName) : base($@"{CommandStorePath}\{keyName}")
                 {
-                    this.Owner = list;
+                    Owner = list;
                     BtnMoveUp.MouseDown += (sender, e) => Owner.MoveItem(this, true);
                     BtnMoveDown.MouseDown += (sender, e) => Owner.MoveItem(this, false);
                     ContextMenuStrip.Items.Remove(TsiDeleteMe);
@@ -214,7 +214,7 @@ namespace ContextMenuManager.Controls
             {
                 public SeparatorItem(PulicMultiItemsList list) : base()
                 {
-                    this.Owner = list;
+                    Owner = list;
                     BtnMoveUp.MouseDown += (sender, e) => Owner.MoveItem(this, true);
                     BtnMoveDown.MouseDown += (sender, e) => Owner.MoveItem(this, false);
                 }
@@ -231,9 +231,9 @@ namespace ContextMenuManager.Controls
             {
                 public InvalidItem(PulicMultiItemsList list, string keyName)
                 {
-                    this.Owner = list;
-                    this.Text = $"{AppString.Other.InvalidItem} {keyName}";
-                    this.Image = AppImage.NotFound.ToTransparent();
+                    Owner = list;
+                    Text = $"{AppString.Other.InvalidItem} {keyName}";
+                    Image = AppImage.NotFound.ToTransparent();
                     BtnDelete = new DeleteButton(this);
                     BtnMoveDown = new MoveButton(this, false);
                     BtnMoveUp = new MoveButton(this, true);
@@ -272,19 +272,19 @@ namespace ContextMenuManager.Controls
 
             public void LoadItems()
             {
-                this.AddItem(subNewItem);
+                AddItem(subNewItem);
                 subNewItem.AddNewItem += () => AddNewItem();
                 subNewItem.AddSeparator += () => AddSeparator();
                 subNewItem.AddExisting += () => AddFromParentMenu();
 
-                string sckValue = Microsoft.Win32.Registry.GetValue(this.ParentPath, "ExtendedSubCommandsKey", null)?.ToString();
+                string sckValue = Microsoft.Win32.Registry.GetValue(ParentPath, "ExtendedSubCommandsKey", null)?.ToString();
                 if(!sckValue.IsNullOrWhiteSpace())
                 {
-                    this.ShellPath = $@"{RegistryEx.CLASSES_ROOT}\{sckValue}\shell";
+                    ShellPath = $@"{RegistryEx.CLASSES_ROOT}\{sckValue}\shell";
                 }
                 else
                 {
-                    this.ShellPath = $@"{this.ParentPath}\shell";
+                    ShellPath = $@"{ParentPath}\shell";
                 }
                 using(var shellKey = RegistryEx.GetRegistryKey(ShellPath))
                 {
@@ -296,11 +296,11 @@ namespace ContextMenuManager.Controls
                         int value = Convert.ToInt32(Microsoft.Win32.Registry.GetValue(regPath, "CommandFlags", 0));
                         if(value % 16 >= 8)
                         {
-                            this.AddItem(new SeparatorItem(this, regPath));
+                            AddItem(new SeparatorItem(this, regPath));
                         }
                         else
                         {
-                            this.AddItem(new SubShellItem(this, regPath));
+                            AddItem(new SubShellItem(this, regPath));
                         }
                     }
                 }
@@ -311,20 +311,20 @@ namespace ContextMenuManager.Controls
                 if(!SubShellTypeItem.CanAddMore(this)) return;
                 using(NewShellDialog dlg = new NewShellDialog
                 {
-                    ScenePath = this.ScenePath,
-                    ShellPath = this.ShellPath
+                    ScenePath = ScenePath,
+                    ShellPath = ShellPath
                 })
                 {
                     if(dlg.ShowDialog() != DialogResult.OK) return;
-                    this.AddItem(new SubShellItem(this, dlg.NewItemRegPath));
+                    AddItem(new SubShellItem(this, dlg.NewItemRegPath));
                 }
             }
 
             private void AddSeparator()
             {
-                if(this.Controls[this.Controls.Count - 1] is SeparatorItem) return;
+                if(Controls[Controls.Count - 1] is SeparatorItem) return;
                 string regPath;
-                if(this.Controls.Count > 1)
+                if(Controls.Count > 1)
                 {
                     regPath = GetItemRegPath((MyListItem)Controls[Controls.Count - 1]);
                 }
@@ -334,7 +334,7 @@ namespace ContextMenuManager.Controls
                 }
                 regPath = ObjectPath.GetNewPathWithIndex(regPath, ObjectPath.PathType.Registry);
                 Microsoft.Win32.Registry.SetValue(regPath, "CommandFlags", 0x8);
-                this.AddItem(new SeparatorItem(this, regPath));
+                AddItem(new SeparatorItem(this, regPath));
             }
 
             private void AddFromParentMenu()
@@ -343,8 +343,8 @@ namespace ContextMenuManager.Controls
                 using(ShellStoreDialog dlg = new ShellStoreDialog())
                 {
                     dlg.IsReference = false;
-                    dlg.ShellPath = this.ParentShellPath;
-                    dlg.Filter = new Func<string, bool>(itemName => !itemName.Equals(this.ParentKeyName, StringComparison.OrdinalIgnoreCase));
+                    dlg.ShellPath = ParentShellPath;
+                    dlg.Filter = new Func<string, bool>(itemName => !itemName.Equals(ParentKeyName, StringComparison.OrdinalIgnoreCase));
                     if(dlg.ShowDialog() != DialogResult.OK) return;
                     foreach(string keyName in dlg.SelectedKeyNames)
                     {
@@ -353,29 +353,29 @@ namespace ContextMenuManager.Controls
                         string dstPath = ObjectPath.GetNewPathWithIndex($@"{ShellPath}\{keyName}", ObjectPath.PathType.Registry);
 
                         RegistryEx.CopyTo(srcPath, dstPath);
-                        this.AddItem(new SubShellItem(this, dstPath));
+                        AddItem(new SubShellItem(this, dstPath));
                     }
                 }
             }
 
             public void MoveItem(MyListItem item, bool isUp)
             {
-                int index = this.GetItemIndex(item);
+                int index = GetItemIndex(item);
                 MyListItem otherItem = null;
                 if(isUp)
                 {
                     if(index > 1)
                     {
-                        otherItem = (MyListItem)this.Controls[index - 1];
-                        this.SetItemIndex(item, index - 1);
+                        otherItem = (MyListItem)Controls[index - 1];
+                        SetItemIndex(item, index - 1);
                     }
                 }
                 else
                 {
-                    if(index < this.Controls.Count - 1)
+                    if(index < Controls.Count - 1)
                     {
-                        otherItem = (MyListItem)this.Controls[index + 1];
-                        this.SetItemIndex(item, index + 1);
+                        otherItem = (MyListItem)Controls[index + 1];
+                        SetItemIndex(item, index + 1);
                     }
                 }
                 if(otherItem != null)
@@ -407,7 +407,7 @@ namespace ContextMenuManager.Controls
             {
                 public SubShellItem(PrivateMultiItemsList list, string regPath) : base(regPath)
                 {
-                    this.Owner = list;
+                    Owner = list;
                     BtnMoveUp.MouseDown += (sender, e) => Owner.MoveItem(this, true);
                     BtnMoveDown.MouseDown += (sender, e) => Owner.MoveItem(this, false);
                     SetItemTextValue();
@@ -417,7 +417,7 @@ namespace ContextMenuManager.Controls
 
                 private void SetItemTextValue()
                 {
-                    using(var key = RegistryEx.GetRegistryKey(this.RegPath, true))
+                    using(var key = RegistryEx.GetRegistryKey(RegPath, true))
                     {
                         bool hasValue = false;
                         foreach(string valueName in new[] { "MUIVerb", "" })
@@ -427,7 +427,7 @@ namespace ContextMenuManager.Controls
                                 hasValue = true; break;
                             }
                         }
-                        if(!hasValue) key.SetValue("MUIVerb", this.ItemText);
+                        if(!hasValue) key.SetValue("MUIVerb", ItemText);
                     }
 
                 }
@@ -437,8 +437,8 @@ namespace ContextMenuManager.Controls
             {
                 public SeparatorItem(PrivateMultiItemsList list, string regPath)
                 {
-                    this.Owner = list;
-                    this.RegPath = regPath;
+                    Owner = list;
+                    RegPath = regPath;
                     BtnMoveUp.MouseDown += (sender, e) => Owner.MoveItem(this, true);
                     BtnMoveDown.MouseDown += (sender, e) => Owner.MoveItem(this, false);
                 }
@@ -448,12 +448,12 @@ namespace ContextMenuManager.Controls
 
                 public override void DeleteMe()
                 {
-                    RegistryEx.DeleteKeyTree(this.RegPath);
-                    int index = this.Parent.Controls.GetChildIndex(this);
-                    if(index == this.Parent.Controls.Count - 1) index--;
-                    this.Parent.Controls[index].Focus();
-                    this.Parent.Controls.Remove(this);
-                    this.Dispose();
+                    RegistryEx.DeleteKeyTree(RegPath);
+                    int index = Parent.Controls.GetChildIndex(this);
+                    if(index == Parent.Controls.Count - 1) index--;
+                    Parent.Controls[index].Focus();
+                    Parent.Controls.Remove(this);
+                    Dispose();
                 }
             }
         }
@@ -462,8 +462,8 @@ namespace ContextMenuManager.Controls
         {
             public SubSeparatorItem()
             {
-                this.Text = AppString.Other.Separator;
-                this.HasImage = false;
+                Text = AppString.Other.Separator;
+                HasImage = false;
                 BtnDelete = new DeleteButton(this);
                 BtnMoveDown = new MoveButton(this, false);
                 BtnMoveUp = new MoveButton(this, true);
@@ -483,8 +483,8 @@ namespace ContextMenuManager.Controls
             {
                 BtnMoveDown = new MoveButton(this, false);
                 BtnMoveUp = new MoveButton(this, true);
-                this.SetCtrIndex(BtnMoveDown, 1);
-                this.SetCtrIndex(BtnMoveUp, 2);
+                SetCtrIndex(BtnMoveDown, 1);
+                SetCtrIndex(BtnMoveUp, 2);
             }
 
             public MoveButton BtnMoveUp { get; set; }
@@ -509,7 +509,7 @@ namespace ContextMenuManager.Controls
         {
             public SubNewItem(bool isPublic)
             {
-                this.AddCtrs(new[] { btnAddExisting, btnAddSeparator });
+                AddCtrs(new[] { btnAddExisting, btnAddSeparator });
                 ToolTipBox.SetToolTip(btnAddExisting, isPublic ? AppString.Tip.AddReference : AppString.Tip.AddFromParentMenu);
                 ToolTipBox.SetToolTip(btnAddSeparator, AppString.Tip.AddSeparator);
                 btnAddExisting.MouseDown += (sender, e) => AddExisting?.Invoke();

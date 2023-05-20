@@ -12,12 +12,12 @@ namespace BluePointLilac.Controls
 
         public MyStatusBar()
         {
-            this.Text = DefaultText;
-            this.Height = 30.DpiZoom();
-            this.Dock = DockStyle.Bottom;
-            this.Font = SystemFonts.StatusFont;
-            this.BackColor = Color.FromArgb(70, 130, 200);
-            this.ForeColor = Color.White;
+            Text = DefaultText;
+            Height = 30.DpiZoom();
+            Dock = DockStyle.Bottom;
+            Font = SystemFonts.StatusFont;
+            BackColor = Color.FromArgb(70, 130, 200);
+            ForeColor = Color.White;
         }
 
         [Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
@@ -26,44 +26,44 @@ namespace BluePointLilac.Controls
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            string txt = this.Text;
-            int left = this.Height / 3;
-            for(int i = this.Text.Length - 1; i >= 0; i--)
+            string txt = Text;
+            int left = Height / 3;
+            for(int i = Text.Length - 1; i >= 0; i--)
             {
-                Size size = TextRenderer.MeasureText(txt, this.Font);
+                Size size = TextRenderer.MeasureText(txt, Font);
                 if(size.Width < ClientSize.Width - 2 * left)
                 {
-                    using(Brush brush = new SolidBrush(this.ForeColor))
+                    using(Brush brush = new SolidBrush(ForeColor))
                     {
-                        int top = (this.Height - size.Height) / 2;
-                        e.Graphics.Clear(this.BackColor);
-                        e.Graphics.DrawString(txt, this.Font, brush, left, top);
+                        int top = (Height - size.Height) / 2;
+                        e.Graphics.Clear(BackColor);
+                        e.Graphics.DrawString(txt, Font, brush, left, top);
                         break;
                     }
                 }
-                txt = this.Text.Substring(0, i) + "...";
+                txt = Text.Substring(0, i) + "...";
             }
         }
 
         protected override void OnResize(EventArgs e)
         {
-            base.OnResize(e); this.Refresh();
+            base.OnResize(e); Refresh();
         }
         protected override void OnTextChanged(EventArgs e)
         {
-            base.OnTextChanged(e); this.Refresh();
+            base.OnTextChanged(e); Refresh();
         }
         protected override void OnFontChanged(EventArgs e)
         {
-            base.OnFontChanged(e); this.Refresh();
+            base.OnFontChanged(e); Refresh();
         }
         protected override void OnForeColorChanged(EventArgs e)
         {
-            base.OnForeColorChanged(e); this.Refresh();
+            base.OnForeColorChanged(e); Refresh();
         }
         protected override void OnBackColorChanged(EventArgs e)
         {
-            base.OnBackColorChanged(e); this.Refresh();
+            base.OnBackColorChanged(e); Refresh();
         }
     }
 }

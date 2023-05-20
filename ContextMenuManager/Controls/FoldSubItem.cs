@@ -17,8 +17,8 @@ namespace ContextMenuManager.Controls
         public void Indent()
         {
             int w = 40.DpiZoom();
-            this.Controls["Image"].Left += w;
-            this.Controls["Text"].Left += w;
+            Controls["Image"].Left += w;
+            Controls["Text"].Left += w;
         }
     }
 
@@ -61,14 +61,14 @@ namespace ContextMenuManager.Controls
             {
                 case PathType.File:
                     tip = AppString.Menu.FileLocation;
-                    this.Text = Path.GetFileNameWithoutExtension(groupPath);
-                    this.Image = ResourceIcon.GetExtensionIcon(groupPath).ToBitmap();
+                    Text = Path.GetFileNameWithoutExtension(groupPath);
+                    Image = ResourceIcon.GetExtensionIcon(groupPath).ToBitmap();
                     openPath = () => ExternalProgram.JumpExplorer(groupPath, AppConfig.OpenMoreExplorer);
                     break;
                 case PathType.Directory:
                     tip = AppString.Menu.FileLocation;
-                    this.Text = Path.GetFileNameWithoutExtension(groupPath);
-                    this.Image = ResourceIcon.GetFolderIcon(groupPath).ToBitmap();
+                    Text = Path.GetFileNameWithoutExtension(groupPath);
+                    Image = ResourceIcon.GetFolderIcon(groupPath).ToBitmap();
                     openPath = () => ExternalProgram.OpenDirectory(groupPath);
                     break;
                 case PathType.Registry:
@@ -76,12 +76,12 @@ namespace ContextMenuManager.Controls
                     openPath = () => ExternalProgram.JumpRegEdit(groupPath, null, AppConfig.OpenMoreRegedit);
                     break;
             }
-            this.PathType = pathType;
-            this.GroupPath = groupPath;
-            this.Font = new Font(this.Font, FontStyle.Bold);
-            this.AddCtrs(new[] { btnFold, btnOpenPath });
-            this.ContextMenuStrip.Items.AddRange(new[] { tsiFoldAll, tsiUnfoldAll });
-            this.MouseDown += (sender, e) =>
+            PathType = pathType;
+            GroupPath = groupPath;
+            Font = new Font(Font, FontStyle.Bold);
+            AddCtrs(new[] { btnFold, btnOpenPath });
+            ContextMenuStrip.Items.AddRange(new[] { tsiFoldAll, tsiUnfoldAll });
+            MouseDown += (sender, e) =>
             {
                 if(e.Button == MouseButtons.Left) Fold();
             };
@@ -98,28 +98,28 @@ namespace ContextMenuManager.Controls
 
         public void SetVisibleWithSubItemCount()
         {
-            foreach(Control ctr in this.Parent.Controls)
+            foreach(Control ctr in Parent.Controls)
             {
                 if(ctr is FoldSubItem item && item.FoldGroupItem == this)
                 {
-                    this.Visible = true;
+                    Visible = true;
                     return;
                 }
             }
-            this.Visible = false;
+            Visible = false;
         }
 
         private void Fold()
         {
-            this.Parent.SuspendLayout();
-            this.IsFold = !this.IsFold;
-            this.Parent.ResumeLayout();
+            Parent.SuspendLayout();
+            IsFold = !IsFold;
+            Parent.ResumeLayout();
         }
 
         private void FoldMe(bool isFold)
         {
             btnFold.BaseImage = isFold ? AppImage.Down : AppImage.Up;
-            foreach(Control ctr in this.Parent?.Controls)
+            foreach(Control ctr in Parent?.Controls)
             {
                 if(ctr is FoldSubItem item && item.FoldGroupItem == this) ctr.Visible = !isFold;
             }
@@ -127,12 +127,12 @@ namespace ContextMenuManager.Controls
 
         private void FoldAll(bool isFold)
         {
-            this.Parent.SuspendLayout();
-            foreach(Control ctr in this.Parent.Controls)
+            Parent.SuspendLayout();
+            foreach(Control ctr in Parent.Controls)
             {
                 if(ctr is FoldGroupItem groupItem) groupItem.IsFold = isFold;
             }
-            this.Parent.ResumeLayout();
+            Parent.ResumeLayout();
         }
     }
 }

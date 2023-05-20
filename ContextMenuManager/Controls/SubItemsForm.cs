@@ -10,14 +10,14 @@ namespace ContextMenuManager.Controls
     {
         public SubItemsForm()
         {
-            this.SuspendLayout();
-            this.StartPosition = FormStartPosition.CenterParent;
-            this.ShowInTaskbar = this.MaximizeBox = this.MinimizeBox = false;
-            this.MinimumSize = this.Size = new Size(646, 419).DpiZoom();
-            this.Controls.AddRange(new Control[] { listBox, statusBar });
+            SuspendLayout();
+            StartPosition = FormStartPosition.CenterParent;
+            ShowInTaskbar = MaximizeBox = MinimizeBox = false;
+            MinimumSize = Size = new Size(646, 419).DpiZoom();
+            Controls.AddRange(new Control[] { listBox, statusBar });
             statusBar.CanMoveForm();
             this.AddEscapeButton();
-            this.ResumeLayout();
+            ResumeLayout();
         }
 
         readonly MyListBox listBox = new MyListBox { Dock = DockStyle.Fill };

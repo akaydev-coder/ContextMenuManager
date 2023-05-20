@@ -58,16 +58,12 @@ namespace ContextMenuManager.Models
 
         public static void ReadBackupList(string filePath)
         {
+            ClearItems();
             // 反序列化到List<BackupItem>对象
             using (StreamReader sr = new StreamReader(filePath))
             {
                 backupList = serializer.Deserialize(sr) as List<BackupItem>;
             }
-        }
-
-        public static void RestoreBackupList()
-        {
-
         }
     }
 
@@ -87,5 +83,4 @@ namespace ContextMenuManager.Models
         [XmlElement("Scene")]
         public Scenes BackupScene { get; set; }// 右键菜单位置
     }
-
 }

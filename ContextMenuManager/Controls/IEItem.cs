@@ -17,7 +17,7 @@ namespace ContextMenuManager.Controls
         public IEItem(string regPath)
         {
             InitializeComponents();
-            this.RegPath = regPath;
+            RegPath = regPath;
         }
 
         private string regPath;
@@ -27,8 +27,8 @@ namespace ContextMenuManager.Controls
             set
             {
                 regPath = value;
-                this.Text = this.ItemText;
-                this.Image = this.ItemImage;
+                Text = ItemText;
+                Image = ItemImage;
             }
         }
         public string ValueName => null;
@@ -71,7 +71,7 @@ namespace ContextMenuManager.Controls
             set
             {
                 Registry.SetValue(RegPath, "", value);
-                this.Image = this.ItemImage;
+                Image = ItemImage;
             }
         }
 
@@ -114,8 +114,8 @@ namespace ContextMenuManager.Controls
 
         public void DeleteMe()
         {
-            RegistryEx.DeleteKeyTree(this.RegPath);
-            RegistryEx.DeleteKeyTree(this.BackupPath);
+            RegistryEx.DeleteKeyTree(RegPath);
+            RegistryEx.DeleteKeyTree(BackupPath);
         }
     }
 }

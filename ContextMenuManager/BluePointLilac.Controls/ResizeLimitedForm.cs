@@ -15,7 +15,7 @@ namespace BluePointLilac.Controls
         protected override void WndProc(ref Message m)
         {
             base.WndProc(ref m);
-            if(m.Msg == WM_NCHITTEST && this.WindowState == FormWindowState.Normal)
+            if(m.Msg == WM_NCHITTEST && WindowState == FormWindowState.Normal)
             {
                 IntPtr hNowhere = new IntPtr((int)HitTest.Nowhere);
                 switch((HitTest)m.Result)

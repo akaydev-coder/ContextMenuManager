@@ -34,7 +34,7 @@ namespace ContextMenuManager.Controls
         public EnhanceShellItem()
         {
             ChkVisible = new VisibleCheckBox(this);
-            this.Indent();
+            Indent();
         }
 
         private static void WriteAttributesValue(XmlNode valueXN, string regPath)
@@ -183,15 +183,15 @@ namespace ContextMenuManager.Controls
             {
                 if(value)
                 {
-                    string regPath = ObjectPath.GetNewPathWithIndex(this.RegPath, ObjectPath.PathType.Registry);
-                    Registry.SetValue(regPath, "", this.Guid.ToString("B"));
+                    string regPath = ObjectPath.GetNewPathWithIndex(RegPath, ObjectPath.PathType.Registry);
+                    Registry.SetValue(regPath, "", Guid.ToString("B"));
                 }
                 else
                 {
                     Dictionary<string, Guid> dic = ShellExItem.GetPathAndGuids(ShellExPath);
                     foreach(string regPath in dic.Keys)
                     {
-                        if(dic[regPath].Equals(this.Guid))
+                        if(dic[regPath].Equals(Guid))
                             RegistryEx.DeleteKeyTree(regPath);
                     }
                 }
@@ -201,7 +201,7 @@ namespace ContextMenuManager.Controls
         public EnhanceShellExItem()
         {
             ChkVisible = new VisibleCheckBox(this);
-            this.Indent();
+            Indent();
         }
     }
 }

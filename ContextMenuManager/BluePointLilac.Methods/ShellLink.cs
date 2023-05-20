@@ -290,18 +290,18 @@ namespace BluePointLilac.Methods
             shellLinkW = null;
         }
 
-        public void Save() { Save(this.ShortcutPath); }
+        public void Save() { Save(ShortcutPath); }
 
         public void Save(string lnkPath)
         {
             PersistFile.Save(lnkPath, true);
         }
 
-        public void Load() { Load(this.ShortcutPath); }
+        public void Load() { Load(ShortcutPath); }
 
         public void Load(string lnkPath)
         {
-            this.ShortcutPath = lnkPath;
+            ShortcutPath = lnkPath;
             if(File.Exists(lnkPath)) PersistFile.Load(lnkPath, STGM_READWRITE);
         }
     }

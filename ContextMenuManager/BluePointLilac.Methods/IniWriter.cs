@@ -11,7 +11,7 @@ namespace BluePointLilac.Methods
 
         public IniWriter(string filePath)
         {
-            this.FilePath = filePath;
+            FilePath = filePath;
         }
 
         public string FilePath { get; set; }

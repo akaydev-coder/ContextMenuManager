@@ -19,9 +19,9 @@ namespace ContextMenuManager.Controls.Interfaces
         {
             item.ContextMenuStrip.Opening += (sender, e) =>
             {
-                this.Visible = item.ItemFilePath != null;
+                Visible = item.ItemFilePath != null;
             };
-            this.Click += (sender, e) => ExternalProgram.JumpExplorer(item.ItemFilePath, AppConfig.OpenMoreExplorer);
+            Click += (sender, e) => ExternalProgram.JumpExplorer(item.ItemFilePath, AppConfig.OpenMoreExplorer);
         }
     }
 
@@ -32,9 +32,9 @@ namespace ContextMenuManager.Controls.Interfaces
             item.ContextMenuStrip.Opening += (sender, e) =>
             {
                 string path = item.ItemFilePath;
-                this.Visible = Directory.Exists(path) || File.Exists(path);
+                Visible = Directory.Exists(path) || File.Exists(path);
             };
-            this.Click += (sender, e) => ExternalProgram.ShowPropertiesDialog(item.ItemFilePath);
+            Click += (sender, e) => ExternalProgram.ShowPropertiesDialog(item.ItemFilePath);
         }
     }
 }

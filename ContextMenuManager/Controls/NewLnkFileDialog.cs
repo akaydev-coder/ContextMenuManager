@@ -18,14 +18,14 @@ namespace ContextMenuManager.Controls
         {
             using(NewLnkForm frm = new NewLnkForm())
             {
-                frm.FileFilter = this.FileFilter;
+                frm.FileFilter = FileFilter;
                 frm.TopMost = AppConfig.TopMost;
                 bool flag = frm.ShowDialog() == DialogResult.OK;
                 if(flag)
                 {
-                    this.ItemText = frm.ItemText;
-                    this.ItemFilePath = frm.ItemFilePath;
-                    this.Arguments = frm.Arguments;
+                    ItemText = frm.ItemText;
+                    ItemFilePath = frm.ItemFilePath;
+                    Arguments = frm.Arguments;
                 }
                 return flag;
             }
@@ -50,7 +50,7 @@ namespace ContextMenuManager.Controls
             protected override void InitializeComponents()
             {
                 base.InitializeComponents();
-                this.Controls.AddRange(new Control[] { rdoFile, rdoFolder });
+                Controls.AddRange(new Control[] { rdoFile, rdoFolder });
                 rdoFile.Top = rdoFolder.Top = btnOK.Top + (btnOK.Height - rdoFile.Height) / 2;
                 rdoFile.Left = lblCommand.Left;
                 rdoFolder.Left = rdoFile.Right + 20.DpiZoom();
@@ -101,7 +101,7 @@ namespace ContextMenuManager.Controls
             {
                 using(OpenFileDialog dlg = new OpenFileDialog())
                 {
-                    dlg.Filter = this.FileFilter;
+                    dlg.Filter = FileFilter;
                     //取消获取lnk目标路径，可选中UWP快捷方式
                     dlg.DereferenceLinks = false;
                     if(dlg.ShowDialog() == DialogResult.OK)

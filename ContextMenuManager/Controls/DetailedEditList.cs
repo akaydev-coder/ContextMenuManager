@@ -17,7 +17,7 @@ namespace ContextMenuManager.Controls
         public override void LoadItems()
         {
             base.LoadItems();
-            int index = this.UseUserDic ? 1 : 0;
+            int index = UseUserDic ? 1 : 0;
             XmlDocument doc = XmlDicHelper.DetailedEditDic[index];
             if(doc?.DocumentElement == null) return;
             foreach(XmlNode groupXN in doc.DocumentElement.ChildNodes)
@@ -30,7 +30,7 @@ namespace ContextMenuManager.Controls
                     {
                         if(!GuidEx.TryParse(guidXN.InnerText, out Guid guid)) continue;
                         if(!File.Exists(GuidInfo.GetFilePath(guid))) continue;
-                        if(this.GroupGuid != Guid.Empty && this.GroupGuid != guid) continue;
+                        if(GroupGuid != Guid.Empty && GroupGuid != guid) continue;
                         guids.Add(guid);
                     }
                     if(guidList.Count > 0 && guids.Count == 0) continue;
@@ -70,7 +70,7 @@ namespace ContextMenuManager.Controls
                     {
                         if(icon != null) groupItem.Image = icon.ToBitmap();
                     }
-                    this.AddItem(groupItem);
+                    AddItem(groupItem);
 
                     string GetRuleFullRegPath(string regPath)
                     {
@@ -210,7 +210,7 @@ namespace ContextMenuManager.Controls
                                     ruleItem = new VisibleRegRuleItem(rules, info);
                                 }
                             }
-                            this.AddItem(ruleItem);
+                            AddItem(ruleItem);
                             ruleItem.FoldGroupItem = groupItem;
                             ruleItem.HasImage = ruleItem.Image != null;
                             ruleItem.Indent();

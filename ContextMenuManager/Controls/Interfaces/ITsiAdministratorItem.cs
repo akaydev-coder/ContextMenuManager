@@ -20,7 +20,7 @@ namespace ContextMenuManager.Controls.Interfaces
             {
                 if(item.ShellLink == null)
                 {
-                    this.Enabled = false;
+                    Enabled = false;
                     return;
                 }
                 string filePath = item.ShellLink.TargetPath;
@@ -30,17 +30,17 @@ namespace ContextMenuManager.Controls.Interfaces
                     case ".exe":
                     case ".bat":
                     case ".cmd":
-                        this.Enabled = true;
+                        Enabled = true;
                         break;
                     default:
-                        this.Enabled = false;
+                        Enabled = false;
                         break;
                 }
-                this.Checked = item.ShellLink.RunAsAdministrator;
+                Checked = item.ShellLink.RunAsAdministrator;
             };
-            this.Click += (sender, e) =>
+            Click += (sender, e) =>
             {
-                item.ShellLink.RunAsAdministrator = !this.Checked;
+                item.ShellLink.RunAsAdministrator = !Checked;
                 item.ShellLink.Save();
                 if(item is WinXItem) ExplorerRestarter.Show();
             };

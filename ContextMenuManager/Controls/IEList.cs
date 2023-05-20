@@ -36,7 +36,7 @@ namespace ContextMenuManager.Controls
                             {
                                 if(!string.IsNullOrEmpty(key.GetValue("")?.ToString()))
                                 {
-                                    this.AddItem(new IEItem(key.Name));
+                                    AddItem(new IEItem(key.Name));
                                     names.Add(keyName);
                                 }
                             }
@@ -49,13 +49,13 @@ namespace ContextMenuManager.Controls
         private void AddNewItem()
         {
             NewItem newItem = new NewItem();
-            this.AddItem(newItem);
+            AddItem(newItem);
             newItem.AddNewItem += () =>
             {
                 using(NewIEDialog dlg = new NewIEDialog())
                 {
                     if(dlg.ShowDialog() != DialogResult.OK) return;
-                    this.InsertItem(new IEItem(dlg.RegPath), 1);
+                    InsertItem(new IEItem(dlg.RegPath), 1);
                 }
             };
         }

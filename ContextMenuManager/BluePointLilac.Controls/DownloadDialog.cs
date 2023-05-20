@@ -19,9 +19,9 @@ namespace BluePointLilac.Controls
             using(Process process = Process.GetCurrentProcess())
             using(DownloadForm frm = new DownloadForm())
             {
-                frm.Url = this.Url;
-                frm.Text = this.Text;
-                frm.FilePath = this.FilePath;
+                frm.Url = Url;
+                frm.Text = Text;
+                frm.FilePath = FilePath;
                 return frm.ShowDialog() == DialogResult.OK;
             }
         }
@@ -30,15 +30,15 @@ namespace BluePointLilac.Controls
         {
             public DownloadForm()
             {
-                this.SuspendLayout();
-                this.Font = SystemFonts.MessageBoxFont;
-                this.FormBorderStyle = FormBorderStyle.FixedSingle;
-                this.MinimizeBox = this.MaximizeBox = this.ShowInTaskbar = false;
-                this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-                this.Controls.AddRange(new Control[] { pgbDownload, btnCancel });
-                this.Load += (sender, e) => DownloadFile(Url, FilePath);
-                this.InitializeComponents();
-                this.ResumeLayout();
+                SuspendLayout();
+                Font = SystemFonts.MessageBoxFont;
+                FormBorderStyle = FormBorderStyle.FixedSingle;
+                MinimizeBox = MaximizeBox = ShowInTaskbar = false;
+                Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+                Controls.AddRange(new Control[] { pgbDownload, btnCancel });
+                Load += (sender, e) => DownloadFile(Url, FilePath);
+                InitializeComponents();
+                ResumeLayout();
             }
 
             readonly ProgressBar pgbDownload = new ProgressBar
@@ -62,7 +62,7 @@ namespace BluePointLilac.Controls
                 pgbDownload.Left = pgbDownload.Top = btnCancel.Top = a;
                 pgbDownload.Height = btnCancel.Height;
                 btnCancel.Left = pgbDownload.Right + a;
-                this.ClientSize = new Size(btnCancel.Right + a, btnCancel.Bottom + a);
+                ClientSize = new Size(btnCancel.Right + a, btnCancel.Bottom + a);
             }
 
             private void DownloadFile(string url, string filePath)
@@ -74,9 +74,9 @@ namespace BluePointLilac.Controls
                         client.DownloadProgressChanged += (sender, e) =>
                         {
                             int value = e.ProgressPercentage;
-                            this.Text = $"Downloading: {value}%";
+                            Text = $"Downloading: {value}%";
                             pgbDownload.Value = value;
-                            if(this.DialogResult == DialogResult.Cancel)
+                            if(DialogResult == DialogResult.Cancel)
                             {
                                 client.CancelAsync();
                                 File.Delete(FilePath);
@@ -84,26 +84,26 @@ namespace BluePointLilac.Controls
                         };
                         client.DownloadFileCompleted += (sender, e) =>
                         {
-                            this.DialogResult = DialogResult.OK;
+                            DialogResult = DialogResult.OK;
                         };
                         client.DownloadFileAsync(new Uri(url), filePath);
                     }
                 }
                 catch(Exception e)
                 {
-                    MessageBox.Show(e.Message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    this.DialogResult = DialogResult.Cancel;
+                    MessageBox.Show(e.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    DialogResult = DialogResult.Cancel;
                 }
             }
 
             protected override void OnLoad(EventArgs e)
             {
-                if(this.Owner == null && Form.ActiveForm != this) this.Owner = Form.ActiveForm;
-                if(this.Owner == null) this.StartPosition = FormStartPosition.CenterScreen;
+                if(Owner == null && Form.ActiveForm != this) Owner = Form.ActiveForm;
+                if(Owner == null) StartPosition = FormStartPosition.CenterScreen;
                 else
                 {
-                    this.TopMost = this.Owner.TopMost;
-                    this.StartPosition = FormStartPosition.CenterParent;
+                    TopMost = Owner.TopMost;
+                    StartPosition = FormStartPosition.CenterParent;
                 }
                 base.OnLoad(e);
             }

@@ -46,8 +46,8 @@ namespace ContextMenuManager.Controls
         public ShellExItem(Guid guid, string regPath)
         {
             InitializeComponents();
-            this.Guid = guid;
-            this.RegPath = regPath;
+            Guid = guid;
+            RegPath = regPath;
         }
 
         private string regPath;
@@ -57,8 +57,8 @@ namespace ContextMenuManager.Controls
             set
             {
                 regPath = value;
-                this.Text = this.ItemText;
-                this.Image = GuidInfo.GetImage(Guid);
+                Text = ItemText;
+                Image = GuidInfo.GetImage(Guid);
             }
         }
 
@@ -149,8 +149,8 @@ namespace ContextMenuManager.Controls
 
         public void DeleteMe()
         {
-            RegistryEx.DeleteKeyTree(this.RegPath, true);
-            RegistryEx.DeleteKeyTree(this.BackupPath);
+            RegistryEx.DeleteKeyTree(RegPath, true);
+            RegistryEx.DeleteKeyTree(BackupPath);
         }
     }
 }

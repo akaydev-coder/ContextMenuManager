@@ -21,8 +21,8 @@ namespace ContextMenuManager.Controls
                 bool flag = frm.ShowDialog() == DialogResult.OK;
                 if(flag)
                 {
-                    this.Verb = frm.Verb;
-                    this.WindowStyle = frm.WindowStyle;
+                    Verb = frm.Verb;
+                    WindowStyle = frm.WindowStyle;
                 }
                 return flag;
             }
@@ -46,18 +46,18 @@ namespace ContextMenuManager.Controls
             private static readonly string[] Verbs = new[] { "open", "runas", "edit", "print", "find", "explore" };
             public ShellExecuteForm()
             {
-                this.SuspendLayout();
-                this.HelpButton = true;
-                this.Text = "ShellExecute";
-                this.AcceptButton = btnOK;
-                this.CancelButton = btnCancel;
-                this.Font = SystemFonts.MenuFont;
-                this.FormBorderStyle = FormBorderStyle.FixedSingle;
-                this.StartPosition = FormStartPosition.CenterParent;
-                this.ShowIcon = ShowInTaskbar = MaximizeBox = MinimizeBox = false;
-                this.HelpButtonClicked += (sender, e) => ExternalProgram.OpenWebUrl(ApiInfoUrl);
-                this.InitializeComponents();
-                this.ResumeLayout();
+                SuspendLayout();
+                HelpButton = true;
+                Text = "ShellExecute";
+                AcceptButton = btnOK;
+                CancelButton = btnCancel;
+                Font = SystemFonts.MenuFont;
+                FormBorderStyle = FormBorderStyle.FixedSingle;
+                StartPosition = FormStartPosition.CenterParent;
+                ShowIcon = ShowInTaskbar = MaximizeBox = MinimizeBox = false;
+                HelpButtonClicked += (sender, e) => ExternalProgram.OpenWebUrl(ApiInfoUrl);
+                InitializeComponents();
+                ResumeLayout();
             }
             public string Verb { get; set; }
             public int WindowStyle { get; set; }
@@ -92,7 +92,7 @@ namespace ContextMenuManager.Controls
 
             private void InitializeComponents()
             {
-                this.Controls.AddRange(new Control[] { grpVerb, lblStyle, nudStyle, btnOK, btnCancel });
+                Controls.AddRange(new Control[] { grpVerb, lblStyle, nudStyle, btnOK, btnCancel });
                 int a = 10.DpiZoom();
                 int b = 2 * a;
                 for(int i = 0; i < 6; i++)
@@ -114,18 +114,18 @@ namespace ContextMenuManager.Controls
                 nudStyle.Left = lblStyle.Right + b;
                 btnCancel.Left = grpVerb.Right - btnCancel.Width;
                 btnOK.Left = btnCancel.Left - btnOK.Width - b;
-                this.ClientSize = new Size(btnCancel.Right + b, btnCancel.Bottom + b);
+                ClientSize = new Size(btnCancel.Right + b, btnCancel.Bottom + b);
                 btnOK.Click += (sender, e) =>
                 {
                     for(int i = 0; i < 6; i++)
                     {
                         if(rdoVerbs[i].Checked)
                         {
-                            this.Verb = rdoVerbs[i].Text;
+                            Verb = rdoVerbs[i].Text;
                             break;
                         }
                     }
-                    this.WindowStyle = (int)nudStyle.Value;
+                    WindowStyle = (int)nudStyle.Value;
                 };
             }
         }
@@ -135,10 +135,10 @@ namespace ContextMenuManager.Controls
     {
         public ShellExecuteCheckBox()
         {
-            this.Text = "ShellExecute";
-            this.AutoSize = true;
-            //this.Font = SystemFonts.DialogFont;
-            //this.Font = new Font(this.Font.FontFamily, this.Font.Size - 1F);
+            Text = "ShellExecute";
+            AutoSize = true;
+            //Font = SystemFonts.DialogFont;
+            //Font = new Font(Font.FontFamily, Font.Size - 1F);
         }
 
         public string Verb { get; set; }
@@ -148,9 +148,9 @@ namespace ContextMenuManager.Controls
 
         protected override void OnClick(EventArgs e)
         {
-            if(this.Checked)
+            if(Checked)
             {
-                this.Checked = false;
+                Checked = false;
                 ttpInfo.RemoveAll();
             }
             else
@@ -158,9 +158,9 @@ namespace ContextMenuManager.Controls
                 using(ShellExecuteDialog dlg = new ShellExecuteDialog())
                 {
                     if(dlg.ShowDialog() != DialogResult.OK) return;
-                    this.Verb = dlg.Verb;
-                    this.WindowStyle = dlg.WindowStyle;
-                    this.Checked = true;
+                    Verb = dlg.Verb;
+                    WindowStyle = dlg.WindowStyle;
+                    Checked = true;
                     ttpInfo.SetToolTip(this, $"Verb: \"{Verb}\"\nWindowStyle: {WindowStyle}");
                 }
             }

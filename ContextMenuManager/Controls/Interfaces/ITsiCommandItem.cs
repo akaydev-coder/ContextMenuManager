@@ -18,7 +18,7 @@ namespace ContextMenuManager.Controls.Interfaces
 
         public ChangeCommandMenuItem(ITsiCommandItem item) : base(AppString.Menu.ChangeCommand)
         {
-            this.Click += (sender, e) =>
+            Click += (sender, e) =>
             {
                 string command = ChangeCommand(item.ItemCommand);
                 if(command != null) item.ItemCommand = command;

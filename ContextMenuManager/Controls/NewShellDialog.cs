@@ -19,13 +19,13 @@ namespace ContextMenuManager.Controls
         {
             using(NewShellForm frm = new NewShellForm
             {
-                ScenePath = this.ScenePath,
-                ShellPath = this.ShellPath
+                ScenePath = ScenePath,
+                ShellPath = ShellPath
             })
             {
                 frm.TopMost = AppConfig.TopMost;
                 bool flag = frm.ShowDialog() == DialogResult.OK;
-                if(flag) this.NewItemRegPath = frm.NewItemRegPath;
+                if(flag) NewItemRegPath = frm.NewItemRegPath;
                 return flag;
             }
         }
@@ -66,7 +66,7 @@ namespace ContextMenuManager.Controls
             protected override void InitializeComponents()
             {
                 base.InitializeComponents();
-                this.Controls.AddRange(new Control[] { rdoSingle, rdoMulti, chkSE });
+                Controls.AddRange(new Control[] { rdoSingle, rdoMulti, chkSE });
                 rdoSingle.Top = rdoMulti.Top = chkSE.Top = btnOK.Top + (btnOK.Height - rdoSingle.Height) / 2;
                 rdoSingle.Left = lblCommand.Left;
                 rdoMulti.Left = rdoSingle.Right + 20.DpiZoom();

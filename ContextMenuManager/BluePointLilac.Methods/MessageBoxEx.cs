@@ -53,29 +53,29 @@ namespace BluePointLilac.Methods
             private MessageBoxForm(string text, string caption, bool canMoveParent)
             {
                 lblText.Text = text;
-                this.Text = caption;
-                this.CanMoveParent = canMoveParent;
-                this.Font = SystemFonts.MessageBoxFont;
-                this.ShowIcon = this.ShowInTaskbar = false;
-                this.MaximizeBox = this.MinimizeBox = false;
-                this.FormBorderStyle = FormBorderStyle.FixedSingle;
-                this.StartPosition = FormStartPosition.CenterParent;
+                Text = caption;
+                CanMoveParent = canMoveParent;
+                Font = SystemFonts.MessageBoxFont;
+                ShowIcon = ShowInTaskbar = false;
+                MaximizeBox = MinimizeBox = false;
+                FormBorderStyle = FormBorderStyle.FixedSingle;
+                StartPosition = FormStartPosition.CenterParent;
             }
 
             public MessageBoxForm(string text, string caption,
                 string[] buttonTexts, Image boxImage,
                 string defaultResult, bool canMoveParent, bool closeBox) : this(text, caption, canMoveParent)
             {
-                this.CloseBox = closeBox;
-                this.InitializeComponents(buttonTexts, boxImage);
+                CloseBox = closeBox;
+                InitializeComponents(buttonTexts, boxImage);
                 foreach(Button button in flpButtons.Controls)
                 {
                     button.Click += (sender, e) =>
                     {
-                        this.Tag = button.Text;
-                        this.Close();
+                        Tag = button.Text;
+                        Close();
                     };
-                    this.Shown += (sender, e) =>
+                    Shown += (sender, e) =>
                     {
                         if(button.Text == defaultResult) button.Focus();
                     };
@@ -114,7 +114,7 @@ namespace BluePointLilac.Methods
                     case MessageBoxIcon.Information:
                         boxImage = MessageBoxImage.Information; break;
                 }
-                this.InitializeComponents(buttonTexts, boxImage);
+                InitializeComponents(buttonTexts, boxImage);
                 foreach(Button button in flpButtons.Controls)
                 {
                     switch(button.Text)
@@ -122,12 +122,12 @@ namespace BluePointLilac.Methods
                         case "OK":
                             if(buttons == MessageBoxButtons.OK)
                             {
-                                this.CancelButton = button;
-                                this.FormClosing += (sender, e) => button.PerformClick();
+                                CancelButton = button;
+                                FormClosing += (sender, e) => button.PerformClick();
                             }
                             button.DialogResult = DialogResult.OK; break;
                         case "Cancel":
-                            this.CancelButton = button;
+                            CancelButton = button;
                             button.DialogResult = DialogResult.Cancel; break;
                         case "&Yes":
                             button.DialogResult = DialogResult.Yes; break;
@@ -140,17 +140,17 @@ namespace BluePointLilac.Methods
                         case "&Ignore":
                             button.DialogResult = DialogResult.Ignore; break;
                     }
-                    this.Shown += (sender, e) =>
+                    Shown += (sender, e) =>
                     {
                         if(button.DialogResult == defaultResult) button.Focus();
                     };
                 }
-                this.CloseBox = this.CancelButton != null;
+                CloseBox = CancelButton != null;
             }
 
             private void InitializeComponents(string[] buttonTexts, Image boxImage)
             {
-                this.SuspendLayout();
+                SuspendLayout();
                 int w1 = 36.DpiZoom();
                 Size buttonSize = new Size(75, 27).DpiZoom();
                 for(int i = 0; i < buttonTexts.Length; i++)
@@ -174,7 +174,7 @@ namespace BluePointLilac.Methods
                     lblText.Left = picIcon.Left;
                 }
                 pnlInfo.Controls.AddRange(new Control[] { picIcon, lblText });
-                this.Controls.AddRange(new Control[] { pnlInfo, flpButtons });
+                Controls.AddRange(new Control[] { pnlInfo, flpButtons });
                 pnlInfo.Height = lblText.Height + lblText.Top * 2;
                 if(picIcon.Height > lblText.Height / 2)
                 {
@@ -183,8 +183,8 @@ namespace BluePointLilac.Methods
                 int w2 = lblText.Right + picIcon.Left;
                 int w = Math.Max(w1, w2);
                 int h = pnlInfo.Height + flpButtons.Height;
-                this.ClientSize = new Size(w, h);
-                this.ResumeLayout();
+                ClientSize = new Size(w, h);
+                ResumeLayout();
             }
 
             readonly FlowLayoutPanel flpButtons = new FlowLayoutPanel
@@ -227,13 +227,13 @@ namespace BluePointLilac.Methods
 
             protected override void OnLoad(EventArgs e)
             {
-                if(this.Owner == null && Form.ActiveForm != this) this.Owner = Form.ActiveForm;
-                if(this.Owner == null) this.StartPosition = FormStartPosition.CenterScreen;
+                if(Owner == null && Form.ActiveForm != this) Owner = Form.ActiveForm;
+                if(Owner == null) StartPosition = FormStartPosition.CenterScreen;
                 else
                 {
-                    this.TopMost = this.Owner.TopMost;
-                    this.StartPosition = FormStartPosition.CenterParent;
-                    if(this.CanMoveParent) this.MoveAsMove(this.Owner);
+                    TopMost = Owner.TopMost;
+                    StartPosition = FormStartPosition.CenterParent;
+                    if(CanMoveParent) this.MoveAsMove(Owner);
                 }
                 base.OnLoad(e);
             }

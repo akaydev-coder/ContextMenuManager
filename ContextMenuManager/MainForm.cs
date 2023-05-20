@@ -14,10 +14,10 @@ namespace ContextMenuManager
     {
         public MainForm()
         {
-            this.TopMost = AppConfig.TopMost;
-            this.Size = AppConfig.MainFormSize;
-            this.Text = AppString.General.AppName;
-            this.Controls.Add(explorerRestarter);
+            TopMost = AppConfig.TopMost;
+            Size = AppConfig.MainFormSize;
+            Text = AppString.General.AppName;
+            Controls.Add(explorerRestarter);
             ToolBar.AddButtons(ToolBarButtons);
             MainBody.Controls.AddRange(MainControls);
             ToolBarButtons[3].CanBeSelected = false;
@@ -25,8 +25,8 @@ namespace ContextMenuManager
             ToolBar.SelectedButtonChanged += (sender, e) => SwitchTab();
             SideBar.HoverIndexChanged += (sender, e) => ShowItemInfo();
             SideBar.SelectIndexChanged += (sender, e) => SwitchItem();
-            this.Shown += (sender, e) => FirstRunDownloadLanguage();
-            this.FormClosing += (sender, e) => CloseMainForm();
+            Shown += (sender, e) => FirstRunDownloadLanguage();
+            FormClosing += (sender, e) => CloseMainForm();
             HoveredToShowItemPath();
             DragDropToAnalysis();
             AddContextMenus();
@@ -227,13 +227,13 @@ namespace ContextMenuManager
 
         private void RefreshApp()
         {
-            this.Cursor = Cursors.WaitCursor;
+            Cursor = Cursors.WaitCursor;
             ObjectPath.FilePathDic.Clear();
             AppConfig.ReloadConfig();
             GuidInfo.ReloadDics();
             XmlDicHelper.ReloadDics();
-            this.SwitchItem();
-            this.Cursor = Cursors.Default;
+            SwitchItem();
+            Cursor = Cursors.Default;
         }
 
         private void SwitchTab()
@@ -272,7 +272,7 @@ namespace ContextMenuManager
                     SwitchAboutItem(); break;
             }
             lastItemIndex[ToolBar.SelectedIndex] = SideBar.SelectedIndex;
-            this.SuspendMainBodyWhenMove = MainControls.ToList().Any(ctr => ctr.Controls.Count > 50);
+            SuspendMainBodyWhenMove = MainControls.ToList().Any(ctr => ctr.Controls.Count > 50);
         }
 
         private void ShowItemInfo()
@@ -448,7 +448,7 @@ namespace ContextMenuManager
                                 switch(index)
                                 {
                                     case 0:
-                                        AppConfig.TopMost = this.TopMost = !tsi.Checked; break;
+                                        AppConfig.TopMost = TopMost = !tsi.Checked; break;
                                     case 2:
                                         AppConfig.ShowFilePath = !tsi.Checked; break;
                                     case 3:
@@ -464,7 +464,7 @@ namespace ContextMenuManager
                                 switch(index)
                                 {
                                     case 0:
-                                        tsi.Checked = this.TopMost; break;
+                                        tsi.Checked = TopMost; break;
                                     case 2:
                                         tsi.Checked = AppConfig.ShowFilePath; break;
                                     case 3:
@@ -500,10 +500,10 @@ namespace ContextMenuManager
         {
             if(explorerRestarter.Visible && AppMessageBox.Show(explorerRestarter.Text,
                 MessageBoxButtons.OKCancel) == DialogResult.OK) ExternalProgram.RestartExplorer();
-            this.Opacity = 0;
-            this.WindowState = FormWindowState.Normal;
+            Opacity = 0;
+            WindowState = FormWindowState.Normal;
             explorerRestarter.Visible = false;
-            AppConfig.MainFormSize = this.Size;
+            AppConfig.MainFormSize = Size;
         }
     }
 }

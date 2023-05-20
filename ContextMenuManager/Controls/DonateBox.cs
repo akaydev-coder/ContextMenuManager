@@ -13,18 +13,18 @@ namespace ContextMenuManager.Controls
     {
         public DonateBox()
         {
-            this.SuspendLayout();
-            this.AutoScroll = true;
-            this.Dock = DockStyle.Fill;
-            this.BackColor = Color.White;
-            this.Font = SystemFonts.MenuFont;
-            this.Font = new Font(this.Font.FontFamily, this.Font.Size + 1F);
-            this.Controls.AddRange(new Control[] { lblInfo, picQR, lblList });
-            this.VisibleChanged += (sender, e) => this.SetEnabled(this.Visible);
-            lblList.Click += (sender, e) => this.ShowDonateDialog();
-            picQR.Resize += (sender, e) => this.OnResize(null);
+            SuspendLayout();
+            AutoScroll = true;
+            Dock = DockStyle.Fill;
+            BackColor = Color.White;
+            Font = SystemFonts.MenuFont;
+            Font = new Font(Font.FontFamily, Font.Size + 1F);
+            Controls.AddRange(new Control[] { lblInfo, picQR, lblList });
+            VisibleChanged += (sender, e) => this.SetEnabled(Visible);
+            lblList.Click += (sender, e) => ShowDonateDialog();
+            picQR.Resize += (sender, e) => OnResize(null);
             picQR.MouseDown += SwitchQR;
-            this.ResumeLayout();
+            ResumeLayout();
         }
 
         readonly Label lblInfo = new Label
@@ -68,9 +68,9 @@ namespace ContextMenuManager.Controls
         {
             int a = 60.DpiZoom();
             base.OnResize(e);
-            picQR.Left = (this.Width - picQR.Width) / 2;
-            lblInfo.Left = (this.Width - lblInfo.Width) / 2;
-            lblList.Left = (this.Width - lblList.Width) / 2;
+            picQR.Left = (Width - picQR.Width) / 2;
+            lblInfo.Left = (Width - lblInfo.Width) / 2;
+            lblList.Left = (Width - lblList.Width) / 2;
             lblInfo.Top = a;
             picQR.Top = lblInfo.Bottom + a;
             lblList.Top = picQR.Bottom + a;
@@ -92,7 +92,7 @@ namespace ContextMenuManager.Controls
 
         private void ShowDonateDialog()
         {
-            this.Cursor = Cursors.WaitCursor;
+            Cursor = Cursors.WaitCursor;
             using(UAWebClient client = new UAWebClient())
             {
                 string url = AppConfig.RequestUseGithub ? AppConfig.GithubDonateRaw : AppConfig.GiteeDonateRaw;
@@ -116,7 +116,7 @@ namespace ContextMenuManager.Controls
                     }
                 }
             }
-            this.Cursor = Cursors.Default;
+            Cursor = Cursors.Default;
         }
 
         sealed class DonateListDialog : CommonDialog
@@ -143,21 +143,21 @@ namespace ContextMenuManager.Controls
             {
                 public DonateListForm()
                 {
-                    this.Font = SystemFonts.DialogFont;
-                    this.Text = AppString.Other.DonationList;
-                    this.SizeGripStyle = SizeGripStyle.Hide;
-                    this.StartPosition = FormStartPosition.Manual;
-                    this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-                    this.MinimizeBox = this.MaximizeBox = this.ShowInTaskbar = false;
-                    this.ClientSize = new Size(520, 350).DpiZoom();
-                    this.MinimumSize = this.Size;
+                    Font = SystemFonts.DialogFont;
+                    Text = AppString.Other.DonationList;
+                    SizeGripStyle = SizeGripStyle.Hide;
+                    StartPosition = FormStartPosition.Manual;
+                    Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+                    MinimizeBox = MaximizeBox = ShowInTaskbar = false;
+                    ClientSize = new Size(520, 350).DpiZoom();
+                    MinimumSize = Size;
                     dgvDonate.ColumnHeadersDefaultCellStyle.Alignment
                         = dgvDonate.RowsDefaultCellStyle.Alignment
                         = DataGridViewContentAlignment.BottomCenter;
-                    this.Controls.AddRange(new Control[] { lblThank, lblDonate, dgvDonate });
+                    Controls.AddRange(new Control[] { lblThank, lblDonate, dgvDonate });
                     lblThank.MouseEnter += (sender, e) => lblThank.ForeColor = Color.FromArgb(0, 162, 255);
                     lblThank.MouseLeave += (sender, e) => lblThank.ForeColor = Color.DimGray;
-                    lblDonate.Resize += (sender, e) => this.OnResize(null);
+                    lblDonate.Resize += (sender, e) => OnResize(null);
                     this.AddEscapeButton();
                 }
 
@@ -190,8 +190,8 @@ namespace ContextMenuManager.Controls
                     int a = 20.DpiZoom();
                     lblDonate.Location = new Point(a, a);
                     dgvDonate.Location = new Point(a, lblDonate.Bottom + a);
-                    dgvDonate.Width = this.ClientSize.Width - 2 * a;
-                    dgvDonate.Height = this.ClientSize.Height - 3 * a - lblDonate.Height;
+                    dgvDonate.Width = ClientSize.Width - 2 * a;
+                    dgvDonate.Height = ClientSize.Height - 3 * a - lblDonate.Height;
                     lblThank.Location = new Point(dgvDonate.Right - lblThank.Width, lblDonate.Bottom - lblThank.Height);
                 }
 

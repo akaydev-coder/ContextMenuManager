@@ -20,7 +20,7 @@ namespace ContextMenuManager.Controls.Interfaces
         {
             item.ContextMenuStrip.Opening += (sender, e) =>
             {
-                this.Visible = !string.IsNullOrEmpty(item.ShellLink?.TargetPath);
+                Visible = !string.IsNullOrEmpty(item.ShellLink?.TargetPath);
             };
         }
 
@@ -49,14 +49,14 @@ namespace ContextMenuManager.Controls.Interfaces
             {
                 using(CommandForm frm = new CommandForm())
                 {
-                    frm.Command = this.Command;
-                    frm.Arguments = this.Arguments;
+                    frm.Command = Command;
+                    frm.Arguments = Arguments;
                     frm.TopMost = AppConfig.TopMost;
                     bool flag = frm.ShowDialog() == DialogResult.OK;
                     if(flag)
                     {
-                        this.Command = frm.Command;
-                        this.Arguments = frm.Arguments;
+                        Command = frm.Command;
+                        Arguments = frm.Arguments;
                     }
                     return flag;
                 }
@@ -66,14 +66,14 @@ namespace ContextMenuManager.Controls.Interfaces
             {
                 public CommandForm()
                 {
-                    this.AcceptButton = btnOK;
-                    this.CancelButton = btnCancel;
-                    this.VerticalResizable = false;
-                    this.Font = SystemFonts.MessageBoxFont;
-                    this.Text = AppString.Menu.ChangeCommand;
-                    this.SizeGripStyle = SizeGripStyle.Hide;
-                    this.StartPosition = FormStartPosition.CenterParent;
-                    this.MaximizeBox = MinimizeBox = ShowIcon = ShowInTaskbar = false;
+                    AcceptButton = btnOK;
+                    CancelButton = btnCancel;
+                    VerticalResizable = false;
+                    Font = SystemFonts.MessageBoxFont;
+                    Text = AppString.Menu.ChangeCommand;
+                    SizeGripStyle = SizeGripStyle.Hide;
+                    StartPosition = FormStartPosition.CenterParent;
+                    MaximizeBox = MinimizeBox = ShowIcon = ShowInTaskbar = false;
                     InitializeComponents();
                 }
 
@@ -116,23 +116,23 @@ namespace ContextMenuManager.Controls.Interfaces
 
                 private void InitializeComponents()
                 {
-                    this.Controls.AddRange(new Control[] { lblCommand, lblArguments, txtCommand, txtArguments, btnOK, btnCancel });
+                    Controls.AddRange(new Control[] { lblCommand, lblArguments, txtCommand, txtArguments, btnOK, btnCancel });
                     int a = 20.DpiZoom();
                     lblArguments.Left = lblCommand.Left = lblCommand.Top = txtCommand.Top = a;
                     lblArguments.Top = txtArguments.Top = txtCommand.Bottom + a;
                     btnOK.Top = btnCancel.Top = txtArguments.Bottom + a;
                     int b = Math.Max(lblCommand.Width, lblArguments.Width) + 3 * a;
-                    this.ClientSize = new Size(250.DpiZoom() + b, btnOK.Bottom + a);
+                    ClientSize = new Size(250.DpiZoom() + b, btnOK.Bottom + a);
                     btnOK.Anchor = btnCancel.Anchor = AnchorStyles.Right | AnchorStyles.Top;
-                    btnCancel.Left = this.ClientSize.Width - btnCancel.Width - a;
+                    btnCancel.Left = ClientSize.Width - btnCancel.Width - a;
                     btnOK.Left = btnCancel.Left - btnOK.Width - a;
-                    this.Resize += (sender, e) =>
+                    Resize += (sender, e) =>
                     {
-                        txtArguments.Width = txtCommand.Width = this.ClientSize.Width - b;
+                        txtArguments.Width = txtCommand.Width = ClientSize.Width - b;
                         txtArguments.Left = txtCommand.Left = btnCancel.Right - txtCommand.Width;
                     };
-                    this.OnResize(null);
-                    this.MinimumSize = this.Size;
+                    OnResize(null);
+                    MinimumSize = Size;
                 }
             }
         }

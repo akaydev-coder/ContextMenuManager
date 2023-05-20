@@ -13,13 +13,13 @@ namespace ContextMenuManager.Controls
     {
         public RuleItem(ItemInfo info)
         {
-            this.Text = info.Text;
-            this.Image = info.Image;
-            this.RestartExplorer = info.RestartExplorer;
+            Text = info.Text;
+            Image = info.Image;
+            RestartExplorer = info.RestartExplorer;
             BtnShowMenu = new MenuButton(this);
             TsiSearch = new WebSearchMenuItem(this);
-            this.ContextMenuStrip = new ContextMenuStrip();
-            this.ContextMenuStrip.Items.Add(TsiSearch);
+            ContextMenuStrip = new ContextMenuStrip();
+            ContextMenuStrip.Items.Add(TsiSearch);
         }
 
         public WebSearchMenuItem TsiSearch { get; set; }
@@ -31,8 +31,8 @@ namespace ContextMenuManager.Controls
         {
             get
             {
-                if(this.FoldGroupItem == null) return this.Text;
-                else return $"{FoldGroupItem.Text} {this.Text}";
+                if(FoldGroupItem == null) return Text;
+                else return $"{FoldGroupItem.Text} {Text}";
             }
         }
     }
@@ -57,9 +57,9 @@ namespace ContextMenuManager.Controls
             public RegRule(string regPath, string valueName, object turnOnValue,
                 object turnOffValue, RegistryValueKind valueKind = RegistryValueKind.DWord)
             {
-                this.RegPath = regPath; this.ValueName = valueName;
-                this.TurnOnValue = turnOnValue; this.TurnOffValue = turnOffValue;
-                this.ValueKind = valueKind;
+                RegPath = regPath; ValueName = valueName;
+                TurnOnValue = turnOnValue; TurnOffValue = turnOffValue;
+                ValueKind = valueKind;
             }
         }
 
@@ -74,14 +74,14 @@ namespace ContextMenuManager.Controls
             ChkVisible = new VisibleCheckBox(this);
             ToolTipBox.SetToolTip(ChkVisible, info.Tip);
             TsiRegLocation = new RegLocationMenuItem(this);
-            this.ContextMenuStrip.Items.AddRange(new ToolStripItem[] { new ToolStripSeparator(), TsiRegLocation });
+            ContextMenuStrip.Items.AddRange(new ToolStripItem[] { new ToolStripSeparator(), TsiRegLocation });
         }
 
         public VisibleRegRuleItem(RegRule[] rules, ItemInfo info)
-            : this(info) { this.Rules = rules; }
+            : this(info) { Rules = rules; }
 
         public VisibleRegRuleItem(RegRule rule, ItemInfo info)
-            : this(info) { this.Rules = new[] { rule }; }
+            : this(info) { Rules = new[] { rule }; }
 
         public VisibleRegRuleItem(RuleAndInfo ruleAndInfo)
             : this(ruleAndInfo.Rules, ruleAndInfo.ItemInfo) { }
@@ -250,14 +250,14 @@ namespace ContextMenuManager.Controls
 
         public NumberRegRuleItem(RegRule rule, ItemInfo info) : base(info)
         {
-            this.AddCtr(NudValue);
+            AddCtr(NudValue);
             ToolTipBox.SetToolTip(NudValue, info.Tip);
             TsiRegLocation = new RegLocationMenuItem(this);
-            this.ContextMenuStrip.Items.AddRange(new ToolStripItem[] { new ToolStripSeparator(), TsiRegLocation });
-            this.Rule = rule;
+            ContextMenuStrip.Items.AddRange(new ToolStripItem[] { new ToolStripSeparator(), TsiRegLocation });
+            Rule = rule;
             NudValue.Maximum = rule.MaxValue;
             NudValue.Minimum = rule.MinValue;
-            NudValue.Font = new Font(this.Font.FontFamily, this.Font.Size + 3F);
+            NudValue.Font = new Font(Font.FontFamily, Font.Size + 3F);
             NudValue.ValueChanged += (sender, e) =>
             {
                 if(NudValue.Value == Rule.DefaultValue)
@@ -270,7 +270,7 @@ namespace ContextMenuManager.Controls
                     NudValue.ForeColor = Color.Black;
                     NudValue.Font = new Font(NudValue.Font, FontStyle.Regular);
                 }
-                this.ItemValue = (int)NudValue.Value;
+                ItemValue = (int)NudValue.Value;
             };
             NudValue.Value = ItemValue;
         }
@@ -318,13 +318,13 @@ namespace ContextMenuManager.Controls
 
         public StringRegRuleItem(RegRule rule, ItemInfo info) : base(info)
         {
-            this.AddCtr(LblValue);
+            AddCtr(LblValue);
             ToolTipBox.SetToolTip(LblValue, info.Tip);
             TsiRegLocation = new RegLocationMenuItem(this);
-            this.ContextMenuStrip.Items.AddRange(new ToolStripItem[] { new ToolStripSeparator(), TsiRegLocation });
-            this.Rule = rule;
+            ContextMenuStrip.Items.AddRange(new ToolStripItem[] { new ToolStripSeparator(), TsiRegLocation });
+            Rule = rule;
             LblValue.Text = ItemValue;
-            LblValue.Font = new Font(this.Font.FontFamily, this.Font.Size + 3F);
+            LblValue.Font = new Font(Font.FontFamily, Font.Size + 3F);
             LblValue.MouseDown += (sender, e) =>
             {
                 using(InputDialog dlg = new InputDialog())
@@ -366,8 +366,8 @@ namespace ContextMenuManager.Controls
 
         public VisbleIniRuleItem(IniRule rule, ItemInfo info) : base(info)
         {
-            this.Rule = rule;
-            this.IniWriter = new IniWriter(rule.IniPath);
+            Rule = rule;
+            IniWriter = new IniWriter(rule.IniPath);
             ChkVisible = new VisibleCheckBox(this);
             ToolTipBox.SetToolTip(ChkVisible, info.Tip);
         }
@@ -400,13 +400,13 @@ namespace ContextMenuManager.Controls
 
         public NumberIniRuleItem(IniRule rule, ItemInfo info) : base(info)
         {
-            this.AddCtr(NudValue);
-            this.Rule = rule;
-            this.IniWriter = new IniWriter(rule.IniPath);
+            AddCtr(NudValue);
+            Rule = rule;
+            IniWriter = new IniWriter(rule.IniPath);
             ToolTipBox.SetToolTip(NudValue, info.Tip);
             NudValue.Maximum = rule.MaxValue;
             NudValue.Minimum = rule.MinValue;
-            NudValue.Font = new Font(this.Font.FontFamily, this.Font.Size + 3F);
+            NudValue.Font = new Font(Font.FontFamily, Font.Size + 3F);
             NudValue.ValueChanged += (sender, e) =>
             {
                 if(NudValue.Value == Rule.DefaultValue)
@@ -419,7 +419,7 @@ namespace ContextMenuManager.Controls
                     NudValue.ForeColor = Color.Black;
                     NudValue.Font = new Font(NudValue.Font, FontStyle.Regular);
                 }
-                this.ItemValue = (int)NudValue.Value;
+                ItemValue = (int)NudValue.Value;
             };
             NudValue.Value = ItemValue;
         }
@@ -472,12 +472,12 @@ namespace ContextMenuManager.Controls
 
         public StringIniRuleItem(IniRule rule, ItemInfo info) : base(info)
         {
-            this.Rule = rule;
-            this.IniWriter = new IniWriter(rule.IniPath);
-            this.AddCtr(LblValue);
+            Rule = rule;
+            IniWriter = new IniWriter(rule.IniPath);
+            AddCtr(LblValue);
             ToolTipBox.SetToolTip(LblValue, info.Tip);
             LblValue.Text = ItemValue;
-            LblValue.Font = new Font(this.Font.FontFamily, this.Font.Size + 3F);
+            LblValue.Font = new Font(Font.FontFamily, Font.Size + 3F);
             LblValue.MouseDown += (sender, e) =>
             {
                 using(InputDialog dlg = new InputDialog())

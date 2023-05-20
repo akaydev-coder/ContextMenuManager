@@ -22,12 +22,12 @@ namespace ContextMenuManager.Controls
 
         public void LoadItems()
         {
-            this.AddNewItem();
-            this.AddItem(new ShellNewLockItem(this));
+            AddNewItem();
+            AddItem(new ShellNewLockItem(this));
             Separator = new ShellNewSeparator();
-            this.AddItem(Separator);
-            if(ShellNewLockItem.IsLocked) this.LoadLockItems();
-            else this.LoadUnlockItems();
+            AddItem(Separator);
+            if(ShellNewLockItem.IsLocked) LoadLockItems();
+            else LoadUnlockItems();
         }
 
         /// <summary>直接扫描所有扩展名</summary>
@@ -38,7 +38,7 @@ namespace ContextMenuManager.Controls
             {
                 extensions.AddRange(Array.FindAll(root.GetSubKeyNames(), keyName => keyName.StartsWith(".")));
                 if(WinOsVersion.Current < WinOsVersion.Win10) extensions.Add("Briefcase");//公文包(Win10没有)
-                this.LoadItems(extensions);
+                LoadItems(extensions);
             }
         }
 
@@ -46,7 +46,7 @@ namespace ContextMenuManager.Controls
         private void LoadLockItems()
         {
             string[] extensions = (string[])Registry.GetValue(ShellNewPath, "Classes", null);
-            this.LoadItems(extensions.ToList());
+            LoadItems(extensions.ToList());
         }
 
         private void LoadItems(List<string> extensions)
@@ -88,12 +88,12 @@ namespace ContextMenuManager.Controls
                                         ShellNewItem item = new ShellNewItem(this, snKey.Name);
                                         if(item.BeforeSeparator)
                                         {
-                                            int index2 = this.GetItemIndex(Separator);
-                                            this.InsertItem(item, index2);
+                                            int index2 = GetItemIndex(Separator);
+                                            InsertItem(item, index2);
                                         }
                                         else
                                         {
-                                            this.AddItem(item);
+                                            AddItem(item);
                                         }
                                         break;
                                     }
@@ -107,21 +107,21 @@ namespace ContextMenuManager.Controls
 
         public void MoveItem(ShellNewItem shellNewItem, bool isUp)
         {
-            int index = this.GetItemIndex(shellNewItem);
+            int index = GetItemIndex(shellNewItem);
             index += isUp ? -1 : 1;
-            if(index == this.Controls.Count) return;
-            Control ctr = this.Controls[index];
+            if(index == Controls.Count) return;
+            Control ctr = Controls[index];
             if(ctr is ShellNewItem item && item.CanSort)
             {
-                this.SetItemIndex(shellNewItem, index);
-                this.SaveSorting();
+                SetItemIndex(shellNewItem, index);
+                SaveSorting();
             }
         }
 
         public void SaveSorting()
         {
             List<string> extensions = new List<string>();
-            for(int i = 2; i < this.Controls.Count; i++)
+            for(int i = 2; i < Controls.Count; i++)
             {
                 if(Controls[i] is ShellNewItem item)
                 {
@@ -136,7 +136,7 @@ namespace ContextMenuManager.Controls
         private void AddNewItem()
         {
             NewItem newItem = new NewItem();
-            this.AddItem(newItem);
+            AddItem(newItem);
             newItem.AddNewItem += () =>
             {
                 using(FileExtensionDialog dlg = new FileExtensionDialog())
@@ -154,7 +154,7 @@ namespace ContextMenuManager.Controls
                         }
                         return;
                     }
-                    foreach(Control ctr in this.Controls)
+                    foreach(Control ctr in Controls)
                     {
                         if(ctr is ShellNewItem item)
                         {
@@ -178,13 +178,13 @@ namespace ContextMenuManager.Controls
                         else snKey.SetValue("NullFile", "", RegistryValueKind.String);
 
                         ShellNewItem item = new ShellNewItem(this, snKey.Name);
-                        this.AddItem(item);
+                        AddItem(item);
                         item.Focus();
                         if(item.ItemText.IsNullOrWhiteSpace())
                         {
                             item.ItemText = FileExtension.GetExtentionInfo(FileExtension.AssocStr.FriendlyDocName, extension);
                         }
-                        if(ShellNewLockItem.IsLocked) this.SaveSorting();
+                        if(ShellNewLockItem.IsLocked) SaveSorting();
                     }
                 }
             };
@@ -220,15 +220,15 @@ namespace ContextMenuManager.Controls
         {
             public ShellNewLockItem(ShellNewList list)
             {
-                this.Owner = list;
-                this.Image = AppImage.Lock;
-                this.Text = AppString.Other.LockNewMenu;
+                Owner = list;
+                Image = AppImage.Lock;
+                Text = AppString.Other.LockNewMenu;
                 BtnShowMenu = new MenuButton(this);
                 ChkVisible = new VisibleCheckBox(this) { Checked = IsLocked };
                 ToolTipBox.SetToolTip(ChkVisible, AppString.Tip.LockNewMenu);
                 TsiSearch = new WebSearchMenuItem(this);
                 TsiRegLocation = new RegLocationMenuItem(this);
-                this.ContextMenuStrip.Items.AddRange(new ToolStripItem[]
+                ContextMenuStrip.Items.AddRange(new ToolStripItem[]
                     { TsiSearch, new ToolStripSeparator(), TsiRegLocation });
             }
 
@@ -313,8 +313,8 @@ namespace ContextMenuManager.Controls
         {
             public ShellNewSeparator()
             {
-                this.Text = AppString.Other.Separator;
-                this.HasImage = false;
+                Text = AppString.Other.Separator;
+                HasImage = false;
             }
         }
     }

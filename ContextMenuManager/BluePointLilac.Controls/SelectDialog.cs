@@ -19,18 +19,18 @@ namespace BluePointLilac.Controls
         {
             using(SelectForm frm = new SelectForm())
             {
-                frm.Text = this.Title;
-                frm.Items = this.Items;
-                if(this.Selected != null) frm.Selected = this.Selected;
-                else frm.SelectedIndex = this.SelectedIndex;
-                frm.CanEdit = this.CanEdit;
+                frm.Text = Title;
+                frm.Items = Items;
+                if(Selected != null) frm.Selected = Selected;
+                else frm.SelectedIndex = SelectedIndex;
+                frm.CanEdit = CanEdit;
                 Form owner = (Form)Control.FromHandle(hwndOwner);
                 if(owner != null) frm.TopMost = owner.TopMost;
                 bool flag = frm.ShowDialog() == DialogResult.OK;
                 if(flag)
                 {
-                    this.Selected = frm.Selected;
-                    this.SelectedIndex = frm.SelectedIndex;
+                    Selected = frm.Selected;
+                    SelectedIndex = frm.SelectedIndex;
                 }
                 return flag;
             }
@@ -40,16 +40,16 @@ namespace BluePointLilac.Controls
         {
             public SelectForm()
             {
-                this.SuspendLayout();
-                this.AcceptButton = btnOK;
-                this.CancelButton = btnCancel;
-                this.Font = SystemFonts.MenuFont;
-                this.ShowIcon = this.ShowInTaskbar = false;
-                this.MaximizeBox = this.MinimizeBox = false;
-                this.FormBorderStyle = FormBorderStyle.FixedSingle;
-                this.StartPosition = FormStartPosition.CenterParent;
-                this.InitializeComponents();
-                this.ResumeLayout();
+                SuspendLayout();
+                AcceptButton = btnOK;
+                CancelButton = btnCancel;
+                Font = SystemFonts.MenuFont;
+                ShowIcon = ShowInTaskbar = false;
+                MaximizeBox = MinimizeBox = false;
+                FormBorderStyle = FormBorderStyle.FixedSingle;
+                StartPosition = FormStartPosition.CenterParent;
+                InitializeComponents();
+                ResumeLayout();
             }
 
             public string Selected
@@ -107,14 +107,14 @@ namespace BluePointLilac.Controls
 
             private void InitializeComponents()
             {
-                this.Controls.AddRange(new Control[] { cmbItems, btnOK, btnCancel });
+                Controls.AddRange(new Control[] { cmbItems, btnOK, btnCancel });
                 int a = 20.DpiZoom();
                 cmbItems.Left = a;
                 cmbItems.Width = 85.DpiZoom();
                 cmbItems.Top = btnOK.Top = btnCancel.Top = a;
                 btnOK.Left = cmbItems.Right + a;
                 btnCancel.Left = btnOK.Right + a;
-                this.ClientSize = new Size(btnCancel.Right + a, btnCancel.Bottom + a);
+                ClientSize = new Size(btnCancel.Right + a, btnCancel.Bottom + a);
                 cmbItems.AutosizeDropDownWidth();
             }
         }

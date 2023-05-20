@@ -46,9 +46,9 @@ namespace ContextMenuManager.Controls
 
         public ShellNewItem(ShellNewList list, string regPath)
         {
-            this.Owner = list;
+            Owner = list;
             InitializeComponents();
-            this.RegPath = regPath;
+            RegPath = regPath;
             SetSortabled(ShellNewList.ShellNewLockItem.IsLocked);
         }
 
@@ -59,8 +59,8 @@ namespace ContextMenuManager.Controls
             set
             {
                 regPath = value;
-                this.Text = this.ItemText;
-                this.Image = this.ItemIcon.ToBitmap();
+                Text = ItemText;
+                Image = ItemIcon.ToBitmap();
             }
         }
 
@@ -111,7 +111,7 @@ namespace ContextMenuManager.Controls
             set
             {
                 RegistryEx.MoveTo(RegPath, BackupPath);
-                this.RegPath = BackupPath;
+                RegPath = BackupPath;
             }
         }
 
@@ -136,7 +136,7 @@ namespace ContextMenuManager.Controls
             {
                 RegistryEx.DeleteValue(RegPath, "MenuText");
                 Registry.SetValue(DefaultOpenModePath, "FriendlyTypeName", value);
-                this.Text = ResourceString.GetDirectString(value);
+                Text = ResourceString.GetDirectString(value);
             }
         }
 
@@ -292,10 +292,10 @@ namespace ContextMenuManager.Controls
             using(InputDialog dlg = new InputDialog
             {
                 Title = AppString.Menu.InitialData,
-                Text = this.InitialData?.ToString()
+                Text = InitialData?.ToString()
             })
             {
-                if(dlg.ShowDialog() == DialogResult.OK) this.InitialData = dlg.Text;
+                if(dlg.ShowDialog() == DialogResult.OK) InitialData = dlg.Text;
             }
         }
 
@@ -307,7 +307,7 @@ namespace ContextMenuManager.Controls
         private void MoveWithSeparator(bool isBefore)
         {
             BeforeSeparator = isBefore;
-            ShellNewList list = (ShellNewList)this.Parent;
+            ShellNewList list = (ShellNewList)Parent;
             int index = list.GetItemIndex(list.Separator);
             list.SetItemIndex(this, index);
             if(ShellNewList.ShellNewLockItem.IsLocked) list.SaveSorting();
@@ -315,9 +315,9 @@ namespace ContextMenuManager.Controls
 
         public void DeleteMe()
         {
-            RegistryEx.DeleteKeyTree(this.RegPath);
-            RegistryEx.DeleteKeyTree(this.BackupPath);
-            this.Parent.Controls.Remove(this);
+            RegistryEx.DeleteKeyTree(RegPath);
+            RegistryEx.DeleteKeyTree(BackupPath);
+            Parent.Controls.Remove(this);
             if(ShellNewList.ShellNewLockItem.IsLocked) Owner.SaveSorting();
         }
     }

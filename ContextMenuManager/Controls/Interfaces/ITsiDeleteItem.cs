@@ -23,7 +23,7 @@ namespace ContextMenuManager.Controls.Interfaces
     {
         public DeleteMeMenuItem(ITsiDeleteItem item) : base(AppString.Menu.Delete)
         {
-            this.Click += (sender, e) =>
+            Click += (sender, e) =>
             {
                 if(item is ITsiRegDeleteItem regItem && AppConfig.AutoBackup)
                 {

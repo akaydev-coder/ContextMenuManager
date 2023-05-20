@@ -17,19 +17,19 @@ namespace ContextMenuManager.Controls
             foreach(string path in Directory.GetFileSystemEntries(SendToPath))
             {
                 if(Path.GetFileName(path).ToLower() == "desktop.ini") continue;
-                this.AddItem(new SendToItem(path));
+                AddItem(new SendToItem(path));
             }
-            this.SortItemByText();
-            this.AddNewItem();
-            this.AddDirItem();
-            this.AddItem(new VisibleRegRuleItem(VisibleRegRuleItem.SendToDrive));
-            this.AddItem(new VisibleRegRuleItem(VisibleRegRuleItem.DeferBuildSendTo));
+            SortItemByText();
+            AddNewItem();
+            AddDirItem();
+            AddItem(new VisibleRegRuleItem(VisibleRegRuleItem.SendToDrive));
+            AddItem(new VisibleRegRuleItem(VisibleRegRuleItem.DeferBuildSendTo));
         }
 
         private void AddNewItem()
         {
             NewItem newItem = new NewItem();
-            this.InsertItem(newItem, 0);
+            InsertItem(newItem, 0);
             newItem.AddNewItem += () =>
             {
                 using(NewLnkFileDialog dlg = new NewLnkFileDialog())
@@ -46,7 +46,7 @@ namespace ContextMenuManager.Controls
                         shellLink.Save();
                     }
                     DesktopIni.SetLocalizedFileNames(lnkPath, dlg.ItemText);
-                    this.InsertItem(new SendToItem(lnkPath), 2);
+                    InsertItem(new SendToItem(lnkPath), 2);
                 }
             };
         }
@@ -62,7 +62,7 @@ namespace ContextMenuManager.Controls
             ToolTipBox.SetToolTip(btnPath, AppString.Menu.FileLocation);
             btnPath.MouseDown += (sender, e) => ExternalProgram.OpenDirectory(SendToPath);
             item.AddCtr(btnPath);
-            this.InsertItem(item, 1);
+            InsertItem(item, 1);
             item.ContextMenuStrip = new ContextMenuStrip();
             ToolStripMenuItem tsiRestoreDefault = new ToolStripMenuItem(AppString.Menu.RestoreDefault);
             item.ContextMenuStrip.Items.Add(tsiRestoreDefault);
@@ -80,8 +80,8 @@ namespace ContextMenuManager.Controls
                         string dstPath = $@"{SendToPath}\{Path.GetFileName(srcPath)}";
                         File.Copy(srcPath, dstPath);
                     }
-                    this.ClearItems();
-                    this.LoadItems();
+                    ClearItems();
+                    LoadItems();
                 }
             };
         }

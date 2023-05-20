@@ -13,7 +13,7 @@ namespace ContextMenuManager.Controls
         public override void LoadItems()
         {
             base.LoadItems();
-            int index = this.UseUserDic ? 1 : 0;
+            int index = UseUserDic ? 1 : 0;
             XmlDocument doc = XmlDicHelper.EnhanceMenusDic[index];
             if(doc?.DocumentElement == null) return;
             foreach(XmlNode xn in doc.DocumentElement.ChildNodes)
@@ -31,7 +31,7 @@ namespace ContextMenuManager.Controls
                         }
                     }
                     if(string.IsNullOrEmpty(path) || string.IsNullOrEmpty(text)) continue;
-                    if(!string.IsNullOrEmpty(this.ScenePath) && !path.Equals(this.ScenePath, StringComparison.OrdinalIgnoreCase)) continue;
+                    if(!string.IsNullOrEmpty(ScenePath) && !path.Equals(ScenePath, StringComparison.OrdinalIgnoreCase)) continue;
 
                     string iconLocation = xn.SelectSingleNode("Icon")?.InnerText;
                     using(Icon icon = ResourceIcon.GetIcon(iconLocation))
@@ -44,7 +44,7 @@ namespace ContextMenuManager.Controls
                         Image = image,
                         Text = text
                     };
-                    this.AddItem(groupItem);
+                    AddItem(groupItem);
                     XmlNode shellXN = xn.SelectSingleNode("Shell");
                     XmlNode shellExXN = xn.SelectSingleNode("ShellEx");
                     if(shellXN != null) LoadShellItems(shellXN, groupItem);
@@ -114,7 +114,7 @@ namespace ContextMenuManager.Controls
                     tip += AppString.Tip.CommandFiles;
                 }
                 ToolTipBox.SetToolTip(item.ChkVisible, tip);
-                this.AddItem(item);
+                AddItem(item);
             }
         }
 
@@ -149,7 +149,7 @@ namespace ContextMenuManager.Controls
                     if(XmlDicHelper.JudgeCulture(tipXE)) tip = tipXE.GetAttribute("Text");
                 }
                 ToolTipBox.SetToolTip(item.ChkVisible, tip);
-                this.AddItem(item);
+                AddItem(item);
             }
         }
     }

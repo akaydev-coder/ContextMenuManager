@@ -14,9 +14,9 @@ namespace ContextMenuManager.Controls
         public WinXItem(string filePath, FoldGroupItem group)
         {
             InitializeComponents();
-            this.FoldGroupItem = group;
-            this.FilePath = filePath;
-            this.Indent();
+            FoldGroupItem = group;
+            FilePath = filePath;
+            Indent();
         }
 
         private string filePath;
@@ -26,9 +26,9 @@ namespace ContextMenuManager.Controls
             set
             {
                 filePath = value;
-                this.ShellLink = new ShellLink(value);
-                this.Text = this.ItemText;
-                this.Image = this.ItemImage;
+                ShellLink = new ShellLink(value);
+                Text = ItemText;
+                Image = ItemImage;
             }
         }
 
@@ -46,7 +46,7 @@ namespace ContextMenuManager.Controls
                 ShellLink.Description = value;
                 ShellLink.Save();
                 DesktopIni.SetLocalizedFileNames(FilePath, value);
-                this.Text = ResourceString.GetDirectString(value);
+                Text = ResourceString.GetDirectString(value);
                 ExplorerRestarter.Show();
             }
         }
@@ -141,7 +141,7 @@ namespace ContextMenuManager.Controls
             {
                 if(TsiChangeCommand.ChangeCommand(ShellLink))
                 {
-                    Image = this.ItemImage;
+                    Image = ItemImage;
                     WinXHasher.HashLnk(FilePath);
                     ExplorerRestarter.Show();
                 }
@@ -154,13 +154,13 @@ namespace ContextMenuManager.Controls
             {
                 dlg.Title = AppString.Dialog.SelectGroup;
                 dlg.Items = WinXList.GetGroupNames();
-                dlg.Selected = this.FoldGroupItem.Text;
+                dlg.Selected = FoldGroupItem.Text;
                 if(dlg.ShowDialog() != DialogResult.OK) return;
-                if(dlg.Selected == this.FoldGroupItem.Text) return;
+                if(dlg.Selected == FoldGroupItem.Text) return;
                 string dirPath = $@"{WinXList.WinXPath}\{dlg.Selected}";
                 int count = Directory.GetFiles(dirPath, "*.lnk").Length;
                 string num = (count + 1).ToString().PadLeft(2, '0');
-                string partName = this.FileName;
+                string partName = FileName;
                 int index = partName.IndexOf(" - ");
                 if(index > 0) partName = partName.Substring(index + 3);
                 string lnkPath = $@"{dirPath}\{num} - {partName}";
@@ -169,8 +169,8 @@ namespace ContextMenuManager.Controls
                 DesktopIni.DeleteLocalizedFileNames(FilePath);
                 if(text != string.Empty) DesktopIni.SetLocalizedFileNames(lnkPath, text);
                 File.Move(FilePath, lnkPath);
-                this.FilePath = lnkPath;
-                WinXList list = (WinXList)this.Parent;
+                FilePath = lnkPath;
+                WinXList list = (WinXList)Parent;
                 list.Controls.Remove(this);
                 for(int i = 0; i < list.Controls.Count; i++)
                 {
@@ -178,8 +178,8 @@ namespace ContextMenuManager.Controls
                     {
                         list.Controls.Add(this);
                         list.SetItemIndex(this, i + 1);
-                        this.Visible = !groupItem.IsFold;
-                        this.FoldGroupItem = groupItem;
+                        Visible = !groupItem.IsFold;
+                        FoldGroupItem = groupItem;
                         break;
                     }
                 }
@@ -189,29 +189,29 @@ namespace ContextMenuManager.Controls
 
         private void MoveItem(bool isUp)
         {
-            WinXList list = (WinXList)this.Parent;
+            WinXList list = (WinXList)Parent;
             int index = list.Controls.GetChildIndex(this);
             if(index == list.Controls.Count - 1) return;
             index += isUp ? -1 : 1;
             Control ctr = list.Controls[index];
             if(ctr is WinXGroupItem) return;
             WinXItem item = (WinXItem)ctr;
-            string name1 = DesktopIni.GetLocalizedFileNames(this.FilePath);
+            string name1 = DesktopIni.GetLocalizedFileNames(FilePath);
             string name2 = DesktopIni.GetLocalizedFileNames(item.FilePath);
-            DesktopIni.DeleteLocalizedFileNames(this.FilePath);
+            DesktopIni.DeleteLocalizedFileNames(FilePath);
             DesktopIni.DeleteLocalizedFileNames(item.FilePath);
-            string fileName1 = $@"{item.FileName.Substring(0, 2)}{this.FileName.Substring(2)}";
-            string fileName2 = $@"{this.FileName.Substring(0, 2)}{item.FileName.Substring(2)}";
-            string dirPath = Path.GetDirectoryName(this.FilePath);
+            string fileName1 = $@"{item.FileName.Substring(0, 2)}{FileName.Substring(2)}";
+            string fileName2 = $@"{FileName.Substring(0, 2)}{item.FileName.Substring(2)}";
+            string dirPath = Path.GetDirectoryName(FilePath);
             string path1 = $@"{dirPath}\{fileName1}";
             string path2 = $@"{dirPath}\{fileName2}";
             path1 = ObjectPath.GetNewPathWithIndex(path1, ObjectPath.PathType.File);
             path2 = ObjectPath.GetNewPathWithIndex(path2, ObjectPath.PathType.File);
-            File.Move(this.FilePath, path1);
+            File.Move(FilePath, path1);
             File.Move(item.FilePath, path2);
             if(name1 != string.Empty) DesktopIni.SetLocalizedFileNames(path1, name1);
             if(name1 != string.Empty) DesktopIni.SetLocalizedFileNames(path2, name2);
-            this.FilePath = path1;
+            FilePath = path1;
             item.FilePath = path2;
             list.SetItemIndex(this, index);
             ExplorerRestarter.Show();
@@ -222,7 +222,7 @@ namespace ContextMenuManager.Controls
             File.Delete(FilePath);
             DesktopIni.DeleteLocalizedFileNames(FilePath);
             ExplorerRestarter.Show();
-            this.ShellLink.Dispose();
+            ShellLink.Dispose();
         }
     }
 }

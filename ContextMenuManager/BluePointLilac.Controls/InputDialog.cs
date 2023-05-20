@@ -20,12 +20,12 @@ namespace BluePointLilac.Controls
             using(InputBox frm = new InputBox())
             {
                 frm.Text = Title;
-                frm.InputedText = this.Text;
-                frm.Size = this.Size;
+                frm.InputedText = Text;
+                frm.Size = Size;
                 Form owner = (Form)Control.FromHandle(hwndOwner);
                 if(owner != null) frm.TopMost = owner.TopMost;
                 bool flag = frm.ShowDialog() == DialogResult.OK;
-                this.Text = flag ? frm.InputedText : null;
+                Text = flag ? frm.InputedText : null;
                 return flag;
             }
         }
@@ -34,13 +34,13 @@ namespace BluePointLilac.Controls
         {
             public InputBox()
             {
-                this.AcceptButton = btnOK;
-                this.CancelButton = btnCancel;
-                this.Font = SystemFonts.MessageBoxFont;
-                this.SizeGripStyle = SizeGripStyle.Hide;
-                this.StartPosition = FormStartPosition.CenterParent;
-                this.MaximizeBox = MinimizeBox = ShowIcon = ShowInTaskbar = false;
-                this.Controls.AddRange(new Control[] { txtInput, btnOK, btnCancel });
+                AcceptButton = btnOK;
+                CancelButton = btnCancel;
+                Font = SystemFonts.MessageBoxFont;
+                SizeGripStyle = SizeGripStyle.Hide;
+                StartPosition = FormStartPosition.CenterParent;
+                MaximizeBox = MinimizeBox = ShowIcon = ShowInTaskbar = false;
+                Controls.AddRange(new Control[] { txtInput, btnOK, btnCancel });
                 txtInput.Font = new Font(txtInput.Font.FontFamily, txtInput.Font.Size + 2F);
                 txtInput.CanResizeFont();
                 InitializeComponents();
@@ -75,19 +75,19 @@ namespace BluePointLilac.Controls
 
             private void InitializeComponents()
             {
-                this.SuspendLayout();
+                SuspendLayout();
                 int a = 20.DpiZoom();
                 txtInput.Location = new Point(a, a);
                 txtInput.Size = new Size(340, 24).DpiZoom();
-                this.ClientSize = new Size(txtInput.Width + a * 2, txtInput.Height + btnOK.Height + a * 3);
+                ClientSize = new Size(txtInput.Width + a * 2, txtInput.Height + btnOK.Height + a * 3);
                 btnCancel.Top = btnOK.Top = txtInput.Bottom + a;
                 btnCancel.Left = txtInput.Right - btnCancel.Width;
                 btnOK.Left = btnCancel.Left - btnOK.Width - a;
-                this.ResumeLayout();
-                this.MinimumSize = this.Size;
-                this.Resize += (sender, e) =>
+                ResumeLayout();
+                MinimumSize = Size;
+                Resize += (sender, e) =>
                 {
-                    txtInput.Width = this.ClientSize.Width - 2 * a;
+                    txtInput.Width = ClientSize.Width - 2 * a;
                     txtInput.Height = btnCancel.Top - 2 * a;
                 };
             }

@@ -49,10 +49,44 @@ namespace BluePointLilac.Methods
                 {
                     if(curByte >= 0x80)
                     {
-                        //判断当前 
-                        while(((curByte <<= 1) & 0x80) != 0) count++;
+                        //计算当前字符所占的字节数
+                        //修复了EncodingType内造成en语言下debug错误的问题（算术溢出）
+                        int byteCount = 7;
+                        if (curByte < 0xC0)
+                        {
+                            byteCount = 0;
+                        }
+                        else if (curByte < 0xE0)
+                        {
+                            byteCount = 1;
+                        }
+                        else if (curByte < 0xF0)
+                        {
+                            byteCount = 2;
+                        }
+                        else if (curByte < 0xF8)
+                        {
+                            byteCount = 3;
+                        }
+                        else if (curByte < 0xFC)
+                        {
+                            byteCount = 4;
+                        }
+                        else if (curByte < 0xFE)
+                        {
+                            byteCount = 5;
+                        }
+                        else if (curByte < 0xFF)
+                        {
+                            byteCount = 6;
+                        }
+                        count += byteCount;
+                        /*while (((curByte <<= 1) & 0x80) != 0)
+                        {
+                            count++;
+                        }*/
                         //标记位首位若为非0 则至少以2个1开始 如:110XXXXX...........1111110X 
-                        if(count == 1 || count > 6) return false;
+                        if (count == 1 || count > 6) return false;
                     }
                 }
                 else

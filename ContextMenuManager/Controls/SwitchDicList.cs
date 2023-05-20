@@ -13,19 +13,19 @@ namespace ContextMenuManager.Controls
 
         public virtual void LoadItems()
         {
-            this.AddSwitchItem();
+            AddSwitchItem();
         }
 
         public void AddSwitchItem()
         {
-            SwitchDicItem item = new SwitchDicItem { UseUserDic = this.UseUserDic };
+            SwitchDicItem item = new SwitchDicItem { UseUserDic = UseUserDic };
             item.UseDicChanged += () =>
             {
-                this.UseUserDic = item.UseUserDic;
-                this.ClearItems();
-                this.LoadItems();
+                UseUserDic = item.UseUserDic;
+                ClearItems();
+                LoadItems();
             };
-            this.AddItem(item);
+            AddItem(item);
         }
     }
 
@@ -33,15 +33,15 @@ namespace ContextMenuManager.Controls
     {
         public SwitchDicItem()
         {
-            this.Text = AppString.Other.SwitchDictionaries;
-            this.AddCtr(cmbDic);
+            Text = AppString.Other.SwitchDictionaries;
+            AddCtr(cmbDic);
             cmbDic.AutosizeDropDownWidth();
-            cmbDic.Font = new Font(this.Font.FontFamily, this.Font.Size + 1F);
+            cmbDic.Font = new Font(Font.FontFamily, Font.Size + 1F);
             cmbDic.Items.AddRange(new[] { AppString.Other.WebDictionaries, AppString.Other.UserDictionaries });
             cmbDic.SelectionChangeCommitted += (sender, e) =>
             {
-                this.Focus();
-                this.UseUserDic = cmbDic.SelectedIndex == 1;
+                Focus();
+                UseUserDic = cmbDic.SelectedIndex == 1;
             };
         }
 
@@ -54,7 +54,7 @@ namespace ContextMenuManager.Controls
                 if(useUserDic == value) return;
                 bool flag = useUserDic == null;
                 useUserDic = value;
-                this.Image = this.UseUserDic ? AppImage.User : AppImage.Web;
+                Image = UseUserDic ? AppImage.User : AppImage.Web;
                 cmbDic.SelectedIndex = value ? 1 : 0;
                 if(!flag) UseDicChanged?.Invoke();
             }

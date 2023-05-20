@@ -8,9 +8,9 @@ namespace BluePointLilac.Controls
     {
         public PictureButton(Image image)
         {
-            this.BaseImage = image;
-            this.SizeMode = PictureBoxSizeMode.AutoSize;
-            this.Cursor = Cursors.Hand;
+            BaseImage = image;
+            SizeMode = PictureBoxSizeMode.AutoSize;
+            Cursor = Cursors.Hand;
         }
 
         private Image baseImage;
@@ -20,18 +20,18 @@ namespace BluePointLilac.Controls
             set
             {
                 baseImage = value;
-                this.Image = ToolStripRenderer.CreateDisabledImage(value);
+                Image = ToolStripRenderer.CreateDisabledImage(value);
             }
         }
 
         protected override void OnMouseEnter(EventArgs e)
         {
-            base.OnMouseEnter(e); this.Image = BaseImage;
+            base.OnMouseEnter(e); Image = BaseImage;
         }
         protected override void OnMouseLeave(EventArgs e)
         {
             base.OnMouseLeave(e);
-            this.Image = ToolStripRenderer.CreateDisabledImage(BaseImage);
+            Image = ToolStripRenderer.CreateDisabledImage(BaseImage);
         }
         protected override void OnMouseDown(MouseEventArgs e)
         {

@@ -17,8 +17,8 @@ namespace ContextMenuManager.Controls
 
         public void LoadItems()
         {
-            this.AddNewItem();
-            this.LoadBlockedItems();
+            AddNewItem();
+            LoadBlockedItems();
         }
 
         private void LoadBlockedItems()
@@ -32,7 +32,7 @@ namespace ContextMenuManager.Controls
                     foreach(string value in key.GetValueNames())
                     {
                         if(values.Contains(value, StringComparer.OrdinalIgnoreCase)) continue;
-                        this.AddItem(new GuidBlockedItem(value));
+                        AddItem(new GuidBlockedItem(value));
                         values.Add(value);
                     }
                 }
@@ -42,7 +42,7 @@ namespace ContextMenuManager.Controls
         private void AddNewItem()
         {
             NewItem newItem = new NewItem(AppString.Other.AddGuidBlockedItem);
-            this.AddItem(newItem);
+            AddItem(newItem);
             newItem.AddNewItem += () =>
             {
                 using(InputDialog dlg = new InputDialog { Title = AppString.Dialog.InputGuid })
@@ -61,7 +61,7 @@ namespace ContextMenuManager.Controls
                                 return;
                             }
                         }
-                        this.InsertItem(new GuidBlockedItem(value), 1);
+                        InsertItem(new GuidBlockedItem(value), 1);
                         ExplorerRestarter.Show();
                     }
                     else AppMessageBox.Show(AppString.Message.MalformedGuid);

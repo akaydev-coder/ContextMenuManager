@@ -20,7 +20,7 @@ namespace ContextMenuManager.Controls.Interfaces
     {
         public ChangeIconMenuItem(ITsiIconItem item) : base(AppString.Menu.ChangeIcon)
         {
-            this.Click += (sender, e) =>
+            Click += (sender, e) =>
             {
                 using(IconDialog dlg = new IconDialog())
                 {

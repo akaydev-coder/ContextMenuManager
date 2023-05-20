@@ -34,7 +34,7 @@ namespace ContextMenuManager.Controls
         public ShellItem(string regPath)
         {
             InitializeComponents();
-            this.RegPath = regPath;
+            RegPath = regPath;
         }
 
         private string regPath;
@@ -44,9 +44,9 @@ namespace ContextMenuManager.Controls
             set
             {
                 regPath = value;
-                this.Text = this.ItemText;
-                this.Image = this.ItemIcon.ToBitmap();
-                if(!HasIcon) this.Image = Image.ToTransparent();
+                Text = ItemText;
+                Image = ItemIcon.ToBitmap();
+                if(!HasIcon) Image = Image.ToTransparent();
                 BtnSubItems.Visible = IsMultiItem;
             }
         }
@@ -270,7 +270,7 @@ namespace ContextMenuManager.Controls
                 else
                 {
                     Registry.SetValue(RegPath, "MUIVerb", value);
-                    this.Text = ResourceString.GetDirectString(value);
+                    Text = ResourceString.GetDirectString(value);
                 }
             }
         }
@@ -286,7 +286,7 @@ namespace ContextMenuManager.Controls
             {
                 if(!TryProtectOpenItem()) return;
                 Registry.SetValue(CommandPath, "", value);
-                if(!this.HasIcon) this.Image = this.ItemIcon.ToBitmap().ToTransparent();
+                if(!HasIcon) Image = ItemIcon.ToBitmap().ToTransparent();
             }
         }
 
@@ -414,44 +414,44 @@ namespace ContextMenuManager.Controls
                 TsiChangeCommand, TsiFileProperties, TsiFileLocation, TsiRegLocation, TsiRegExport, TsiClsidLocation});
 
             TsiDeleteIcon.Click += (sender, e) => DeleteIcon();
-            TsiSetTop.Click += (sender, e) => this.ItemPosition = Positions.Top;
-            TsiSetBottom.Click += (sender, e) => this.ItemPosition = Positions.Bottom;
-            TsiDefault.Click += (sender, e) => this.ItemPosition = Positions.Default;
-            TsiOnlyInExplorer.Click += (sender, e) => this.OnlyInExplorer = !TsiOnlyInExplorer.Checked;
-            TsiOnlyWithShift.Click += (sender, e) => this.OnlyWithShift = !TsiOnlyWithShift.Checked;
-            TsiNoWorkDir.Click += (sender, e) => this.NoWorkingDirectory = !TsiNoWorkDir.Checked;
-            TsiNeverDefault.Click += (sender, e) => this.NeverDefault = !TsiNeverDefault.Checked;
-            TsiShowAsDisabled.Click += (sender, e) => this.ShowAsDisabledIfHidden = !TsiShowAsDisabled.Checked;
+            TsiSetTop.Click += (sender, e) => ItemPosition = Positions.Top;
+            TsiSetBottom.Click += (sender, e) => ItemPosition = Positions.Bottom;
+            TsiDefault.Click += (sender, e) => ItemPosition = Positions.Default;
+            TsiOnlyInExplorer.Click += (sender, e) => OnlyInExplorer = !TsiOnlyInExplorer.Checked;
+            TsiOnlyWithShift.Click += (sender, e) => OnlyWithShift = !TsiOnlyWithShift.Checked;
+            TsiNoWorkDir.Click += (sender, e) => NoWorkingDirectory = !TsiNoWorkDir.Checked;
+            TsiNeverDefault.Click += (sender, e) => NeverDefault = !TsiNeverDefault.Checked;
+            TsiShowAsDisabled.Click += (sender, e) => ShowAsDisabledIfHidden = !TsiShowAsDisabled.Checked;
             TsiClsidLocation.Click += (sender, e) => ExternalProgram.JumpRegEdit(GuidInfo.GetClsidPath(Guid), null, AppConfig.OpenMoreRegedit);
             ChkVisible.PreCheckChanging += () => !ChkVisible.Checked || TryProtectOpenItem();
             ContextMenuStrip.Opening += (sender, e) => RefreshMenuItem();
             BtnSubItems.MouseDown += (sender, e) => ShowSubItems();
             TsiShieldIcon.Click += (sender, e) => UseShieldIcon();
             ToolTipBox.SetToolTip(BtnSubItems, AppString.Tip.EditSubItems);
-            this.AddCtr(BtnSubItems);
+            AddCtr(BtnSubItems);
         }
 
         private void DeleteIcon()
         {
-            this.IconLocation = null;
-            this.HasLUAShield = false;
-            this.Image = this.Image.ToTransparent();
+            IconLocation = null;
+            HasLUAShield = false;
+            Image = Image.ToTransparent();
         }
 
         private void UseShieldIcon()
         {
-            bool flag = this.HasLUAShield = TsiShieldIcon.Checked = !TsiShieldIcon.Checked;
+            bool flag = HasLUAShield = TsiShieldIcon.Checked = !TsiShieldIcon.Checked;
             if(IconLocation == null)
             {
                 if(flag)
                 {
-                    this.Image = AppImage.Shield;
-                    this.IconPath = "imageres.dll";
-                    this.IconIndex = -78;
+                    Image = AppImage.Shield;
+                    IconPath = "imageres.dll";
+                    IconIndex = -78;
                 }
                 else
                 {
-                    this.Image = this.Image.ToTransparent();
+                    Image = Image.ToTransparent();
                 }
             }
         }
@@ -460,12 +460,12 @@ namespace ContextMenuManager.Controls
         {
             TsiOnlyWithShift.Visible = !IsSubItem;
             TsiDeleteMe.Enabled = !(IsOpenItem && AppConfig.ProtectOpenItem);
-            TsiNoWorkDir.Checked = this.NoWorkingDirectory;
+            TsiNoWorkDir.Checked = NoWorkingDirectory;
             TsiShowAsDisabled.Visible = WinOsVersion.Current >= WinOsVersion.Win10_1703;
-            TsiShowAsDisabled.Checked = this.ShowAsDisabledIfHidden;
+            TsiShowAsDisabled.Checked = ShowAsDisabledIfHidden;
             TsiChangeCommand.Visible = !IsMultiItem && Guid.Equals(Guid.Empty);
             TsiClsidLocation.Visible = GuidInfo.GetClsidPath(Guid) != null;
-            if(!this.IsSubItem) TsiOnlyWithShift.Checked = this.OnlyWithShift;
+            if(!IsSubItem) TsiOnlyWithShift.Checked = OnlyWithShift;
 
             if(WinOsVersion.Current >= WinOsVersion.Vista)
             {
@@ -473,7 +473,7 @@ namespace ContextMenuManager.Controls
                 TsiPosition.Visible = !IsSubItem;
                 TsiOnlyInExplorer.Visible = !IsSubItem;
                 TsiNeverDefault.Visible = !IsSubItem;
-                if(this.HasIcon)
+                if(HasIcon)
                 {
                     TsiChangeIcon.Text = AppString.Menu.ChangeIcon;
                     TsiDeleteIcon.Visible = true;
@@ -487,10 +487,10 @@ namespace ContextMenuManager.Controls
 
                 if(!IsSubItem)
                 {
-                    TsiOnlyInExplorer.Checked = this.OnlyInExplorer;
-                    TsiNeverDefault.Checked = this.NeverDefault;
+                    TsiOnlyInExplorer.Checked = OnlyInExplorer;
+                    TsiNeverDefault.Checked = NeverDefault;
                     TsiDefault.Checked = TsiSetTop.Checked = TsiSetBottom.Checked = false;
-                    switch(this.ItemPosition)
+                    switch(ItemPosition)
                     {
                         case Positions.Default:
                             TsiDefault.Checked = true;
@@ -522,9 +522,9 @@ namespace ContextMenuManager.Controls
             }
             using(ShellSubMenuDialog dlg = new ShellSubMenuDialog())
             {
-                dlg.Text = AppString.Dialog.EditSubItems.Replace("%s", this.Text);
+                dlg.Text = AppString.Dialog.EditSubItems.Replace("%s", Text);
                 dlg.Icon = ResourceIcon.GetIcon(IconPath, IconIndex);
-                dlg.ParentPath = this.RegPath;
+                dlg.ParentPath = RegPath;
                 dlg.ShowDialog();
             }
         }
@@ -538,7 +538,7 @@ namespace ContextMenuManager.Controls
 
         public virtual void DeleteMe()
         {
-            RegistryEx.DeleteKeyTree(this.RegPath, true);
+            RegistryEx.DeleteKeyTree(RegPath, true);
         }
     }
 }

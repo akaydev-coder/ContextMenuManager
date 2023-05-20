@@ -1,5 +1,6 @@
 ﻿using BluePointLilac.Methods;
 using ContextMenuManager.Methods;
+using ContextMenuManager.Models;
 using System;
 using System.IO;
 using System.Windows.Forms;
@@ -21,6 +22,7 @@ namespace ContextMenuManager
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             if(SingleInstance.IsRunning()) return;
+            //BackupList.SaveBackupList("D:\\a.xml");
             AppString.LoadStrings();
             Updater.PeriodicUpdate();
             XmlDicHelper.ReloadDics();

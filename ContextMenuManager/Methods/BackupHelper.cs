@@ -23,8 +23,7 @@ namespace ContextMenuManager.Methods
         {
             string date = DateTime.Today.ToString("yyyy-MM-dd");
             string time = DateTime.Now.ToString("HH-mm-ss");
-            string fileFolderPath = $@"{AppConfig.MenuBackupDir}\{date}";
-            string filePath = $@"{fileFolderPath}\{time}.xml";
+            string filePath = $@"{AppConfig.MenuBackupDir}\{date} {time}.xml";
             Scenes[] BackupScenes = null;
             switch (mode)
             {
@@ -39,12 +38,36 @@ namespace ContextMenuManager.Methods
                 backupScene = BackupScenes[i];
                 GetBackupItems();
             }
-            if (!Directory.Exists(fileFolderPath))
+            if (!Directory.Exists($@"{AppConfig.MenuBackupDir}"))
             {
-                Directory.CreateDirectory(fileFolderPath);
+                Directory.CreateDirectory($@"{AppConfig.MenuBackupDir}");
             }
             BackupList.SaveBackupList(filePath);
             BackupList.ClearItems();
+        }
+
+        public void RestoreItems(BackupList.BackupMode mode)
+        {
+            /*Scenes[] BackupScenes = null;
+            switch (mode)
+            {
+                case BackupList.BackupMode.Basic:
+                    BackupScenes = new Scenes[] {
+                        Scenes.File, Scenes.Folder, Scenes.Directory, Scenes.Background, Scenes.Desktop,
+                        Scenes.Drive, Scenes.AllObjects, Scenes.Computer, Scenes.RecycleBin, Scenes.Library
+                    }; break;
+            }
+            for (int i = 0; i < BackupScenes.Length; i++)
+            {
+                backupScene = BackupScenes[i];
+                GetBackupItems();
+            }
+            if (!Directory.Exists($@"{AppConfig.MenuBackupDir}"))
+            {
+                Directory.CreateDirectory($@"{AppConfig.MenuBackupDir}");
+            }
+            BackupList.SaveBackupList(filePath);
+            BackupList.ClearItems();*/
         }
 
         private void GetBackupItems()

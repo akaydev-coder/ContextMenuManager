@@ -9,13 +9,13 @@ namespace BluePointLilac.Controls
     {
         public ReadOnlyTextBox()
         {
-            this.ReadOnly = true;
-            this.Multiline = true;
-            this.ShortcutsEnabled = false;
-            this.BackColor = Color.White;
-            this.ForeColor = Color.FromArgb(80, 80, 80);
-            this.Font = SystemFonts.MenuFont;
-            this.Font = new Font(this.Font.FontFamily, this.Font.Size + 1F);
+            ReadOnly = true;
+            Multiline = true;
+            ShortcutsEnabled = false;
+            BackColor = Color.White;
+            ForeColor = Color.FromArgb(80, 80, 80);
+            Font = SystemFonts.MenuFont;
+            Font = new Font(Font.FontFamily, Font.Size + 1F);
         }
 
         const int WM_SETFOCUS = 0x0007;
@@ -35,7 +35,7 @@ namespace BluePointLilac.Controls
         protected override void OnMouseEnter(EventArgs e)
         {
             base.OnMouseEnter(e);
-            if(firstEnter) this.Focus();
+            if(firstEnter) Focus();
             firstEnter = false;
         }
     }
@@ -44,13 +44,13 @@ namespace BluePointLilac.Controls
     {
         public ReadOnlyRichTextBox()
         {
-            this.ReadOnly = true;
-            this.Dock = DockStyle.Fill;
-            this.BackColor = Color.White;
-            this.BorderStyle = BorderStyle.None;
-            this.ForeColor = Color.FromArgb(80, 80, 80);
-            this.Font = SystemFonts.MenuFont;
-            this.Font = new Font(this.Font.FontFamily, this.Font.Size + 1F);
+            ReadOnly = true;
+            Dock = DockStyle.Fill;
+            BackColor = Color.White;
+            BorderStyle = BorderStyle.None;
+            ForeColor = Color.FromArgb(80, 80, 80);
+            Font = SystemFonts.MenuFont;
+            Font = new Font(Font.FontFamily, Font.Size + 1F);
         }
 
         const int WM_SETFOCUS = 0x0007;
@@ -71,7 +71,7 @@ namespace BluePointLilac.Controls
         protected override void OnMouseEnter(EventArgs e)
         {
             base.OnMouseEnter(e);
-            if(firstEnter) this.Focus();
+            if(firstEnter) Focus();
             firstEnter = false;
         }
 

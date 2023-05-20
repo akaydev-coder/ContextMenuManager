@@ -13,15 +13,15 @@ namespace ContextMenuManager.Controls
     {
         public void LoadItems()
         {
-            this.LoadOpenWithItems();
-            this.SortItemByText();
-            this.AddNewItem();
+            LoadOpenWithItems();
+            SortItemByText();
+            AddNewItem();
             VisibleRegRuleItem storeItem = new VisibleRegRuleItem(VisibleRegRuleItem.UseStoreOpenWith)
             {
                 //Win8及以上版本系统才有在应用商店中查找应用
                 Visible = WinOsVersion.Current >= WinOsVersion.Win8
             };
-            this.InsertItem(storeItem, 1);
+            InsertItem(storeItem, 1);
         }
 
         private void LoadOpenWithItems()
@@ -50,7 +50,7 @@ namespace ContextMenuManager.Controls
                         {
                             string command = commandKey?.GetValue("")?.ToString();
                             if(ObjectPath.ExtractFilePath(command) != null)
-                                this.AddItem(new OpenWithItem(commandKey.Name));
+                                AddItem(new OpenWithItem(commandKey.Name));
                         }
                     }
                 }
@@ -60,13 +60,13 @@ namespace ContextMenuManager.Controls
         private void AddNewItem()
         {
             NewItem newItem = new NewItem();
-            this.InsertItem(newItem, 0);
+            InsertItem(newItem, 0);
             newItem.AddNewItem += () =>
             {
                 using(NewOpenWithDialog dlg = new NewOpenWithDialog())
                 {
                     if(dlg.ShowDialog() == DialogResult.OK)
-                        this.InsertItem(new OpenWithItem(dlg.RegPath), 2);
+                        InsertItem(new OpenWithItem(dlg.RegPath), 2);
                 }
             };
         }
