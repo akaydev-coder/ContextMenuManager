@@ -19,6 +19,7 @@ namespace ContextMenuManager.Methods
     {
         private Scenes currentScene;
         private RestoreMode restoreMode;
+        public int backupCount = 0;
         public int changeCount = 0;
 
         public void BackupItems(BackupTarget mode)
@@ -31,6 +32,7 @@ namespace ContextMenuManager.Methods
             BackupRestoreItems(mode, true);
             // 保存缓冲区的备份文件
             SaveBackupList(filePath);
+            backupCount = BackupList.GetBackupListCount();
             ClearBackupList();
         }
 

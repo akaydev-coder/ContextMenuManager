@@ -51,6 +51,11 @@ namespace ContextMenuManager.Models
             });
         }
 
+        public static int GetBackupListCount()
+        {
+            return backupList.Count;
+        }
+
         public static void ClearBackupList()
         {
             backupList.Clear();

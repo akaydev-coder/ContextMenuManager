@@ -39,7 +39,8 @@ namespace ContextMenuManager.Controls
                 Cursor = Cursors.WaitCursor; 
                 helper.BackupItems(BackupList.BackupTarget.Basic); 
                 Cursor = Cursors.Default;
-                MessageBox("备份完成！", "备份");
+                int backupCount = helper.backupCount;
+                MessageBox("备份完成！共处理了" + backupCount.ToString() + "个菜单项目！", "备份");
             };
             Restore.Click += (sender, e) => {
                 if (UpdateRestoreFileList())
