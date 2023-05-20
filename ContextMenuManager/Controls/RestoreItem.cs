@@ -2,12 +2,11 @@
 using BluePointLilac.Methods;
 using ContextMenuManager.Controls.Interfaces;
 using ContextMenuManager.Methods;
-using ContextMenuManager.Models;
 using Microsoft.Win32;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using static ContextMenuManager.Models.BackupList;
+using static ContextMenuManager.Methods.BackupList;
 
 namespace ContextMenuManager.Controls
 {

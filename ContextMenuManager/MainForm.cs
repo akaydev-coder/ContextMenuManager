@@ -48,7 +48,7 @@ namespace ContextMenuManager
             shellList, shellNewList, sendToList, openWithList, winXList,
             enhanceMenusList, detailedEditList, guidBlockedList, iEList,
             appSettingBox, languagesBox, dictionariesBox, aboutMeBox, 
-            donateBox, backupBox, backupListBox
+            donateBox, backupListBox
         };
 
         readonly ShellList shellList = new ShellList();
@@ -67,7 +67,6 @@ namespace ContextMenuManager
         readonly DictionariesBox dictionariesBox = new DictionariesBox();
         readonly ReadOnlyRichTextBox aboutMeBox = new ReadOnlyRichTextBox();
         readonly DonateBox donateBox = new DonateBox();
-        readonly BackupBox backupBox = new BackupBox();
         readonly BackupListBox backupListBox = new BackupListBox();
         readonly ExplorerRestarter explorerRestarter = new ExplorerRestarter();
 
@@ -166,11 +165,10 @@ namespace ContextMenuManager
         {
             AppString.SideBar.AppSetting,
             AppString.SideBar.AppLanguage,
+            "备份恢复",
             AppString.SideBar.Dictionaries,
             AppString.SideBar.AboutApp,
             AppString.SideBar.Donate,
-            "备份恢复",
-            "备份恢复"
         };
 
         static readonly string[] SettingItems =
@@ -383,17 +381,18 @@ namespace ContextMenuManager
                     languagesBox.LoadLanguages(); languagesBox.Visible = true;
                     break;
                 case 2:
-                    dictionariesBox.LoadText(); dictionariesBox.Visible = true;
+                    backupListBox.LoadItems(); backupListBox.Visible = true;
                     break;
                 case 3:
-                    if(aboutMeBox.TextLength == 0) aboutMeBox.LoadIni(AppString.Other.AboutApp);
-                    aboutMeBox.Visible = true; break;
+                    dictionariesBox.LoadText(); dictionariesBox.Visible = true;
+                    break;
                 case 4:
-                    donateBox.Visible = true; break;
+                    if(aboutMeBox.TextLength == 0) aboutMeBox.LoadIni(AppString.Other.AboutApp);
+                    aboutMeBox.Visible = true;
+                    break;
                 case 5:
-                    backupBox.Visible = true; break;
-                case 6:
-                    backupListBox.LoadItems(); backupListBox.Visible = true; break;
+                    donateBox.Visible = true;
+                    break;
             }
         }
 

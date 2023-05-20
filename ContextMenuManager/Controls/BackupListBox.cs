@@ -1,16 +1,12 @@
 ﻿using BluePointLilac.Controls;
-using BluePointLilac.Methods;
 using ContextMenuManager.Methods;
-using ContextMenuManager.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using static ContextMenuManager.Models.BackupList;
+using static ContextMenuManager.Methods.BackupList;
 
 namespace ContextMenuManager.Controls
 {
@@ -48,6 +44,8 @@ namespace ContextMenuManager.Controls
                 }
                 Cursor = Cursors.WaitCursor;
                 helper.BackupItems(backupTarget);
+                // 新增新加入的备份项目
+
                 Cursor = Cursors.Default;
                 int backupCount = helper.backupCount;
                 AppMessageBox.Show("备份完成！共处理了" + backupCount.ToString() + "个菜单项目！");
