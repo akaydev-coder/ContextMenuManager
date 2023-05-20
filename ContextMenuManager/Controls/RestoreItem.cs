@@ -1,5 +1,4 @@
 ﻿using BluePointLilac.Controls;
-using BluePointLilac.Methods;
 using ContextMenuManager.Controls.Interfaces;
 using ContextMenuManager.Methods;
 using Microsoft.Win32;
@@ -22,7 +21,7 @@ namespace ContextMenuManager.Controls
             InitializeComponents();
             restoreInterface = item;
             FilePath = filePath;
-            Text = "备份（源计算机：" + deviceName + "；创建于" + creatTime + "）";
+            Text = $@"备份（源计算机：{deviceName}；创建于{creatTime}）";
             Image = AppImage.BackupItem;
         }
 

@@ -21,18 +21,21 @@ namespace ContextMenuManager.Methods
         private RestoreMode restoreMode;
         public int backupCount = 0;
         public int changeCount = 0;
+        public string createTime;
+        public string filePath;
 
         public void BackupItems(BackupTarget mode)
         {
             ClearBackupList();
             string date = DateTime.Today.ToString("yyyy-MM-dd");
             string time = DateTime.Now.ToString("HH-mm-ss");
-            string filePath = $@"{AppConfig.MenuBackupDir}\{date} {time}.xml";
+            createTime = $@"{date} {time}";
+            filePath = $@"{AppConfig.MenuBackupDir}\{createTime}.xml";
             // 加载备份文件到缓冲区
             BackupRestoreItems(mode, true);
             // 保存缓冲区的备份文件
             SaveBackupList(filePath);
-            backupCount = BackupList.GetBackupListCount();
+            backupCount = GetBackupListCount();
             ClearBackupList();
         }
 
