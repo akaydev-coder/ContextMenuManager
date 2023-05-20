@@ -79,8 +79,10 @@ namespace ContextMenuManager.Controls
         public void RestoreItems(int restoreIndex)
         {
             if (restoreIndex == -1) return;
-            BackupList.LoadBackupList(restoreFileList[restoreIndex].FilePath);
+            Cursor = Cursors.WaitCursor;
+            BackupList.ReadBackupList(restoreFileList[restoreIndex].FilePath);
             helper.RestoreItems(BackupList.BackupMode.Basic);
+            Cursor = Cursors.Default;
             MessageBox("恢复完成！", "恢复");
         }
 

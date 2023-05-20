@@ -14,7 +14,7 @@ namespace ContextMenuManager.Models
     public static class BackupList
     {
         // 备份列表缓存区
-        private static List<BackupItem> backupList = new List<BackupItem>();
+        public static List<BackupItem> backupList = new List<BackupItem>();
 
         // 创建一个XmlSerializer对象
         private static readonly XmlSerializer serializer = new XmlSerializer(typeof(List<BackupItem>));
@@ -31,11 +31,11 @@ namespace ContextMenuManager.Models
 
         static BackupList() { }
 
-        public static void AddItem(string itemName, BackupItemType backupItemType, bool itemVisible, Scenes scene)
+        public static void AddItem(string keyName, BackupItemType backupItemType, bool itemVisible, Scenes scene)
         {
             backupList.Add(new BackupItem
             {
-                ItemName = itemName,
+                KeyName = keyName,
                 ItemType = backupItemType,
                 ItemVisible = itemVisible,
                 BackupScene = scene,
@@ -56,7 +56,7 @@ namespace ContextMenuManager.Models
             }
         }
 
-        public static void LoadBackupList(string filePath)
+        public static void ReadBackupList(string filePath)
         {
             ClearItems();
             // 反序列化到List<BackupItem>对象
@@ -71,8 +71,8 @@ namespace ContextMenuManager.Models
     [Serializable, XmlType("BackupItem")]
     public class BackupItem
     {
-        [XmlElement("ItemName")]
-        public string ItemName { get; set; }// 右键菜单名字
+        [XmlElement("KeyName")]
+        public string KeyName { get; set; }// 查询索引名字
 
         [XmlElement("BackupItemType")]
         public BackupItemType ItemType { get; set; }// 备份项目类型

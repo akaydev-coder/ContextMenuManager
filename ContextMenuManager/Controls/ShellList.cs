@@ -477,7 +477,6 @@ namespace ContextMenuManager.Controls
             {
                 sw.WriteLine("\tLoadAnalysisItems: ");
             }
-            int i = 0;
 #endif
             if (CurrentFileObjectPath == null) return;
 

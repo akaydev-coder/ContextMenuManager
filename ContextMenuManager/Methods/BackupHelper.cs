@@ -10,70 +10,85 @@ using System.Text;
 using System.Threading.Tasks;
 using static ContextMenuManager.Controls.ShellList;
 using System.Xml;
-using System.Windows.Forms;
 using System.Drawing;
+using static ContextMenuManager.Models.BackupList;
 
 namespace ContextMenuManager.Methods
 {
     internal class BackupHelper
     {
-        private Scenes backupScene;
+        private Scenes currentScene;
+        private List<BackupItem> currentRestoreItems = new List<BackupItem>();
 
-        public void BackupItems(BackupList.BackupMode mode)
+        public void BackupItems(BackupMode mode)
         {
             string date = DateTime.Today.ToString("yyyy-MM-dd");
             string time = DateTime.Now.ToString("HH-mm-ss");
             string filePath = $@"{AppConfig.MenuBackupDir}\{date} {time}.xml";
-            Scenes[] BackupScenes = null;
-            switch (mode)
-            {
-                case BackupList.BackupMode.Basic:
-                    BackupScenes = new Scenes[] {
-                        Scenes.File, Scenes.Folder, Scenes.Directory, Scenes.Background, Scenes.Desktop,
-                        Scenes.Drive, Scenes.AllObjects, Scenes.Computer, Scenes.RecycleBin, Scenes.Library
-                    }; break;
-            }
-            for (int i = 0; i < BackupScenes.Length; i++)
-            {
-                backupScene = BackupScenes[i];
-                GetBackupItems();
-            }
+            BackupRestoreItems(mode, true);
             if (!Directory.Exists($@"{AppConfig.MenuBackupDir}"))
             {
                 Directory.CreateDirectory($@"{AppConfig.MenuBackupDir}");
             }
-            BackupList.SaveBackupList(filePath);
-            BackupList.ClearItems();
+            SaveBackupList(filePath);
+            ClearItems();
         }
 
-        public void RestoreItems(BackupList.BackupMode mode)
+        public void RestoreItems(BackupMode mode)
         {
-            /*Scenes[] BackupScenes = null;
+            BackupRestoreItems(mode, false);
+            ClearItems();
+        }
+
+        private void BackupRestoreItems(BackupMode mode, bool backup)
+        {
+            Scenes[] scenes = null;
             switch (mode)
             {
-                case BackupList.BackupMode.Basic:
-                    BackupScenes = new Scenes[] {
+                case BackupMode.Basic:
+                    scenes = new Scenes[] {
                         Scenes.File, Scenes.Folder, Scenes.Directory, Scenes.Background, Scenes.Desktop,
                         Scenes.Drive, Scenes.AllObjects, Scenes.Computer, Scenes.RecycleBin, Scenes.Library
                     }; break;
             }
-            for (int i = 0; i < BackupScenes.Length; i++)
+            for (int i = 0; i < scenes.Length; i++)
             {
-                backupScene = BackupScenes[i];
-                GetBackupItems();
+                currentScene = scenes[i];
+                // 通过Scene筛选目前恢复项目
+                if (!backup)
+                {
+                    currentRestoreItems.Clear();
+                    foreach(BackupItem item in backupList)
+                    {
+                        if (item.BackupScene == currentScene)
+                        {
+                            currentRestoreItems.Add(item);
+                        }
+                    }
+                }
+                GetBackupItems(backup);
             }
-            if (!Directory.Exists($@"{AppConfig.MenuBackupDir}"))
-            {
-                Directory.CreateDirectory($@"{AppConfig.MenuBackupDir}");
-            }
-            BackupList.SaveBackupList(filePath);
-            BackupList.ClearItems();*/
         }
 
-        private void GetBackupItems()
+        private bool IfItemNeedChange(string keyName, BackupItemType itemType, bool itemVisible)
+        {
+            foreach(BackupItem item in currentRestoreItems)
+            {
+                if(item.KeyName == keyName && item.ItemType == itemType)
+                {
+                    if (item.ItemVisible != itemVisible)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private void GetBackupItems(bool backup)
         {
             string scenePath = null;
-            switch (backupScene)
+            switch (currentScene)
             {
                 case Scenes.File:
                     scenePath = MENUPATH_FILE; break;
@@ -103,18 +118,18 @@ namespace ContextMenuManager.Methods
 #if DEBUG
             using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
             {
-                sw.WriteLine("BackupItems: " + backupScene);
+                sw.WriteLine("BackupItems: " + currentScene);
             }
             int i = 0;
 #endif
             // 获取ShellItem与ShellExItem类的备份项目
-            GetBackupItems(scenePath);
+            GetBackupItems(scenePath, backup);
             if (WinOsVersion.Current >= WinOsVersion.Win10)
             {
                 // 获取UwpModeItem类的备份项目
-                GetBackupUwpModeItem();
+                GetBackupUwpModeItem(backup);
             }
-            switch (backupScene)
+            switch (currentScene)
             {
                 case Scenes.Background:
                     VisibleRegRuleItem item = new VisibleRegRuleItem(VisibleRegRuleItem.CustomFolder);
@@ -122,8 +137,19 @@ namespace ContextMenuManager.Methods
                     string valueName = item.ValueName;
                     string itemName = item.Text;
                     bool ifItemInMenu = item.ItemVisible;
-                    // 加入备份列表
-                    BackupList.AddItem(valueName, BackupList.BackupItemType.VisibleRegRuleItem, ifItemInMenu, backupScene);
+                    if (backup)
+                    {
+                        // 加入备份列表
+                        AddItem(valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene);
+                    }
+                    else
+                    {
+                        // 恢复备份列表
+                        if (IfItemNeedChange(valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu))
+                        {
+                            item.ItemVisible = !ifItemInMenu;
+                        }
+                    }
 #if DEBUG
                     i++;
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -139,8 +165,20 @@ namespace ContextMenuManager.Methods
                     valueName = item.ValueName;
                     itemName = item.Text;
                     ifItemInMenu = item.ItemVisible;
-                    // 加入备份列表
-                    BackupList.AddItem(valueName, BackupList.BackupItemType.VisibleRegRuleItem, ifItemInMenu, backupScene);
+                    if (backup)
+                    {
+                        // 加入备份列表
+                        AddItem(valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene);
+                    }
+                    else
+                    {
+                        // 恢复备份列表
+                        if (IfItemNeedChange(valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu))
+                        {
+                            item.ItemVisible = !ifItemInMenu;
+                        }
+                    }
+                    
 #if DEBUG
                     i++;
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -156,8 +194,19 @@ namespace ContextMenuManager.Methods
                     valueName = item.ValueName;
                     itemName = item.Text;
                     ifItemInMenu = item.ItemVisible;
-                    // 加入备份列表
-                    BackupList.AddItem(valueName, BackupList.BackupItemType.VisibleRegRuleItem, ifItemInMenu, backupScene);
+                    if (backup)
+                    {
+                        // 加入备份列表
+                        AddItem(valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene);
+                    }
+                    else
+                    {
+                        // 恢复备份列表
+                        if (IfItemNeedChange(valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu))
+                        {
+                            item.ItemVisible = !ifItemInMenu;
+                        }
+                    }
 #if DEBUG
                     i++;
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -179,22 +228,22 @@ namespace ContextMenuManager.Methods
                     for (int j = 0; j < AddedScenePathes.Length; j++)
                     {
                         scenePath = AddedScenePathes[j];
-                        GetBackupShellItems(GetShellPath(scenePath));
-                        GetBackupShellExItems(GetShellExPath(scenePath));
+                        GetBackupShellItems(GetShellPath(scenePath), backup);
+                        GetBackupShellExItems(GetShellExPath(scenePath), backup);
                     }
                     break;
             }
         }
 
-        private void GetBackupItems(string scenePath)
+        private void GetBackupItems(string scenePath, bool backup)
         {
             if (scenePath == null) return;
             RegTrustedInstaller.TakeRegKeyOwnerShip(scenePath);
-            GetBackupShellItems(GetShellPath(scenePath));
-            GetBackupShellExItems(GetShellExPath(scenePath));
+            GetBackupShellItems(GetShellPath(scenePath), backup);
+            GetBackupShellExItems(GetShellExPath(scenePath), backup);
         }
 
-        private void GetBackupShellItems(string shellPath)
+        private void GetBackupShellItems(string shellPath, bool backup)
         {
 #if DEBUG
             using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -213,8 +262,19 @@ namespace ContextMenuManager.Methods
                     ShellItem item = new ShellItem(regPath);
                     string itemName = item.ItemText;
                     bool ifItemInMenu = item.ItemVisible;
-                    // 加入备份列表
-                    BackupList.AddItem(keyName, BackupList.BackupItemType.ShellItem, ifItemInMenu, backupScene);
+                    if (backup)
+                    {
+                        // 加入备份列表
+                        AddItem(keyName, BackupItemType.ShellItem, ifItemInMenu, currentScene);
+                    }
+                    else
+                    {
+                        // 恢复备份列表
+                        if (IfItemNeedChange(keyName, BackupItemType.ShellItem, ifItemInMenu))
+                        {
+                            item.ItemVisible = !ifItemInMenu;
+                        }
+                    }
 #if DEBUG
                     i++;
                     using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -226,7 +286,7 @@ namespace ContextMenuManager.Methods
             }
         }
 
-        private void GetBackupShellExItems(string shellExPath)
+        private void GetBackupShellExItems(string shellExPath, bool backup)
         {
 #if DEBUG
             using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -239,7 +299,7 @@ namespace ContextMenuManager.Methods
             using (RegistryKey shellExKey = RegistryEx.GetRegistryKey(shellExPath))
             {
                 if (shellExKey == null) return;
-                bool isDragDrop = backupScene == Scenes.DragDrop;
+                bool isDragDrop = currentScene == Scenes.DragDrop;
                 RegTrustedInstaller.TakeRegTreeOwnerShip(shellExKey.Name);
                 Dictionary<string, Guid> dic = ShellExItem.GetPathAndGuids(shellExPath, isDragDrop);
                 FoldGroupItem groupItem = null;
@@ -269,8 +329,20 @@ namespace ContextMenuManager.Methods
                             item.FoldGroupItem = groupItem;
                             item.Indent();
                         }
-                        // 加入备份列表
-                        BackupList.AddItem(keyName, BackupList.BackupItemType.ShellExItem, ifItemInMenu, backupScene);
+                        if (backup)
+                        {
+                            // 加入备份列表
+                            AddItem(keyName, BackupItemType.ShellExItem, ifItemInMenu, currentScene);
+                        }
+                        else
+                        {
+                            // 恢复备份列表
+                            if (IfItemNeedChange(keyName, BackupItemType.ShellExItem, ifItemInMenu))
+                            {
+                                item.ItemVisible = !ifItemInMenu;
+                            }
+                        }
+                        
 #if DEBUG
                         i++;
                         using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -284,7 +356,7 @@ namespace ContextMenuManager.Methods
             }
         }
 
-        private void GetBackupUwpModeItem()
+        private void GetBackupUwpModeItem(bool backup)
         {
 #if DEBUG
             using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
@@ -293,13 +365,13 @@ namespace ContextMenuManager.Methods
             }
             int i = 0;
 #endif
-            List<Guid> guidList = new List<Guid>() { };
+            List<Guid> guidList = new List<Guid>();
             foreach (XmlDocument doc in XmlDicHelper.UwpModeItemsDic)
             {
                 if (doc?.DocumentElement == null) continue;
                 foreach (XmlNode sceneXN in doc.DocumentElement.ChildNodes)
                 {
-                    if (sceneXN.Name == backupScene.ToString())
+                    if (sceneXN.Name == currentScene.ToString())
                     {
                         foreach (XmlElement itemXE in sceneXN.ChildNodes)
                         {
@@ -312,8 +384,19 @@ namespace ContextMenuManager.Methods
                                 UwpModeItem uwpItem = new UwpModeItem(uwpName, guid);
                                 string itemName = uwpItem.Text; // 右键菜单名称
                                 bool ifItemInMenu = uwpItem.ItemVisible;
-                                // 加入备份列表
-                                BackupList.AddItem(itemName, BackupList.BackupItemType.UwpModelItem, ifItemInMenu, backupScene);
+                                if (backup)
+                                {
+                                    // 加入备份列表
+                                    AddItem(itemName, BackupItemType.UwpModelItem, ifItemInMenu, currentScene);
+                                }
+                                else
+                                {
+                                    // 恢复备份列表
+                                    if (IfItemNeedChange(itemName, BackupItemType.UwpModelItem, ifItemInMenu))
+                                    {
+                                        uwpItem.ItemVisible = !ifItemInMenu;
+                                    }
+                                } 
 #if DEBUG
                                 i++;
                                 using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
