@@ -19,6 +19,11 @@ namespace ContextMenuManager.Methods
             LoadLanguage();
         }
 
+#if DEBUG
+        public const string DebugLogPath = "D:\\log.txt";
+        public const bool EnableLog = false;
+#endif
+
         public const string GithubLatest = "https://github.com/Jack251970/ContextMenuManager/releases/latest";
         public const string GithubLatestApi = "https://api.github.com/repos/Jack251970/ContextMenuManager/releases/latest";
         public const string GithubLangsApi = "https://api.github.com/repos/Jack251970/ContextMenuManager/contents/languages";

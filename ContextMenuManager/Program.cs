@@ -13,9 +13,12 @@ namespace ContextMenuManager
         static void Main()
         {
 #if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            if (AppConfig.EnableLog)
             {
-                sw.WriteLine("--------------------" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + "--------------------");
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine($@"--------------------{DateTime.Now:yyyy-MM-dd HH:mm:ss}--------------------");
+                }
             }
 #endif
             Application.EnableVisualStyles();

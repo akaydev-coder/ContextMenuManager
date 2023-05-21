@@ -282,11 +282,14 @@ namespace ContextMenuManager.Controls
             }
             AddNewItem(scenePath); // 新建一个菜单项目
 #if DEBUG
-            if (sceneName != null)
+            if (AppConfig.EnableLog)
             {
-                using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                if (sceneName != null)
                 {
-                    sw.WriteLine("LoadItems: " + sceneName);
+                    using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                    {
+                        sw.WriteLine($@"LoadItems: {sceneName}");
+                    }
                 }
             }
 #endif
@@ -417,9 +420,12 @@ namespace ContextMenuManager.Controls
         private void LoadStoreItems()
         {
 #if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            if (AppConfig.EnableLog)
             {
-                sw.WriteLine("\tLoadStoreItems: ");
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine("\tLoadStoreItems: ");
+                }
             }
             int i = 0;
 #endif
@@ -431,9 +437,12 @@ namespace ContextMenuManager.Controls
                     AddItem(new StoreShellItem($@"{ShellItem.CommandStorePath}\{itemName}", true, false));
 #if DEBUG
                     i++;
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    if (AppConfig.EnableLog)
                     {
-                        sw.WriteLine("\t\t" + i.ToString() + ". " + itemName);
+                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                        {
+                            sw.WriteLine($@"\t\t{i}. {itemName}");
+                        }
                     }
 #endif
                 }
@@ -473,9 +482,12 @@ namespace ContextMenuManager.Controls
         private void LoadAnalysisItems()
         {
 #if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            if (AppConfig.EnableLog)
             {
-                sw.WriteLine("\tLoadAnalysisItems: ");
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine("\tLoadAnalysisItems: ");
+                }
             }
 #endif
             if (CurrentFileObjectPath == null) return;

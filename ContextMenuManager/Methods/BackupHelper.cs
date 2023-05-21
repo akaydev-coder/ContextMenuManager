@@ -134,9 +134,12 @@ namespace ContextMenuManager.Methods
                     scenePath = MENUPATH_LIBRARY; break;
             }
 #if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            if (AppConfig.EnableLog)
             {
-                sw.WriteLine("BackupItems: " + currentScene);
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine($@"BackupItems: {currentScene}");
+                }
             }
             int i = 0;
 #endif
@@ -170,11 +173,14 @@ namespace ContextMenuManager.Methods
                     }
 #if DEBUG
                     i++;
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    if (AppConfig.EnableLog)
                     {
-                        sw.WriteLine("\tBackupAddedItems");
-                        sw.WriteLine("\t\t" + i.ToString() + ". " + valueName + " " + itemName + " " + ifItemInMenu + " " + regPath);
-                    }
+                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                        {
+                            sw.WriteLine("\tBackupAddedItems");
+                            sw.WriteLine($@"\t\t{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
+                        }
+                    } 
 #endif
                     break;
                 case Scenes.Computer:
@@ -199,10 +205,13 @@ namespace ContextMenuManager.Methods
                     
 #if DEBUG
                     i++;
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    if (AppConfig.EnableLog)
                     {
-                        sw.WriteLine("\tBackupAddedItems");
-                        sw.WriteLine("\t\t" + i.ToString() + ". " + valueName + " " + itemName + " " + ifItemInMenu + " " + regPath);
+                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                        {
+                            sw.WriteLine("\tBackupAddedItems");
+                            sw.WriteLine($@"\t\t{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
+                        }
                     }
 #endif
                     break;
@@ -227,18 +236,24 @@ namespace ContextMenuManager.Methods
                     }
 #if DEBUG
                     i++;
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    if (AppConfig.EnableLog)
                     {
-                        sw.WriteLine("\tBackupAddedItems");
-                        sw.WriteLine("\t\t" + i.ToString() + ". " + valueName + " " + itemName + " " + ifItemInMenu + " " + regPath);
+                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                        {
+                            sw.WriteLine("\tBackupAddedItems");
+                            sw.WriteLine($@"\t\t{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
+                        }
                     }
 #endif
                     break;
                 case Scenes.Library:
 #if DEBUG
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    if (AppConfig.EnableLog)
                     {
-                        sw.WriteLine("\tBackupAddedItems");
+                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                        {
+                            sw.WriteLine("\tBackupAddedItems");
+                        }
                     }
 #endif
                     string[] AddedScenePathes = new string[] { MENUPATH_LIBRARY_BACKGROUND, MENUPATH_LIBRARY_USER };
@@ -264,9 +279,12 @@ namespace ContextMenuManager.Methods
         private void GetBackupShellItems(string shellPath, bool backup)
         {
 #if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            if (AppConfig.EnableLog)
             {
-                sw.WriteLine("\tGetBackupShellItems");
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine("\tGetBackupShellItems");
+                }
             }
             int i = 0;
 #endif
@@ -295,9 +313,12 @@ namespace ContextMenuManager.Methods
                     }
 #if DEBUG
                     i++;
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    if (AppConfig.EnableLog)
                     {
-                        sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + itemName + " " + ifItemInMenu + " " + regPath);
+                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                        {
+                            sw.WriteLine($@"\t\t{i}. {keyName} {itemName} {ifItemInMenu} {regPath}");
+                        }
                     }
 #endif
                 }
@@ -307,9 +328,12 @@ namespace ContextMenuManager.Methods
         private void GetBackupShellExItems(string shellExPath, bool backup)
         {
 #if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            if (AppConfig.EnableLog)
             {
-                sw.WriteLine("\tGetBackupShellExItems");
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine("\tGetBackupShellExItems");
+                }
             }
             int i = 0;
 #endif
@@ -326,9 +350,12 @@ namespace ContextMenuManager.Methods
                     // here!
                     groupItem = GetDragDropGroupItem(shellExPath);
 #if DEBUG
-                    using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                    if (AppConfig.EnableLog)
                     {
-                        sw.WriteLine("\t\t" + shellExPath + "(FoldGroupItem)");
+                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                        {
+                            sw.WriteLine($@"\t\t{shellExPath}(FoldGroupItem)");
+                        }
                     }
 #endif
                 }
@@ -360,15 +387,17 @@ namespace ContextMenuManager.Methods
                                 item.ItemVisible = !ifItemInMenu;
                             }
                         }
-                        
+                        names.Add(keyName);
 #if DEBUG
                         i++;
-                        using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                        if (AppConfig.EnableLog)
                         {
-                            sw.WriteLine("\t\t" + i.ToString() + ". " + keyName + " " + itemName + " " + ifItemInMenu + " " + regPath);
+                            using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                            {
+                                sw.WriteLine($@"\t\t{i}. {keyName} {itemName} {ifItemInMenu} {regPath}");
+                            }
                         }
 #endif
-                        names.Add(keyName);
                     }
                 }
             }
@@ -377,9 +406,12 @@ namespace ContextMenuManager.Methods
         private void GetBackupUwpModeItem(bool backup)
         {
 #if DEBUG
-            using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+            if (AppConfig.EnableLog)
             {
-                sw.WriteLine("\tGetBackupUwpModeItem");
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine("\tGetBackupUwpModeItem");
+                }
             }
             int i = 0;
 #endif
@@ -400,26 +432,30 @@ namespace ContextMenuManager.Methods
                                 guidList.Add(guid);
                                 string uwpName = GuidInfo.GetUwpName(guid); // uwp程序的名称
                                 UwpModeItem uwpItem = new UwpModeItem(uwpName, guid);
-                                string itemName = uwpItem.Text; // 右键菜单名称
+                                string keyName = uwpItem.Text; // 右键菜单索引
+                                string itemName = keyName;  // 右键菜单名称 // here!
                                 bool ifItemInMenu = uwpItem.ItemVisible;
                                 if (backup)
                                 {
                                     // 加入备份列表
-                                    AddItem(itemName, BackupItemType.UwpModelItem, ifItemInMenu, currentScene);
+                                    AddItem(keyName, BackupItemType.UwpModelItem, ifItemInMenu, currentScene);
                                 }
                                 else
                                 {
                                     // 恢复备份列表
-                                    if (CheckItemNeedChange(itemName, BackupItemType.UwpModelItem, ifItemInMenu))
+                                    if (CheckItemNeedChange(keyName, BackupItemType.UwpModelItem, ifItemInMenu))
                                     {
                                         uwpItem.ItemVisible = !ifItemInMenu;
                                     }
                                 } 
 #if DEBUG
                                 i++;
-                                using (StreamWriter sw = new StreamWriter("D:\\log.txt", true))
+                                if (AppConfig.EnableLog)
                                 {
-                                    sw.WriteLine("\t\t" + i.ToString() + ". " + uwpName + " " + itemName + " " + ifItemInMenu + " " + guid);
+                                    using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                                    {
+                                        sw.WriteLine($@"\t\t{i}. {keyName}({uwpName}) {itemName} {ifItemInMenu} {guid}");
+                                    }
                                 }
 #endif
                             }
