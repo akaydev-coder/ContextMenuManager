@@ -19,25 +19,25 @@ namespace ContextMenuManager.Methods
             LoadLanguage();
         }
 
-        public const string GithubLatest = "https://github.com/BluePointLilac/ContextMenuManager/releases/latest";
-        public const string GithubLatestApi = "https://api.github.com/repos/BluePointLilac/ContextMenuManager/releases/latest";
-        public const string GithubLangsApi = "https://api.github.com/repos/BluePointLilac/ContextMenuManager/contents/languages";
-        public const string GithubLangsRawDir = "https://raw.githubusercontent.com/BluePointLilac/ContextMenuManager/master/languages";
-        public const string GithubShellNewApi = "https://api.github.com/repos/BluePointLilac/ContextMenuManager/contents/ContextMenuManager/Properties/Resources/ShellNew";
-        public const string GithubShellNewRawDir = "https://raw.githubusercontent.com/BluePointLilac/ContextMenuManager/master/ContextMenuManager/Properties/Resources/ShellNew";
-        public const string GithubTexts = "https://raw.githubusercontent.com/BluePointLilac/ContextMenuManager/master/ContextMenuManager/Properties/Resources/Texts";
-        public const string GithubDonateRaw = "https://raw.githubusercontent.com/BluePointLilac/ContextMenuManager/master/Donate.md";
-        public const string GithubDonate = "https://github.com/BluePointLilac/ContextMenuManager/blob/master/Donate.md";
+        public const string GithubLatest = "https://github.com/Jack251970/ContextMenuManager/releases/latest";
+        public const string GithubLatestApi = "https://api.github.com/repos/Jack251970/ContextMenuManager/releases/latest";
+        public const string GithubLangsApi = "https://api.github.com/repos/Jack251970/ContextMenuManager/contents/languages";
+        public const string GithubLangsRawDir = "https://raw.githubusercontent.com/Jack251970/ContextMenuManager/master/languages";
+        public const string GithubShellNewApi = "https://api.github.com/repos/Jack251970/ContextMenuManager/contents/ContextMenuManager/Properties/Resources/ShellNew";
+        public const string GithubShellNewRawDir = "https://raw.githubusercontent.com/Jack251970/ContextMenuManager/master/ContextMenuManager/Properties/Resources/ShellNew";
+        public const string GithubTexts = "https://raw.githubusercontent.com/Jack251970/ContextMenuManager/master/ContextMenuManager/Properties/Resources/Texts";
+        public const string GithubDonateRaw = "https://raw.githubusercontent.com/Jack251970/ContextMenuManager/master/Donate.md";
+        public const string GithubDonate = "https://github.com/Jack251970/ContextMenuManager/blob/master/Donate.md";
 
-        public const string GiteeReleases = "https://gitee.com/BluePointLilac/ContextMenuManager/releases";
-        public const string GiteeLatestApi = "https://gitee.com/api/v5/repos/BluePointLilac/ContextMenuManager/releases/latest";
-        public const string GiteeLangsApi = "https://gitee.com/api/v5/repos/BluePointLilac/ContextMenuManager/contents/languages";
-        public const string GiteeLangsRawDir = "https://gitee.com/BluePointLilac/ContextMenuManager/raw/master/languages";
-        public const string GiteeShellNewApi = "https://gitee.com/api/v5/repos/BluePointLilac/ContextMenuManager/contents/ContextMenuManager/Properties/Resources/ShellNew";
-        public const string GiteeShellNewRawDir = "https://gitee.com/BluePointLilac/ContextMenuManager/raw/master/ContextMenuManager/Properties/Resources/ShellNew";
-        public const string GiteeTexts = "https://gitee.com/BluePointLilac/ContextMenuManager/raw/master/ContextMenuManager/Properties/Resources/Texts";
-        public const string GiteeDonateRaw = "https://gitee.com/BluePointLilac/ContextMenuManager/raw/master/Donate.md";
-        public const string GiteeDonate = "https://gitee.com/BluePointLilac/ContextMenuManager/blob/master/Donate.md";
+        public const string GiteeReleases = "https://gitee.com/Jack251970/ContextMenuManager/releases";
+        public const string GiteeLatestApi = "https://gitee.com/api/v5/repos/Jack251970/ContextMenuManager/releases/latest";
+        public const string GiteeLangsApi = "https://gitee.com/api/v5/repos/Jack251970/ContextMenuManager/contents/languages";
+        public const string GiteeLangsRawDir = "https://gitee.com/Jack251970/ContextMenuManager/raw/master/languages";
+        public const string GiteeShellNewApi = "https://gitee.com/api/v5/repos/Jack251970/ContextMenuManager/contents/ContextMenuManager/Properties/Resources/ShellNew";
+        public const string GiteeShellNewRawDir = "https://gitee.com/Jack251970/ContextMenuManager/raw/master/ContextMenuManager/Properties/Resources/ShellNew";
+        public const string GiteeTexts = "https://gitee.com/Jack251970/ContextMenuManager/raw/master/ContextMenuManager/Properties/Resources/Texts";
+        public const string GiteeDonateRaw = "https://gitee.com/Jack251970/ContextMenuManager/raw/master/Donate.md";
+        public const string GiteeDonate = "https://gitee.com/Jack251970/ContextMenuManager/blob/master/Donate.md";
 
         public static readonly string AppConfigDir = $@"{Application.StartupPath}\Config";
         public static readonly string AppDataDir = Environment.ExpandEnvironmentVariables(@"%AppData%\ContextMenuManager");

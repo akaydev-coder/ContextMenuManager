@@ -69,12 +69,12 @@ namespace ContextMenuManager.Controls
         public void RestoreMe()
         {
             RestoreMode restoreMode;
-            using (SelectDialog dlg = new SelectDialog())
+            using (RestoreDialog dlg = new RestoreDialog())
             {
-                dlg.Items = new[] { "不处理不存在于备份列表上的菜单项", "仅启用备份列表上可见的菜单项" };
-                dlg.Title = "恢复模式";
+                dlg.Items = new[] { "不处理不存在于备份列表上的菜单项", "关闭不存在于备份列表上的菜单项" };
+                dlg.Title = "恢复一个备份";
                 if (dlg.ShowDialog() != DialogResult.OK) return;
-                restoreMode = dlg.SelectedIndex == 0 ? RestoreMode.EnableDiableOnList : RestoreMode.JustEnableOnList;
+                restoreMode = dlg.SelectedIndex == 0 ? RestoreMode.NotHandleNotOnList : RestoreMode.DisableNotOnList;
             }
             restoreInterface.RestoreItems(filePath, restoreMode);
         }

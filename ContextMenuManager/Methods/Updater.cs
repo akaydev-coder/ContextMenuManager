@@ -68,12 +68,11 @@ namespace ContextMenuManager.Methods
                     if(MessageBox.Show(info, AppString.General.AppName, 
                         MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
-                        string netVer = Environment.Version > new Version(4, 0) ? "4.0" : "3.5";
                         XmlNode assetsXN = root.SelectSingleNode("assets");
                         foreach(XmlNode itemXN in assetsXN.SelectNodes("item"))
                         {
                             XmlNode nameXN = itemXN.SelectSingleNode("name");
-                            if(nameXN != null && nameXN.InnerText.Contains(netVer))
+                            if(nameXN != null && nameXN.InnerText.Contains(".exe"))
                             {
                                 XmlNode urlXN = itemXN.SelectSingleNode("browser_download_url");
                                 using(DownloadDialog dlg = new DownloadDialog())

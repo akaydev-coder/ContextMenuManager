@@ -94,10 +94,10 @@ namespace ContextMenuManager.Methods
             }
             switch(restoreMode)
             {
-                case RestoreMode.JustEnableOnList:
+                case RestoreMode.DisableNotOnList:
                     if (itemVisible) changeCount++;
                     return itemVisible;
-                case RestoreMode.EnableDiableOnList:
+                case RestoreMode.NotHandleNotOnList:
                 default:
                     return false;
             }
@@ -480,8 +480,8 @@ namespace ContextMenuManager.Methods
 
         public enum RestoreMode
         {
-            EnableDiableOnList,     // 启用备份列表上可见的菜单项，禁用备份列表上不可见的菜单项，不处理不存在于备份列表上的菜单项
-            JustEnableOnList,       // 仅启用备份列表上可见的菜单项，禁用备份列表上不可见以及不存在于备份列表上的菜单项
+            NotHandleNotOnList,     // 启用备份列表上可见的菜单项，禁用备份列表上不可见的菜单项，不处理不存在于备份列表上的菜单项
+            DisableNotOnList,       // 启用备份列表上可见的菜单项，禁用备份列表上不可见以及不存在于备份列表上的菜单项
         };
 
         static BackupList() { }

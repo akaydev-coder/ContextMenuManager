@@ -45,7 +45,7 @@ namespace ContextMenuManager.Controls
             newItem.AddNewItem += () =>
             {
                 BackupTarget backupTarget;
-                using (SelectDialog dlg = new SelectDialog())
+                using (BackupDialog dlg = new BackupDialog())
                 {
                     dlg.Items = new[] { "基本", "详细" };
                     dlg.Title = "新建一个备份";
