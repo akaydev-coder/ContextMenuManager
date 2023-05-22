@@ -58,13 +58,13 @@ namespace ContextMenuManager.Methods
         private Scenes currentScene;    // 目前处理场景
         private RestoreMode restoreMode;    // 备份恢复模式
 
-        // 备份场景处理
+        // 初始化备份恢复场景
         private void BackupRestoreItems(BackupTarget mode, bool backup)
         {
             Scenes[] scenes = new Scenes[] {
-                /*Scenes.File, Scenes.Folder, Scenes.Directory, Scenes.Background, Scenes.Desktop,
+                Scenes.File, Scenes.Folder, Scenes.Directory, Scenes.Background, Scenes.Desktop,
                 Scenes.Drive, Scenes.AllObjects, Scenes.Computer, Scenes.RecycleBin, Scenes.Library,
-                Scenes.NewItem, Scenes.SendTo, Scenes.OpenWith,*/ Scenes.WinX
+                Scenes.NewItem, Scenes.SendTo, Scenes.OpenWith, Scenes.WinX
             };
             switch (mode)
             {
