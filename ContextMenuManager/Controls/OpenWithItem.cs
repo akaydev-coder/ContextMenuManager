@@ -85,6 +85,7 @@ namespace ContextMenuManager.Controls
 
         public string SearchText => $"{AppString.SideBar.OpenWith} {Text}";
         public string ItemFilePath { get; private set; }
+        public string ItemFileName => Path.GetFileName(ItemFilePath);
 
         public VisibleCheckBox ChkVisible { get; set; }
         public MenuButton BtnShowMenu { get; set; }

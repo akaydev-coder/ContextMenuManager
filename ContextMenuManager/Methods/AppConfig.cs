@@ -21,7 +21,7 @@ namespace ContextMenuManager.Methods
 
 #if DEBUG
         public const string DebugLogPath = "D:\\log.txt";
-        public const bool EnableLog = false;
+        public const bool EnableLog = true;
 #endif
 
         public const string GithubLatest = "https://github.com/Jack251970/ContextMenuManager/releases/latest";

@@ -15,6 +15,7 @@ using System.Xml.Serialization;
 using static ContextMenuManager.Controls.ShellNewList;
 using System.Windows.Markup.Localizer;
 using BluePointLilac.Controls;
+using System.Web.UI;
 
 namespace ContextMenuManager.Methods
 {
@@ -59,7 +60,7 @@ namespace ContextMenuManager.Methods
             Scenes[] scenes = new Scenes[] {
                 Scenes.File, Scenes.Folder, Scenes.Directory, Scenes.Background, Scenes.Desktop,
                 Scenes.Drive, Scenes.AllObjects, Scenes.Computer, Scenes.RecycleBin, Scenes.Library,
-                Scenes.NewItem, Scenes.SendTo
+                Scenes.NewItem, Scenes.SendTo, Scenes.OpenWith
             };
             switch (mode)
             {
@@ -135,6 +136,8 @@ namespace ContextMenuManager.Methods
                             ((ShellNewItem)item).ItemVisible = !ifItemInMenu; break;
                         case BackupItemType.SendToItem:
                             ((SendToItem)item).ItemVisible = !ifItemInMenu; break;
+                        case BackupItemType.OpenWithItem:
+                            ((OpenWithItem)item).ItemVisible = !ifItemInMenu; break;
                     }
                 }
             }
@@ -144,18 +147,27 @@ namespace ContextMenuManager.Methods
 
         private void GetBackupItems(bool backup)
         {
-            // 不位于ShellList.cs内的备份项目
             switch (currentScene)
             {
                 case Scenes.NewItem:
                     // 新建右键菜单
-                    GetShellNewListBackupItems(backup); return;
+                    GetShellNewListBackupItems(backup); break;
                 case Scenes.SendTo:
                     // 发送到右键菜单
-                    GetSendToItems(backup); return;
+                    GetSendToListItems(backup); break;
+                case Scenes.OpenWith:
+                    // 打开方式右键菜单
+                    GetOpenWithListItems(backup); break;
+                default:
+                    // 位于ShellList.cs内的备份项目
+                    GetShellListItems(backup); break;
             }
+        }
 
-            // 位于ShellList.cs内的备份项目
+        /*******************************ShellList.cs内************************************/
+
+        private void GetShellListItems(bool backup)
+        {
             string scenePath = null;
             switch (currentScene)
             {
@@ -219,7 +231,7 @@ namespace ContextMenuManager.Methods
                             sw.WriteLine("\tBackupAddedItems");
                             sw.WriteLine("\t\t" + $@"{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
                         }
-                    } 
+                    }
 #endif
                     break;
                 case Scenes.Computer:
@@ -470,6 +482,8 @@ namespace ContextMenuManager.Methods
             return new FoldGroupItem(shellExPath, ObjectPath.PathType.Registry) { Text = text, Image = image };
         }
 
+        /*******************************ShellNewList.cs内************************************/
+
         private void GetShellNewListBackupItems(bool backup)
         {
 #if DEBUG
@@ -494,7 +508,7 @@ namespace ContextMenuManager.Methods
                 }
 #endif
                 string[] extensions = (string[])Registry.GetValue(ShellNewPath, "Classes", null);
-                GetShellNewListBackupItems(extensions.ToList(), backup);
+                GetShellNewBackupItems(extensions.ToList(), backup);
             }
             else
             {
@@ -512,12 +526,12 @@ namespace ContextMenuManager.Methods
                 {
                     extensions.AddRange(Array.FindAll(root.GetSubKeyNames(), keyName => keyName.StartsWith(".")));
                     if (WinOsVersion.Current < WinOsVersion.Win10) extensions.Add("Briefcase");//公文包(Win10没有)
-                    GetShellNewListBackupItems(extensions, backup);
+                    GetShellNewBackupItems(extensions, backup);
                 }
             }
         }
 
-        private void GetShellNewListBackupItems(List<string> extensions, bool backup)
+        private void GetShellNewBackupItems(List<string> extensions, bool backup)
         {
 #if DEBUG
             int i = 0;
@@ -582,7 +596,9 @@ namespace ContextMenuManager.Methods
             }
         }
 
-        private void GetSendToItems(bool backup)
+        /*******************************SendToList.cs内************************************/
+
+        private void GetSendToListItems(bool backup)
         {
 #if DEBUG
             if (AppConfig.EnableLog)
@@ -653,6 +669,91 @@ namespace ContextMenuManager.Methods
             }
 #endif
         }
+
+        /*******************************OpenWithList.cs内************************************/
+
+        private void GetOpenWithListItems(bool backup)
+        {
+#if DEBUG
+            if (AppConfig.EnableLog)
+            {
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine("BackupOpenWithItems");
+                    sw.WriteLine("\tGetOpenWithItems");
+                }
+            }
+            int i = 0;
+#endif
+            using (RegistryKey root = Registry.ClassesRoot)
+            using (RegistryKey appKey = root.OpenSubKey("Applications"))
+            {
+                foreach (string appName in appKey.GetSubKeyNames())
+                {
+                    if (!appName.Contains('.')) continue;
+                    using (RegistryKey shellKey = appKey.OpenSubKey($@"{appName}\shell"))
+                    {
+                        if (shellKey == null) continue;
+
+                        List<string> names = shellKey.GetSubKeyNames().ToList();
+                        if (names.Contains("open", StringComparer.OrdinalIgnoreCase)) names.Insert(0, "open");
+
+                        string keyName = names.Find(name =>
+                        {
+                            using (RegistryKey cmdKey = shellKey.OpenSubKey(name))
+                                return cmdKey.GetValue("NeverDefault") == null;
+                        });
+                        if (keyName == null) continue;
+
+                        using (RegistryKey commandKey = shellKey.OpenSubKey($@"{keyName}\command"))
+                        {
+                            string command = commandKey?.GetValue("")?.ToString();
+                            if (ObjectPath.ExtractFilePath(command) != null)
+                            {
+                                OpenWithItem item = new OpenWithItem(commandKey.Name);
+                                string regPath = item.RegPath;
+                                string itemFileName = item.ItemFileName;
+                                string itemName = item.Text;
+                                bool ifItemInMenu = item.ItemVisible;
+                                BackupRestoreItem(item, itemFileName, BackupItemType.OpenWithItem, ifItemInMenu, currentScene, backup);
+#if DEBUG
+                                i++;
+                                if (AppConfig.EnableLog)
+                                {
+                                    using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                                    {
+                                        sw.WriteLine("\tBackupAddedItems");
+                                        sw.WriteLine("\t\t" + $@"{i}. {itemFileName} {itemName} {ifItemInMenu} {regPath}");
+                                    }
+                                }
+#endif
+                            }
+                        }
+                    }
+                }
+            }
+            //Win8及以上版本系统才有在应用商店中查找应用
+            if (WinOsVersion.Current >= WinOsVersion.Win8)
+            {
+                VisibleRegRuleItem storeItem = new VisibleRegRuleItem(VisibleRegRuleItem.UseStoreOpenWith);
+                string regPath = storeItem.RegPath;
+                string valueName = storeItem.ValueName;
+                string itemName = storeItem.Text;
+                bool ifItemInMenu = storeItem.ItemVisible;
+                BackupRestoreItem(storeItem, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene, backup);
+#if DEBUG
+                i = 1;
+                if (AppConfig.EnableLog)
+                {
+                    using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                    {
+                        sw.WriteLine("\tBackupAddedItems");
+                        sw.WriteLine("\t\t" + $@"{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
+                    }
+                }
+#endif
+            }
+        }
     }
 
     public sealed class BackupList
@@ -668,7 +769,8 @@ namespace ContextMenuManager.Methods
 
         public enum BackupItemType
         {
-            ShellItem, ShellExItem, UwpModelItem, VisibleRegRuleItem, ShellNewItem, SendToItem
+            ShellItem, ShellExItem, UwpModelItem, VisibleRegRuleItem, ShellNewItem, SendToItem,
+            OpenWithItem
         }
 
         public enum BackupTarget

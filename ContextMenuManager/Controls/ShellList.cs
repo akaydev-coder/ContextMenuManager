@@ -43,6 +43,7 @@ namespace ContextMenuManager.Controls
             // 为备份兼容
             NewItem, // 新建菜单
             SendTo, // 发送到
+            OpenWith // 打开方式
         };
 
         private static readonly List<string> DirectoryTypes = new List<string>
