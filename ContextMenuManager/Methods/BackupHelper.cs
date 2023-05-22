@@ -13,6 +13,7 @@ using System.Drawing;
 using static ContextMenuManager.Methods.BackupList;
 using System.Xml.Serialization;
 using static ContextMenuManager.Controls.ShellNewList;
+using System.Windows.Markup.Localizer;
 using BluePointLilac.Controls;
 
 namespace ContextMenuManager.Methods
@@ -58,7 +59,7 @@ namespace ContextMenuManager.Methods
             Scenes[] scenes = new Scenes[] {
                 Scenes.File, Scenes.Folder, Scenes.Directory, Scenes.Background, Scenes.Desktop,
                 Scenes.Drive, Scenes.AllObjects, Scenes.Computer, Scenes.RecycleBin, Scenes.Library,
-                Scenes.NewItem
+                Scenes.NewItem, Scenes.SendTo
             };
             switch (mode)
             {
@@ -108,7 +109,7 @@ namespace ContextMenuManager.Methods
             }
         }
 
-        private void BackupRestoreItem(object item, string keyName, BackupItemType backupItemType, bool ifItemInMenu, Scenes currentScene, bool backup)
+        private void BackupRestoreItem(MyListItem item, string keyName, BackupItemType backupItemType, bool ifItemInMenu, Scenes currentScene, bool backup)
         {
             if (backup)
             {
@@ -132,13 +133,29 @@ namespace ContextMenuManager.Methods
                             ((VisibleRegRuleItem)item).ItemVisible = !ifItemInMenu; break;
                         case BackupItemType.ShellNewItem:
                             ((ShellNewItem)item).ItemVisible = !ifItemInMenu; break;
+                        case BackupItemType.SendToItem:
+                            ((SendToItem)item).ItemVisible = !ifItemInMenu; break;
                     }
                 }
             }
+            // 释放资源
+            item.Dispose();
         }
 
         private void GetBackupItems(bool backup)
         {
+            // 不位于ShellList.cs内的备份项目
+            switch (currentScene)
+            {
+                case Scenes.NewItem:
+                    // 新建右键菜单
+                    GetShellNewListBackupItems(backup); return;
+                case Scenes.SendTo:
+                    // 发送到右键菜单
+                    GetSendToItems(backup); return;
+            }
+
+            // 位于ShellList.cs内的备份项目
             string scenePath = null;
             switch (currentScene)
             {
@@ -261,14 +278,6 @@ namespace ContextMenuManager.Methods
                         GetBackupShellItems(GetShellPath(scenePath), backup);
                         GetBackupShellExItems(GetShellExPath(scenePath), backup);
                     }
-                    break;
-            }
-            // 不位于ShellList.cs内的
-            switch (currentScene)
-            {
-                case Scenes.NewItem:
-                    // 新建右键菜单
-                    GetShellNewListBackupItems(backup);
                     break;
             }
         }
@@ -572,9 +581,81 @@ namespace ContextMenuManager.Methods
                 }
             }
         }
+
+        private void GetSendToItems(bool backup)
+        {
+#if DEBUG
+            if (AppConfig.EnableLog)
+            {
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine("BackupSendToItems");
+                    sw.WriteLine("\tGetSendToItems");
+                }
+            }
+            int i = 0;
+#endif
+            string filePath, itemFileName, itemName;
+            bool ifItemInMenu;
+            foreach (string path in Directory.GetFileSystemEntries(SendToList.SendToPath))
+            {
+                if (Path.GetFileName(path).ToLower() == "desktop.ini") continue;
+                SendToItem sendToItem = new SendToItem(path);
+                filePath = sendToItem.FilePath;
+                itemFileName = sendToItem.ItemFileName;
+                itemName = sendToItem.Text;
+                ifItemInMenu = sendToItem.ItemVisible;
+                BackupRestoreItem(sendToItem, itemFileName, BackupItemType.SendToItem, ifItemInMenu, currentScene, backup);
+#if DEBUG
+                i = 0;
+                i++;
+                if (AppConfig.EnableLog)
+                {
+                    using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                    {
+                        sw.WriteLine("\t\t" + $@"{i}. {itemFileName} {itemName} {ifItemInMenu} {filePath}");
+                    }
+                }
+#endif
+            }
+            VisibleRegRuleItem item = new VisibleRegRuleItem(VisibleRegRuleItem.SendToDrive);
+            string regPath = item.RegPath;
+            string valueName = item.ValueName;
+            itemName = item.Text;
+            ifItemInMenu = item.ItemVisible;
+            BackupRestoreItem(item, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene, backup);
+#if DEBUG
+            i = 0;
+            i++;
+            if (AppConfig.EnableLog)
+            {
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine("\tBackupAddedItems");
+                    sw.WriteLine("\t\t" + $@"{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
+                }
+            }
+#endif
+            item = new VisibleRegRuleItem(VisibleRegRuleItem.DeferBuildSendTo);
+            regPath = item.RegPath;
+            valueName = item.ValueName;
+            itemName = item.Text;
+            ifItemInMenu = item.ItemVisible;
+            BackupRestoreItem(item, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene, backup);
+#if DEBUG
+            i++;
+            if (AppConfig.EnableLog)
+            {
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine("\t\t" + $@"{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
+                }
+            }
+#endif
+        }
     }
 
-    public static class BackupList
+    public sealed class BackupList
     {
         // 备份列表缓存区
         private static List<BackupItem> backupList = new List<BackupItem>();
@@ -587,7 +668,7 @@ namespace ContextMenuManager.Methods
 
         public enum BackupItemType
         {
-            ShellItem, ShellExItem, UwpModelItem, VisibleRegRuleItem, ShellNewItem
+            ShellItem, ShellExItem, UwpModelItem, VisibleRegRuleItem, ShellNewItem, SendToItem
         }
 
         public enum BackupTarget
@@ -658,7 +739,7 @@ namespace ContextMenuManager.Methods
 
     // 定义一个类来表示BackupItem
     [Serializable, XmlType("BackupItem")]
-    public class BackupItem
+    public sealed class BackupItem
     {
         [XmlElement("KeyName")]
         public string KeyName { get; set; }// 查询索引名字

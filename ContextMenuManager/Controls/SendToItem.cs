@@ -36,6 +36,7 @@ namespace ContextMenuManager.Controls
         private bool IsShortcut => FileExtension.ToLower() == ".lnk";
         public string SearchText => $"{AppString.SideBar.SendTo} {Text}";
         private Image ItemImage => ItemIcon?.ToBitmap() ?? AppImage.NotFound;
+        public string ItemFileName => Path.GetFileName(ItemFilePath);
 
         public string ItemFilePath
         {

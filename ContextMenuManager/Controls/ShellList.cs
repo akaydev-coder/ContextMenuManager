@@ -181,9 +181,6 @@ namespace ContextMenuManager.Controls
         public void LoadItems()
         {
             string scenePath = null;
-#if DEBUG
-            string sceneName = null;
-#endif
             switch (Scene)
             {
                 case Scenes.File:

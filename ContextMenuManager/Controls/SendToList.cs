@@ -9,8 +9,8 @@ namespace ContextMenuManager.Controls
 {
     sealed class SendToList : MyList // 主页 发送到
     {
-        private static readonly string SendToPath = Environment.ExpandEnvironmentVariables(@"%AppData%\Microsoft\Windows\SendTo");
-        private static readonly string DefaultSendToPath = Environment.ExpandEnvironmentVariables(@"%SystemDrive%\Users\Default\AppData\Roaming\Microsoft\Windows\SendTo");
+        public static readonly string SendToPath = Environment.ExpandEnvironmentVariables(@"%AppData%\Microsoft\Windows\SendTo");
+        public static readonly string DefaultSendToPath = Environment.ExpandEnvironmentVariables(@"%SystemDrive%\Users\Default\AppData\Roaming\Microsoft\Windows\SendTo");
 
         public void LoadItems()
         {
@@ -21,7 +21,7 @@ namespace ContextMenuManager.Controls
             }
             SortItemByText();
             AddNewItem();
-            AddDirItem();
+            AddDirItem();   // 发送到右键菜单Ink文件的文件夹存放位置
             AddItem(new VisibleRegRuleItem(VisibleRegRuleItem.SendToDrive));
             AddItem(new VisibleRegRuleItem(VisibleRegRuleItem.DeferBuildSendTo));
         }
