@@ -33,12 +33,16 @@ namespace ContextMenuManager.Controls
         public const string MENUPATH_UNKNOWN = @"HKEY_CLASSES_ROOT\Unknown";//未知格式
         public const string SYSFILEASSPATH = @"HKEY_CLASSES_ROOT\SystemFileAssociations";//系统扩展名注册表父项路径
         private const string LASTKEYPATH = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit";//上次打开的注册表项路径记录
-
+        
+        // 菜单场景
         public enum Scenes
         {
             File, Folder, Directory, Background, Desktop, Drive, AllObjects, Computer, RecycleBin, Library,
             LnkFile, UwpLnk, ExeFile, UnknownType, CustomExtension, PerceivedType, DirectoryType,
-            CommandStore, DragDrop, CustomRegPath, MenuAnalysis, CustomExtensionPerceivedType
+            CommandStore, DragDrop, CustomRegPath, MenuAnalysis, CustomExtensionPerceivedType,
+            // 为备份兼容
+            NewItem, // 新建菜单
+            SendTo, // 发送到
         };
 
         private static readonly List<string> DirectoryTypes = new List<string>
@@ -206,72 +210,40 @@ namespace ContextMenuManager.Controls
                     //Vista系统没有这一项
                     if (WinOsVersion.Current == WinOsVersion.Vista) return;
                     scenePath = MENUPATH_LIBRARY; break;
+                // TODO:此处往下没有进行备份
                 case Scenes.LnkFile:
-#if DEBUG
-                    sceneName = "LnkFile";
-#endif
                     scenePath = GetOpenModePath(".lnk"); break;
                 case Scenes.UwpLnk:
-#if DEBUG
-                    sceneName = "UwpLnk";
-#endif
                     //Win8之前没有Uwp
                     if (WinOsVersion.Current < WinOsVersion.Win8) return;
                     scenePath = MENUPATH_UWPLNK; break;
                 case Scenes.ExeFile:
-#if DEBUG
-                    sceneName = "ExeFile";
-#endif
                     scenePath = GetSysAssExtPath(".exe"); break;
                 case Scenes.UnknownType:
-#if DEBUG
-                    sceneName = "UnknownType";
-#endif
                     scenePath = MENUPATH_UNKNOWN; break;
                 case Scenes.CustomExtension:
-#if DEBUG
-                    sceneName = "CustomExtention";
-#endif
                     bool isLnk = CurrentExtension?.ToLower() == ".lnk";
                     if(isLnk) scenePath = GetOpenModePath(".lnk");
                     else scenePath = GetSysAssExtPath(CurrentExtension);
                     break;
                 case Scenes.PerceivedType:
-#if DEBUG
-                    sceneName = "PerceivedType";
-#endif
                     scenePath = GetSysAssExtPath(CurrentPerceivedType); break;
                 case Scenes.DirectoryType:
-#if DEBUG
-                    sceneName = "DirectoryType";
-#endif
                     if (CurrentDirectoryType == null) scenePath = null;
                     else scenePath = GetSysAssExtPath($"Directory.{CurrentDirectoryType}"); break;
                 case Scenes.MenuAnalysis:
-#if DEBUG
-                    sceneName = "MenuAnalysis";
-#endif
                     AddItem(new SelectItem(Scene));
                     LoadAnalysisItems();
                     return;
                 case Scenes.CustomRegPath:
-#if DEBUG
-                    sceneName = "CustomRegPath";
-#endif
                     scenePath = CurrentCustomRegPath; break;
                 case Scenes.CommandStore:
-#if DEBUG
-                    sceneName = "CommandStore";
-#endif
                     //Vista系统没有这一项
                     if (WinOsVersion.Current == WinOsVersion.Vista) return;
                     AddNewItem(RegistryEx.GetParentPath(ShellItem.CommandStorePath));
                     LoadStoreItems();
                     return;
                 case Scenes.DragDrop:
-#if DEBUG
-                    sceneName = "DragDrop";
-#endif
                     AddItem(new SelectItem(Scene));
                     AddNewItem(MENUPATH_FOLDER);
                     LoadShellExItems(GetShellExPath(MENUPATH_FOLDER));
@@ -284,14 +256,12 @@ namespace ContextMenuManager.Controls
 #if DEBUG
             if (AppConfig.EnableLog)
             {
-                if (sceneName != null)
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
                 {
-                    using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
-                    {
-                        sw.WriteLine($@"LoadItems: {sceneName}");
-                    }
+                    sw.WriteLine($@"LoadShellListItems: {Scene}");
                 }
             }
+            int i = 0;
 #endif
             LoadItems(scenePath);
             if(WinOsVersion.Current >= WinOsVersion.Win10)
@@ -303,14 +273,60 @@ namespace ContextMenuManager.Controls
                 case Scenes.Background:
                     VisibleRegRuleItem item = new VisibleRegRuleItem(VisibleRegRuleItem.CustomFolder);
                     AddItem(item);
+#if DEBUG
+                    string regPath = item.RegPath;
+                    string valueName = item.ValueName;
+                    string itemName = item.Text;
+                    bool ifItemInMenu = item.ItemVisible;
+                    i++;
+                    if (AppConfig.EnableLog)
+                    {
+                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                        {
+                            sw.WriteLine("\tBackupAddedItems");
+                            sw.WriteLine("\t\t" + $@"{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
+                        }
+                    }
+#endif
+                    
                     break;
                 case Scenes.Computer:
                     item = new VisibleRegRuleItem(VisibleRegRuleItem.NetworkDrive);
                     AddItem(item);
+#if DEBUG
+                    regPath = item.RegPath;
+                    valueName = item.ValueName;
+                    itemName = item.Text;
+                    ifItemInMenu = item.ItemVisible;
+                    i++;
+                    if (AppConfig.EnableLog)
+                    {
+                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                        {
+                            sw.WriteLine("\tBackupAddedItems");
+                            sw.WriteLine("\t\t" + $@"{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
+                        }
+                    }
+#endif
                     break;
                 case Scenes.RecycleBin:
                     item = new VisibleRegRuleItem(VisibleRegRuleItem.RecycleBinProperties);
                     AddItem(item);
+#if DEBUG
+                    regPath = item.RegPath;
+                    valueName = item.ValueName;
+                    itemName = item.Text;
+                    ifItemInMenu = item.ItemVisible;
+                    i++;
+                    if (AppConfig.EnableLog)
+                    {
+                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                        {
+                            sw.WriteLine("\tBackupAddedItems");
+                            sw.WriteLine("\t\t" + $@"{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
+                        }
+                    }
+#endif
                     break;
                 case Scenes.Library:
                     LoadItems(MENUPATH_LIBRARY_BACKGROUND);
@@ -354,8 +370,7 @@ namespace ContextMenuManager.Controls
                 }
             }
         }
-
-        // here!?
+        
         private void LoadShellExItems(string shellExPath)
         {
             List<string> names = new List<string>();
@@ -369,7 +384,17 @@ namespace ContextMenuManager.Controls
                 if(isDragDrop)
                 {
                     groupItem = GetDragDropGroupItem(shellExPath);
+                    // TODO:什么是groupItem？
                     AddItem(groupItem);
+#if DEBUG
+                    if (AppConfig.EnableLog)
+                    {
+                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                        {
+                            sw.WriteLine($@"\t\t!!!!!!{shellExPath}(FoldGroupItem)");
+                        }
+                    }
+#endif
                 }
                 foreach (string path in dic.Keys)
                 {
@@ -441,7 +466,7 @@ namespace ContextMenuManager.Controls
                     {
                         using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
                         {
-                            sw.WriteLine($@"\t\t{i}. {itemName}");
+                            sw.WriteLine("\t\t" + $@"{i}. {itemName}");
                         }
                     }
 #endif

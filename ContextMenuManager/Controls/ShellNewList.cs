@@ -11,6 +11,7 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows.Forms;
 using System.Xml;
+using static ContextMenuManager.Controls.ShellList;
 
 namespace ContextMenuManager.Controls
 {
@@ -23,7 +24,34 @@ namespace ContextMenuManager.Controls
         public void LoadItems()
         {
             AddNewItem();
-            AddItem(new ShellNewLockItem(this));
+#if DEBUG
+            if (AppConfig.EnableLog)
+            {
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine($@"LoadShellNewItems:");
+                }
+            }
+            int i = 0;
+#endif
+            // TODO:加入可以锁定的功能；新建菜单可以进行排序
+            ShellNewLockItem item = new ShellNewLockItem(this);
+            AddItem(item);
+#if DEBUG
+            string regPath = item.RegPath;
+            string valueName = item.ValueName;
+            string itemName = item.Text;
+            bool ifItemInMenu = item.ItemVisible;
+            i++;
+            if (AppConfig.EnableLog)
+            {
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine("\tShellNewLockItems");
+                    sw.WriteLine("\t\t" + $@"{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
+                }
+            }
+#endif
             Separator = new ShellNewSeparator();
             AddItem(Separator);
             if(ShellNewLockItem.IsLocked) LoadLockItems();
@@ -33,6 +61,15 @@ namespace ContextMenuManager.Controls
         /// <summary>直接扫描所有扩展名</summary>
         private void LoadUnlockItems()
         {
+#if DEBUG
+            if (AppConfig.EnableLog)
+            {
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine("\tLoadUnlockItems");
+                }
+            }
+#endif
             List<string> extensions = new List<string> { "Folder" };//文件夹
             using(RegistryKey root = Registry.ClassesRoot)
             {
@@ -45,13 +82,25 @@ namespace ContextMenuManager.Controls
         /// <summary>根据ShellNewPath的Classes键值扫描</summary>
         private void LoadLockItems()
         {
+#if DEBUG
+            if (AppConfig.EnableLog)
+            {
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine("\tLoadLockItems");
+                }
+            }
+#endif
             string[] extensions = (string[])Registry.GetValue(ShellNewPath, "Classes", null);
             LoadItems(extensions.ToList());
         }
 
         private void LoadItems(List<string> extensions)
         {
-            foreach(string extension in ShellNewItem.UnableSortExtensions)
+#if DEBUG
+            int i = 0;
+#endif
+            foreach (string extension in ShellNewItem.UnableSortExtensions)
             {
                 if(extensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
                 {
@@ -61,7 +110,7 @@ namespace ContextMenuManager.Controls
             }
             using(RegistryKey root = Registry.ClassesRoot)
             {
-                foreach(string extension in extensions)
+                foreach (string extension in extensions)
                 {
                     using(RegistryKey extKey = root.OpenSubKey(extension))
                     {
@@ -85,8 +134,22 @@ namespace ContextMenuManager.Controls
                                 {
                                     if(ShellNewItem.EffectValueNames.Any(valueName => snKey?.GetValue(valueName) != null))
                                     {
-                                        ShellNewItem item = new ShellNewItem(this, snKey.Name);
-                                        if(item.BeforeSeparator)
+                                        ShellNewItem item = new ShellNewItem(snKey.Name, this);
+#if DEBUG
+                                        string regPath = item.RegPath;
+                                        string openMode = item.OpenMode;
+                                        string itemName = item.Text;
+                                        bool ifItemInMenu = item.ItemVisible;
+                                        i++;
+                                        if (AppConfig.EnableLog)
+                                        {
+                                            using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                                            {
+                                                sw.WriteLine("\t\t" + $@"{i}. {openMode} {itemName} {ifItemInMenu} {regPath}");
+                                            }
+                                        }
+#endif
+                                        if (item.BeforeSeparator)
                                         {
                                             int index2 = GetItemIndex(Separator);
                                             InsertItem(item, index2);
@@ -177,7 +240,7 @@ namespace ContextMenuManager.Controls
                         if(bytes != null) snKey.SetValue("Data", bytes, RegistryValueKind.Binary);
                         else snKey.SetValue("NullFile", "", RegistryValueKind.String);
 
-                        ShellNewItem item = new ShellNewItem(this, snKey.Name);
+                        ShellNewItem item = new ShellNewItem(snKey.Name, this);
                         AddItem(item);
                         item.Focus();
                         if(item.ItemText.IsNullOrWhiteSpace())
@@ -238,7 +301,7 @@ namespace ContextMenuManager.Controls
             public VisibleCheckBox ChkVisible { get; set; }
             public ShellNewList Owner { get; private set; }
 
-            public bool ItemVisible
+            public bool ItemVisible // 锁定新建菜单是否锁定
             {
                 get => IsLocked;
                 set

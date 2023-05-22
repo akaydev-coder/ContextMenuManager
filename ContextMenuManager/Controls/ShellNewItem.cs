@@ -44,7 +44,7 @@ namespace ContextMenuManager.Controls
         private static readonly string[] UnableEditDataValues = { "Directory", "FileName", "Handler", "Command" };
         private static readonly string[] UnableChangeCommandValues = { "Data", "Directory", "FileName", "Handler" };
 
-        public ShellNewItem(ShellNewList list, string regPath)
+        public ShellNewItem(string regPath, ShellNewList list = null)
         {
             Owner = list;
             InitializeComponents();
@@ -69,7 +69,7 @@ namespace ContextMenuManager.Controls
         public string Extension => RegPath.Split('\\')[1];
         private string SnKeyName => RegistryEx.GetKeyName(RegPath);
         private string BackupPath => $@"{RegistryEx.GetParentPath(RegPath)}\{(ItemVisible ? SnParts[1] : SnParts[0])}";
-        private string OpenMode => FileExtension.GetOpenMode(Extension);//关联打开方式
+        public string OpenMode => FileExtension.GetOpenMode(Extension);//关联打开方式
         private string OpenModePath => $@"{RegistryEx.CLASSES_ROOT}\{OpenMode}";//关联打开方式注册表路径
         private string DefaultOpenMode => Registry.GetValue($@"{RegistryEx.CLASSES_ROOT}\{Extension}", "", null)?.ToString();//HKCR默认值打开方式
         private string DefaultOpenModePath => $@"{RegistryEx.CLASSES_ROOT}\{DefaultOpenMode}";//HKCR默认值打开方式路径
@@ -281,8 +281,8 @@ namespace ContextMenuManager.Controls
             };
             TsiEditData.Click += (sender, e) => EditInitialData();
             TsiBeforeSeparator.Click += (sender, e) => MoveWithSeparator(!TsiBeforeSeparator.Checked);
-            BtnMoveUp.MouseDown += (sender, e) => Owner.MoveItem(this, true);
-            BtnMoveDown.MouseDown += (sender, e) => Owner.MoveItem(this, false);
+            BtnMoveUp.MouseDown += (sender, e) => Owner?.MoveItem(this, true);
+            BtnMoveDown.MouseDown += (sender, e) => Owner?.MoveItem(this, false);
         }
 
         private void EditInitialData()
@@ -318,7 +318,7 @@ namespace ContextMenuManager.Controls
             RegistryEx.DeleteKeyTree(RegPath);
             RegistryEx.DeleteKeyTree(BackupPath);
             Parent.Controls.Remove(this);
-            if(ShellNewList.ShellNewLockItem.IsLocked) Owner.SaveSorting();
+            if(ShellNewList.ShellNewLockItem.IsLocked) Owner?.SaveSorting();
         }
     }
 }
