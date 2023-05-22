@@ -30,6 +30,7 @@ namespace ContextMenuManager.Controls
             bool sorted = false;
             foreach(string dirPath in dirPaths)
             {
+                // TODO:WinXGroupItem的备份
                 WinXGroupItem groupItem = new WinXGroupItem(dirPath);
                 AddItem(groupItem);
                 string[] lnkPaths;
@@ -141,7 +142,7 @@ namespace ContextMenuManager.Controls
             return items.ToArray();
         }
 
-        private static string[] GetSortedPaths(string groupPath, out bool sorted)
+        public static string[] GetSortedPaths(string groupPath, out bool sorted)
         {
             sorted = false;
             List<string> sortedPaths = new List<string>();

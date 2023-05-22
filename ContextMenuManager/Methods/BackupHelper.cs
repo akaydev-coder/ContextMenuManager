@@ -13,20 +13,18 @@ using System.Drawing;
 using static ContextMenuManager.Methods.BackupList;
 using System.Xml.Serialization;
 using static ContextMenuManager.Controls.ShellNewList;
-using System.Windows.Markup.Localizer;
 using BluePointLilac.Controls;
-using System.Web.UI;
 
 namespace ContextMenuManager.Methods
 {
     sealed class BackupHelper
     {
-        private Scenes currentScene;
-        private RestoreMode restoreMode;
-        public int backupCount = 0;
-        public int changeCount = 0;
-        public string createTime;
-        public string filePath;
+        /*******************************外部调用************************************/
+
+        public int backupCount = 0; // 备份项目总数量
+        public int changeCount = 0; // 备份恢复改变项目数量
+        public string createTime;   // 本次备份文件创建时间
+        public string filePath; // 本次备份文件名
 
         public void BackupItems(BackupTarget mode)
         {
@@ -55,12 +53,18 @@ namespace ContextMenuManager.Methods
             ClearBackupList();
         }
 
+        /*******************************内部调用************************************/
+
+        private Scenes currentScene;    // 目前处理场景
+        private RestoreMode restoreMode;    // 备份恢复模式
+
+        // 备份场景处理
         private void BackupRestoreItems(BackupTarget mode, bool backup)
         {
             Scenes[] scenes = new Scenes[] {
-                Scenes.File, Scenes.Folder, Scenes.Directory, Scenes.Background, Scenes.Desktop,
+                /*Scenes.File, Scenes.Folder, Scenes.Directory, Scenes.Background, Scenes.Desktop,
                 Scenes.Drive, Scenes.AllObjects, Scenes.Computer, Scenes.RecycleBin, Scenes.Library,
-                Scenes.NewItem, Scenes.SendTo, Scenes.OpenWith
+                Scenes.NewItem, Scenes.SendTo, Scenes.OpenWith,*/ Scenes.WinX
             };
             switch (mode)
             {
@@ -80,35 +84,31 @@ namespace ContextMenuManager.Methods
                 GetBackupItems(backup);
             }
         }
-
-        private bool CheckItemNeedChange(string keyName, BackupItemType itemType, bool itemVisible)
+        
+        // 开始进行备份
+        private void GetBackupItems(bool backup)
         {
-            foreach(BackupItem item in tempRestoreList)
+            switch (currentScene)
             {
-                // 成功匹配到后的处理方式
-                if(item.KeyName == keyName && item.ItemType == itemType)
-                {
-                    if (item.ItemVisible != itemVisible)
-                    {
-                        changeCount++;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-            switch(restoreMode)
-            {
-                case RestoreMode.DisableNotOnList:
-                    if (itemVisible) changeCount++;
-                    return itemVisible;
-                case RestoreMode.NotHandleNotOnList:
+                case Scenes.NewItem:
+                    // 新建
+                    GetShellNewListBackupItems(backup); break;
+                case Scenes.SendTo:
+                    // 发送到
+                    GetSendToListItems(backup); break;
+                case Scenes.OpenWith:
+                    // 打开方式
+                    GetOpenWithListItems(backup); break;
+                case Scenes.WinX:
+                    // Win+X
+                    GetWinXListItems(backup); break;
                 default:
-                    return false;
+                    // 位于ShellList.cs内的备份项目
+                    GetShellListItems(backup); break;
             }
         }
+
+        /*******************************单个Item处理************************************/
 
         private void BackupRestoreItem(MyListItem item, string keyName, BackupItemType backupItemType, bool ifItemInMenu, Scenes currentScene, bool backup)
         {
@@ -138,6 +138,8 @@ namespace ContextMenuManager.Methods
                             ((SendToItem)item).ItemVisible = !ifItemInMenu; break;
                         case BackupItemType.OpenWithItem:
                             ((OpenWithItem)item).ItemVisible = !ifItemInMenu; break;
+                        case BackupItemType.WinXItem:
+                            ((WinXItem)item).ItemVisible = !ifItemInMenu; break;
                     }
                 }
             }
@@ -145,26 +147,36 @@ namespace ContextMenuManager.Methods
             item.Dispose();
         }
 
-        private void GetBackupItems(bool backup)
+        private bool CheckItemNeedChange(string keyName, BackupItemType itemType, bool itemVisible)
         {
-            switch (currentScene)
+            foreach (BackupItem item in tempRestoreList)
             {
-                case Scenes.NewItem:
-                    // 新建右键菜单
-                    GetShellNewListBackupItems(backup); break;
-                case Scenes.SendTo:
-                    // 发送到右键菜单
-                    GetSendToListItems(backup); break;
-                case Scenes.OpenWith:
-                    // 打开方式右键菜单
-                    GetOpenWithListItems(backup); break;
+                // 成功匹配到后的处理方式
+                if (item.KeyName == keyName && item.ItemType == itemType)
+                {
+                    if (item.ItemVisible != itemVisible)
+                    {
+                        changeCount++;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            switch (restoreMode)
+            {
+                case RestoreMode.DisableNotOnList:
+                    if (itemVisible) changeCount++;
+                    return itemVisible;
+                case RestoreMode.NotHandleNotOnList:
                 default:
-                    // 位于ShellList.cs内的备份项目
-                    GetShellListItems(backup); break;
+                    return false;
             }
         }
 
-        /*******************************ShellList.cs内************************************/
+        /*******************************ShellList.cs************************************/
 
         private void GetShellListItems(bool backup)
         {
@@ -482,7 +494,7 @@ namespace ContextMenuManager.Methods
             return new FoldGroupItem(shellExPath, ObjectPath.PathType.Registry) { Text = text, Image = image };
         }
 
-        /*******************************ShellNewList.cs内************************************/
+        /*******************************ShellNewList.cs************************************/
 
         private void GetShellNewListBackupItems(bool backup)
         {
@@ -596,7 +608,7 @@ namespace ContextMenuManager.Methods
             }
         }
 
-        /*******************************SendToList.cs内************************************/
+        /*******************************SendToList.cs************************************/
 
         private void GetSendToListItems(bool backup)
         {
@@ -670,7 +682,7 @@ namespace ContextMenuManager.Methods
 #endif
         }
 
-        /*******************************OpenWithList.cs内************************************/
+        /*******************************OpenWithList.cs************************************/
 
         private void GetOpenWithListItems(bool backup)
         {
@@ -754,6 +766,69 @@ namespace ContextMenuManager.Methods
 #endif
             }
         }
+
+        /*******************************WinXList.cs************************************/
+
+        private void GetWinXListItems(bool backup)
+        {
+#if DEBUG
+            if (AppConfig.EnableLog)
+            {
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine("BackupWinXItems");
+                    sw.WriteLine("\tGetWinXItems");
+                }
+            }
+            int i = 0;
+#endif
+            if (WinOsVersion.Current >= WinOsVersion.Win8)
+            {
+                string[] dirPaths = Directory.GetDirectories(WinXList.WinXPath);
+                Array.Reverse(dirPaths);
+                bool sorted = false;
+                foreach (string dirPath in dirPaths)
+                {
+                    WinXGroupItem groupItem = new WinXGroupItem(dirPath);
+                    string[] lnkPaths;
+                    if (AppConfig.WinXSortable)
+                    {
+                        lnkPaths = WinXList.GetSortedPaths(dirPath, out bool flag);
+                        if (flag) sorted = true;
+                    }
+                    else
+                    {
+                        lnkPaths = Directory.GetFiles(dirPath, "*.lnk");
+                        Array.Reverse(lnkPaths);
+                    }
+                    foreach (string path in lnkPaths)
+                    {
+                        WinXItem item = new WinXItem(path, groupItem);
+                        string filePath = item.FilePath;
+                        string fileName = item.FileName;
+                        string itemName = item.Text;
+                        bool ifItemInMenu = item.ItemVisible;
+                        BackupRestoreItem(item, fileName, BackupItemType.WinXItem, ifItemInMenu, currentScene, backup);
+#if DEBUG
+                        i++;
+                        if (AppConfig.EnableLog)
+                        {
+                            using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                            {
+                                sw.WriteLine("\t\t" + $@"{i}. {fileName} {itemName} {ifItemInMenu} {filePath}");
+                            }
+                        }
+#endif
+                    }
+                    groupItem.Dispose();
+                }
+                if (sorted)
+                {
+                    ExplorerRestarter.Show();
+                    AppMessageBox.Show(AppString.Message.WinXSorted);
+                }
+            }
+        }
     }
 
     public sealed class BackupList
@@ -770,7 +845,7 @@ namespace ContextMenuManager.Methods
         public enum BackupItemType
         {
             ShellItem, ShellExItem, UwpModelItem, VisibleRegRuleItem, ShellNewItem, SendToItem,
-            OpenWithItem
+            OpenWithItem, WinXItem
         }
 
         public enum BackupTarget

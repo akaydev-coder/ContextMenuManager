@@ -95,7 +95,7 @@ namespace ContextMenuManager.Controls
 
         public ShellLink ShellLink { get; private set; }
         public string SearchText => $"{AppString.SideBar.WinX} {Text}";
-        private string FileName => Path.GetFileName(FilePath);
+        public string FileName => Path.GetFileName(FilePath);
         private Image ItemImage => ItemIcon?.ToBitmap() ?? AppImage.NotFound;
 
         public VisibleCheckBox ChkVisible { get; set; }

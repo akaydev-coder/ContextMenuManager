@@ -41,9 +41,7 @@ namespace ContextMenuManager.Controls
             LnkFile, UwpLnk, ExeFile, UnknownType, CustomExtension, PerceivedType, DirectoryType,
             CommandStore, DragDrop, CustomRegPath, MenuAnalysis, CustomExtensionPerceivedType,
             // 为备份兼容
-            NewItem, // 新建菜单
-            SendTo, // 发送到
-            OpenWith // 打开方式
+            NewItem, SendTo, OpenWith, WinX
         };
 
         private static readonly List<string> DirectoryTypes = new List<string>
