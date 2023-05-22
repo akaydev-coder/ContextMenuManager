@@ -33,16 +33,6 @@ namespace ContextMenuManager.Controls
         public const string MENUPATH_UNKNOWN = @"HKEY_CLASSES_ROOT\Unknown";//未知格式
         public const string SYSFILEASSPATH = @"HKEY_CLASSES_ROOT\SystemFileAssociations";//系统扩展名注册表父项路径
         private const string LASTKEYPATH = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit";//上次打开的注册表项路径记录
-        
-        // 菜单场景
-        public enum Scenes
-        {
-            File, Folder, Directory, Background, Desktop, Drive, AllObjects, Computer, RecycleBin, Library,
-            LnkFile, UwpLnk, ExeFile, UnknownType, CustomExtension, PerceivedType, DirectoryType,
-            CommandStore, DragDrop, CustomRegPath, MenuAnalysis, CustomExtensionPerceivedType,
-            // 为备份兼容
-            NewItem, SendTo, OpenWith, WinX
-        };
 
         private static readonly List<string> DirectoryTypes = new List<string>
         {

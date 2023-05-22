@@ -182,32 +182,32 @@ namespace ContextMenuManager
             AppString.Other.OpenMoreExplorer,
         };
 
-        static readonly ShellList.Scenes[] GeneralShellScenes =
+        static readonly Scenes[] GeneralShellScenes =
         {
-            ShellList.Scenes.File,
-            ShellList.Scenes.Folder,
-            ShellList.Scenes.Directory,
-            ShellList.Scenes.Background,
-            ShellList.Scenes.Desktop,
-            ShellList.Scenes.Drive,
-            ShellList.Scenes.AllObjects,
-            ShellList.Scenes.Computer,
-            ShellList.Scenes.RecycleBin,
-            ShellList.Scenes.Library
+            Scenes.File,
+            Scenes.Folder,
+            Scenes.Directory,
+            Scenes.Background,
+            Scenes.Desktop,
+            Scenes.Drive,
+            Scenes.AllObjects,
+            Scenes.Computer,
+            Scenes.RecycleBin,
+            Scenes.Library
         };
 
-        static readonly ShellList.Scenes?[] TypeShellScenes =
+        static readonly Scenes?[] TypeShellScenes =
         {
-            ShellList.Scenes.LnkFile,
-            ShellList.Scenes.UwpLnk,
-            ShellList.Scenes.ExeFile,
+            Scenes.LnkFile,
+            Scenes.UwpLnk,
+            Scenes.ExeFile,
             null,
-            ShellList.Scenes.CustomExtension,
-            ShellList.Scenes.PerceivedType,
-            ShellList.Scenes.DirectoryType,
+            Scenes.CustomExtension,
+            Scenes.PerceivedType,
+            Scenes.DirectoryType,
             null,
-            ShellList.Scenes.UnknownType,
-            ShellList.Scenes.MenuAnalysis
+            Scenes.UnknownType,
+            Scenes.MenuAnalysis
         };
 
         readonly int[] lastItemIndex = new int[5];
@@ -344,7 +344,7 @@ namespace ContextMenuManager
 
         private void SwitchTypeItem()
         {
-            shellList.Scene = (ShellList.Scenes)TypeShellScenes[SideBar.SelectedIndex];
+            shellList.Scene = (Scenes)TypeShellScenes[SideBar.SelectedIndex];
             shellList.LoadItems();
             shellList.Visible = true;
         }
@@ -358,11 +358,11 @@ namespace ContextMenuManager
                 case 1:
                     detailedEditList.GroupGuid = Guid.Empty; detailedEditList.LoadItems(); detailedEditList.Visible = true; break;
                 case 3:
-                    shellList.Scene = ShellList.Scenes.DragDrop; shellList.LoadItems(); shellList.Visible = true; break;
+                    shellList.Scene = Scenes.DragDrop; shellList.LoadItems(); shellList.Visible = true; break;
                 case 4:
-                    shellList.Scene = ShellList.Scenes.CommandStore; shellList.LoadItems(); shellList.Visible = true; break;
+                    shellList.Scene = Scenes.CommandStore; shellList.LoadItems(); shellList.Visible = true; break;
                 case 5:
-                    shellList.Scene = ShellList.Scenes.CustomRegPath; shellList.LoadItems(); shellList.Visible = true; break;
+                    shellList.Scene = Scenes.CustomRegPath; shellList.LoadItems(); shellList.Visible = true; break;
                 case 7:
                     guidBlockedList.LoadItems(); guidBlockedList.Visible = true; break;
                 case 8:

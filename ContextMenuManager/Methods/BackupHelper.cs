@@ -17,9 +17,47 @@ using BluePointLilac.Controls;
 
 namespace ContextMenuManager.Methods
 {
+    /*******************************外部枚举变量************************************/
+
+    // 右键菜单场景
+    public enum Scenes
+    {
+        // 主页——第一板块
+        File, Folder, Directory, Background, Desktop, Drive, AllObjects, Computer, RecycleBin, Library,
+        // 主页——第二板块
+        NewItem, SendTo, OpenWith,
+        // 主页——第三板块
+        WinX,
+        // 文件类型——第一板块
+        LnkFile, UwpLnk, ExeFile,
+        // 文件类型——第二板块
+        UnknownType, CustomExtension, PerceivedType, DirectoryType,
+        CommandStore, DragDrop, CustomRegPath, MenuAnalysis, CustomExtensionPerceivedType,
+    };
+
+    // 备份项目类型
+    public enum BackupItemType
+    {
+        ShellItem, ShellExItem, UwpModelItem, VisibleRegRuleItem, ShellNewItem, SendToItem,
+        OpenWithItem, WinXItem
+    }
+
+    // 备份选项
+    public enum BackupTarget
+    {
+        Basic, AllHomePage
+    };
+
+    // 恢复模式
+    public enum RestoreMode
+    {
+        NotHandleNotOnList,     // 启用备份列表上可见的菜单项，禁用备份列表上不可见的菜单项，不处理不存在于备份列表上的菜单项
+        DisableNotOnList,       // 启用备份列表上可见的菜单项，禁用备份列表上不可见以及不存在于备份列表上的菜单项
+    };
+
     sealed class BackupHelper
     {
-        /*******************************外部调用************************************/
+        /*******************************外部变量、函数************************************/
 
         public int backupCount = 0; // 备份项目总数量
         public int changeCount = 0; // 备份恢复改变项目数量
@@ -53,7 +91,7 @@ namespace ContextMenuManager.Methods
             ClearBackupList();
         }
 
-        /*******************************内部调用************************************/
+        /*******************************内部变量、函数************************************/
 
         private Scenes currentScene;    // 目前处理场景
         private RestoreMode restoreMode;    // 备份恢复模式
@@ -841,23 +879,6 @@ namespace ContextMenuManager.Methods
 
         // 创建一个XmlSerializer对象
         private static readonly XmlSerializer serializer = new XmlSerializer(typeof(List<BackupItem>));
-
-        public enum BackupItemType
-        {
-            ShellItem, ShellExItem, UwpModelItem, VisibleRegRuleItem, ShellNewItem, SendToItem,
-            OpenWithItem, WinXItem
-        }
-
-        public enum BackupTarget
-        {
-            Basic, AllHomePage
-        };
-
-        public enum RestoreMode
-        {
-            NotHandleNotOnList,     // 启用备份列表上可见的菜单项，禁用备份列表上不可见的菜单项，不处理不存在于备份列表上的菜单项
-            DisableNotOnList,       // 启用备份列表上可见的菜单项，禁用备份列表上不可见以及不存在于备份列表上的菜单项
-        };
 
         static BackupList() { }
 
