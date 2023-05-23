@@ -174,9 +174,11 @@ namespace BluePointLilac.Controls
                 Controls.AddRange(new Control[] { dgvInfo, dgvItems, cmbInfo, cmbItems, btnOK, btnCancel });
                 int margin = 20.DpiZoom();
                 int cmbItemsWidth = 240.DpiZoom();
+                int dgvHeight = 300.DpiZoom();
                 dgvInfo.Top = margin;
                 dgvInfo.Left = dgvItems.Left = cmbInfo.Left = margin;
                 dgvItems.Top = dgvInfo.Bottom + 5.DpiZoom();
+                dgvItems.Height = dgvHeight;
                 cmbInfo.Top = cmbItems.Top = dgvItems.Bottom + margin;
                 cmbItems.Left = cmbInfo.Right;
                 cmbItems.Width = cmbItemsWidth;

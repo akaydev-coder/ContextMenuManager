@@ -75,17 +75,23 @@ namespace ContextMenuManager.Methods
         public int backupCount = 0; // 备份项目总数量
         public int changeCount = 0; // 备份恢复改变项目数量
         public string createTime;   // 本次备份文件创建时间
-        public string filePath; // 本次备份文件名
+        public string filePath; // 本次备份文件目录
 
         public void BackupItems(List<string> sceneTexts, BackupMode backupMode)
         {
             ClearBackupList();
             GetBackupRestoreScenes(sceneTexts);
             this.backupMode = backupMode;
+            DateTime dateTime = DateTime.Now;
             string date = DateTime.Today.ToString("yyyy-MM-dd");
-            string time = DateTime.Now.ToString("HH-mm-ss");
+            string time = dateTime.ToString("HH-mm-ss");
             createTime = $@"{date} {time}";
             filePath = $@"{AppConfig.MenuBackupDir}\{createTime}.xml";
+            // 构建备份元数据
+            metaData.CreateTime = dateTime;
+            metaData.Device = AppConfig.ComputerHostName;
+            metaData.BackupScenes = currentScenes;
+            metaData.Version = BackupVersion;
             // 加载备份文件到缓冲区
             BackupRestoreItems(true);
             // 保存缓冲区的备份文件
@@ -109,11 +115,13 @@ namespace ContextMenuManager.Methods
 
         /*******************************内部变量、函数************************************/
 
+        private const int BackupVersion = 1;    // 目前备份版本号
+
         private Scenes currentScene;    // 目前处理场景
         private BackupMode backupMode;  // 目前备份模式
         private RestoreMode restoreMode;    // 目前恢复模式
-        private List<Scenes> currentScenes = new List<Scenes>();   // 目前备份恢复场景
-
+        private readonly List<Scenes> currentScenes = new List<Scenes>();   // 目前备份恢复场景
+        
         // 获取目前备份恢复场景
         private void GetBackupRestoreScenes(List<string> sceneTexts)
         {
@@ -207,7 +215,7 @@ namespace ContextMenuManager.Methods
 
         private bool CheckItemNeedChange(string keyName, BackupItemType itemType, bool itemVisible)
         {
-            foreach (BackupItem item in tempRestoreList)
+            foreach (BackupItem item in restoreList)
             {
                 // 成功匹配到后的处理方式
                 if (item.KeyName == keyName && item.ItemType == itemType)
@@ -891,16 +899,26 @@ namespace ContextMenuManager.Methods
 
     public sealed class BackupList
     {
+        // 备份元数据缓存区
+        public static MetaData metaData = new MetaData();  
+
         // 备份列表缓存区
-        private static List<BackupItem> backupList = new List<BackupItem>();
+        private static readonly List<BackupItem> backupList = new List<BackupItem>();
 
         // 恢复列表暂存区
-        public static List<BackupItem> tempRestoreList = new List<BackupItem>();
+        public static List<BackupItem> restoreList = new List<BackupItem>();
 
-        // 创建一个XmlSerializer对象
-        private static readonly XmlSerializer serializer = new XmlSerializer(typeof(List<BackupItem>));
-
-        static BackupList() { }
+        // 创建一个XmlSerializer实例并设置根节点
+        private static readonly XmlSerializer serializer = new XmlSerializer(typeof(BackupData), 
+            new XmlRootAttribute("ContextMenuManager"));
+        // 自定义命名空间
+        private static readonly XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+        
+        static BackupList()
+        {
+            // 禁用默认命名空间
+            namespaces.Add(string.Empty, string.Empty);
+        }
 
         public static void AddItem(string keyName, BackupItemType backupItemType, bool itemVisible, Scenes scene)
         {
@@ -925,50 +943,89 @@ namespace ContextMenuManager.Methods
 
         public static void SaveBackupList(string filePath)
         {
-            // 序列化到XML文档
-            using (StreamWriter sw = new StreamWriter(filePath))
+            // 创建一个父对象，并将BackupList和MetaData对象包装到其中
+            BackupData myData = new BackupData()
             {
-                serializer.Serialize(sw, backupList);
+                MetaData = metaData,
+                BackupList = backupList,
+            };
+
+            // 序列化root对象并保存到XML文档
+            using (FileStream stream = new FileStream(filePath, FileMode.Create))
+            {
+                serializer.Serialize(stream, myData, namespaces);
             }
         }
 
         public static void LoadBackupList(string filePath)
         {
-            // 反序列化到List<BackupItem>对象
-            using (StreamReader sr = new StreamReader(filePath))
+            // 反序列化XML文件并获取根对象
+            BackupData myData;
+            using (FileStream stream = new FileStream(filePath, FileMode.Open))
             {
-                backupList = serializer.Deserialize(sr) as List<BackupItem>;
+                myData = (BackupData)serializer.Deserialize(stream);
             }
+
+            // 获取 BackupList 和 MetaData 对象
+            metaData = myData.MetaData;
+            restoreList = myData.BackupList;
         }
 
         public static void LoadTempRestoreList(Scenes scene)
         {
-            tempRestoreList.Clear();
+            restoreList.Clear();
             // 根据backupScene加载列表
             foreach (BackupItem item in backupList)
             {
                 if (item.BackupScene == scene)
                 {
-                    tempRestoreList.Add(item);
+                    restoreList.Add(item);
                 }
             }
         }
     }
 
-    // 定义一个类来表示BackupItem
+    // 定义一个类来表示备份数据
+    [Serializable, XmlType("BackupData")]
+    public sealed class BackupData
+    {
+        [XmlElement("MetaData")]
+        public MetaData MetaData { get; set; }
+
+        [XmlElement("BackupList")]
+        public List<BackupItem> BackupList { get; set; }
+    }
+
+    // 定义一个类来表示备份项目
     [Serializable, XmlType("BackupItem")]
     public sealed class BackupItem
     {
         [XmlElement("KeyName")]
-        public string KeyName { get; set; }// 查询索引名字
+        public string KeyName { get; set; } // 查询索引名字
 
-        [XmlElement("BackupItemType")]
-        public BackupItemType ItemType { get; set; }// 备份项目类型
+        [XmlElement("ItemType")]
+        public BackupItemType ItemType { get; set; } // 备份项目类型
 
         [XmlElement("ItemVisible")]
-        public bool ItemVisible { get; set; }// 是否位于右键菜单中
+        public bool ItemVisible { get; set; } // 是否位于右键菜单中
 
         [XmlElement("Scene")]
-        public Scenes BackupScene { get; set; }// 右键菜单位置
+        public Scenes BackupScene { get; set; } // 右键菜单位置
+    }
+
+    // 定义一个类来表示备份项目的元数据
+    public sealed class MetaData
+    {
+        [XmlElement("Version")]
+        public int Version { get; set; } // 备份版本
+
+        [XmlElement("BackupScenes")]
+        public List<Scenes> BackupScenes { get; set; } // 备份场景
+
+        [XmlElement("CreateTime")]
+        public DateTime CreateTime { get; set; } // 备份时间
+
+        [XmlElement("Device")]
+        public string Device { get; set; } // 备份设备
     }
 }
