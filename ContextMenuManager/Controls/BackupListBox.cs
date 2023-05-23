@@ -1,11 +1,11 @@
 ﻿using BluePointLilac.Controls;
 using ContextMenuManager.Methods;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using static ContextMenuManager.Methods.BackupList;
 
 namespace ContextMenuManager.Controls
 {
@@ -44,16 +44,21 @@ namespace ContextMenuManager.Controls
             InsertItem(newItem, 0);
             newItem.AddNewItem += () =>
             {
-                BackupTarget backupTarget;
+                BackupMode backupMode;
+                List<string> backupScenes;
                 using (BackupDialog dlg = new BackupDialog())
                 {
-                    dlg.Items = new[] { "基本", "详细" };
                     dlg.Title = "新建一个备份";
+                    dlg.DgvTitle = "备份内容：";
+                    dlg.DgvItems = BackupHelper.BackupRestoreAllScenesText;
+                    dlg.CmbTitle = "备份模式：";
+                    dlg.CmbItems = new[] { "备份全部菜单项目", "仅备份已启用的菜单项目" };
                     if (dlg.ShowDialog() != DialogResult.OK) return;
-                    backupTarget = dlg.SelectedIndex == 0 ? BackupTarget.Basic : BackupTarget.AllHomePage;
+                    backupMode = dlg.CmbSelectedIndex == 0 ? BackupMode.All : BackupMode.OnlyVisible;
+                    backupScenes = dlg.DgvSelectedItems;
                 }
                 Cursor = Cursors.WaitCursor;
-                helper.BackupItems(backupTarget);
+                helper.BackupItems(backupScenes, backupMode);
                 AddItem(new RestoreItem(this, helper.filePath, AppConfig.ComputerHostName, helper.createTime));
                 Cursor = Cursors.Default;
                 int backupCount = helper.backupCount;
@@ -61,10 +66,10 @@ namespace ContextMenuManager.Controls
             };
         }
 
-        public void RestoreItems(string restoreFile, RestoreMode restoreMode)
+        public void RestoreItems(string restoreFile, List<string> sceneTexts, RestoreMode restoreMode)
         {
             Cursor = Cursors.WaitCursor;
-            helper.RestoreItems(BackupTarget.Basic, restoreFile, restoreMode);
+            helper.RestoreItems(restoreFile, sceneTexts, restoreMode);
             Cursor = Cursors.Default;
             int changeCount = helper.changeCount;
             AppMessageBox.Show("恢复完成！共处理了" + changeCount.ToString() + "个菜单项目！");

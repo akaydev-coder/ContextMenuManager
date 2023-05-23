@@ -142,9 +142,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BluePointLilac.Controls\RestoreDialog.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="BluePointLilac.Controls\BackupDialog.cs">
       <SubType>Component</SubType>
     </Compile>

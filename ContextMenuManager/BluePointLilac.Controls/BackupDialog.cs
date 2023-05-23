@@ -1,5 +1,7 @@
 ﻿using BluePointLilac.Methods;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -8,10 +10,15 @@ namespace BluePointLilac.Controls
     public class BackupDialog : CommonDialog
     {
         public string Title { get; set; }
-        public string Selected { get; set; }
-        public int SelectedIndex { get; set; }
-        public string[] Items { get; set; }
-        public bool CanEdit { get; set; }
+
+        public string CmbTitle { get; set; }
+        public string[] CmbItems { get; set; }
+        public int CmbSelectedIndex { get; set; }
+        public string CmbSelectedText { get; set; }
+
+        public string DgvTitle { get; set; }
+        public string[] DgvItems { get; set; }
+        public List<string> DgvSelectedItems { get; set; }
 
         public override void Reset() { }
 
@@ -20,17 +27,20 @@ namespace BluePointLilac.Controls
             using(SelectForm frm = new SelectForm())
             {
                 frm.Text = Title;
-                frm.Items = Items;
-                if(Selected != null) frm.Selected = Selected;
-                else frm.SelectedIndex = SelectedIndex;
-                frm.CanEdit = CanEdit;
+                frm.CmbTitle = CmbTitle;
+                frm.CmbItems = CmbItems;
+                frm.DgvTitle = DgvTitle;
+                frm.DgvItems = DgvItems;
+                if (CmbSelectedText != null) frm.CmbSelectedText = CmbSelectedText;
+                else frm.CmbSelectedIndex = CmbSelectedIndex;
                 Form owner = (Form)Control.FromHandle(hwndOwner);
                 if(owner != null) frm.TopMost = owner.TopMost;
                 bool flag = frm.ShowDialog() == DialogResult.OK;
                 if(flag)
                 {
-                    Selected = frm.Selected;
-                    SelectedIndex = frm.SelectedIndex;
+                    CmbSelectedText = frm.CmbSelectedText;
+                    CmbSelectedIndex = frm.CmbSelectedIndex;
+                    DgvSelectedItems = frm.DgvSelectedItems;
                 }
                 return flag;
             }
@@ -38,6 +48,8 @@ namespace BluePointLilac.Controls
 
         sealed class SelectForm : Form
         {
+            /*************************************外部函数***********************************/
+
             public SelectForm()
             {
                 SuspendLayout();
@@ -52,13 +64,18 @@ namespace BluePointLilac.Controls
                 ResumeLayout();
             }
 
-            public string Selected
-            {
-                get => cmbItems.Text;
-                set => cmbItems.Text = value;
-            }
+            /*************************************外部属性***********************************/
 
-            public string[] Items
+            public string CmbTitle
+            {
+                get => cmbInfo.Text;
+                set {
+                    cmbInfo.Text = value;
+                    cmbItems.Left = cmbInfo.Right;
+                    cmbItems.Width -= cmbInfo.Width;
+                }
+            }
+            public string[] CmbItems
             {
                 get
                 {
@@ -72,18 +89,70 @@ namespace BluePointLilac.Controls
                     cmbItems.Items.AddRange(value);
                 }
             }
-
-            public bool CanEdit
-            {
-                get => cmbItems.DropDownStyle == ComboBoxStyle.DropDown;
-                set => cmbItems.DropDownStyle = value ? ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList;
-            }
-
-            public int SelectedIndex
+            // cmb选中项目索引
+            public int CmbSelectedIndex
             {
                 get => cmbItems.SelectedIndex;
                 set => cmbItems.SelectedIndex = value;
             }
+            // cmb选中项目内容
+            public string CmbSelectedText
+            {
+                get => cmbItems.Text;
+                set => cmbItems.Text = value;
+            }
+
+            public string DgvTitle
+            {
+                get => dgvInfo.Text;
+                set => dgvInfo.Text = value;
+            }
+            private string[] dgvItemsValue;
+            public string[] DgvItems
+            {
+                get
+                {
+                    return dgvItemsValue;
+                }
+                set
+                {
+                    dgvItemsValue = value;
+                    ShowDgvList(value);
+                }
+            }
+            // dgv选中的项目
+            private readonly List<string> dgvSelectedItems = new List<string>();
+            public List<string> DgvSelectedItems
+            {
+                get => dgvSelectedItems;
+            }
+
+            /*************************************内部控件***********************************/
+
+            readonly Label dgvInfo = new Label { AutoSize = true };
+            readonly DataGridView dgvItems = new DataGridView
+            {
+                ColumnHeadersVisible = false,   // 隐藏列标题
+                RowHeadersVisible = false,  // 隐藏行标题
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect, // 整行一起选中
+                BackgroundColor = SystemColors.Control,
+                BorderStyle = BorderStyle.None,
+                AllowUserToResizeRows = false,
+                AllowUserToAddRows = false,
+                MultiSelect = false,
+                ReadOnly = true,
+            };
+
+            readonly Label cmbInfo = new Label { AutoSize = true };
+            readonly ComboBox cmbItems = new ComboBox
+            {
+                AutoCompleteMode = AutoCompleteMode.SuggestAppend,
+                AutoCompleteSource = AutoCompleteSource.ListItems,
+                DropDownHeight = 300.DpiZoom(),
+                DropDownStyle = ComboBoxStyle.DropDownList, // 用户不可增加新项目
+                ImeMode = ImeMode.Disable
+            };
 
             readonly Button btnOK = new Button
             {
@@ -97,33 +166,76 @@ namespace BluePointLilac.Controls
                 Text = ResourceString.Cancel,
                 AutoSize = true
             };
-            readonly ComboBox cmbItems = new ComboBox
-            {
-                AutoCompleteMode = AutoCompleteMode.SuggestAppend,
-                AutoCompleteSource = AutoCompleteSource.ListItems,
-                DropDownHeight = 294.DpiZoom(),
-                ImeMode = ImeMode.Disable
-            };
-            readonly Label lblInfo = new Label
-            {
-                Text = "备份内容：",
-                AutoSize = true
-            };
+
+            /*************************************内部函数***********************************/
 
             private void InitializeComponents()
             {
-                Controls.AddRange(new Control[] { lblInfo, cmbItems, btnOK, btnCancel });
+                Controls.AddRange(new Control[] { dgvInfo, dgvItems, cmbInfo, cmbItems, btnOK, btnCancel });
                 int margin = 20.DpiZoom();
                 int cmbItemsWidth = 240.DpiZoom();
-                int lblItemMargin = 6.DpiZoom();
-                lblInfo.Left = lblInfo.Top = cmbItems.Top = margin;
-                cmbItems.Left = lblInfo.Right + lblItemMargin;
+                dgvInfo.Top = margin;
+                dgvInfo.Left = dgvItems.Left = cmbInfo.Left = margin;
+                dgvItems.Top = dgvInfo.Bottom + 5.DpiZoom();
+                cmbInfo.Top = cmbItems.Top = dgvItems.Bottom + margin;
+                cmbItems.Left = cmbInfo.Right;
                 cmbItems.Width = cmbItemsWidth;
                 btnOK.Top = btnCancel.Top = cmbItems.Bottom + margin;
-                btnOK.Left = (cmbItems.Width + lblInfo.Width + 3 * margin - lblItemMargin) / 2 - btnOK.Width;
+                btnOK.Left = (cmbItems.Width + cmbInfo.Width + 2 * margin - margin) / 2 - btnOK.Width;
                 btnCancel.Left = btnOK.Right + margin;
                 ClientSize = new Size(cmbItems.Right + margin, btnCancel.Bottom + margin);
+                dgvItems.Width = ClientSize.Width - 2 * margin;
                 cmbItems.AutosizeDropDownWidth();
+            }
+
+            private void ShowDgvList(string[] value)
+            {
+                // 显示1列数据列
+                int headLength = 1;
+                dgvItems.ColumnCount = headLength;
+                dgvItems.Columns[headLength - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                for (int m = 0; m < headLength; m++)
+                {
+                    dgvItems.Columns[m].HeaderText = value[m];
+                }
+                for (int i = 0; i < value.Length; i++)
+                {
+                    string[] line = new string[headLength];
+                    string temp = value[i];
+                    line[0] = temp;
+                    dgvItems.Rows.Add(line);
+                }
+                // 增加复选框列
+                DataGridViewCheckBoxColumn checkbox = new DataGridViewCheckBoxColumn()
+                {
+                    TrueValue = true,
+                    FalseValue = false,
+                    DataPropertyName = "IsChecked",
+                    Width = 50.DpiZoom(),
+                    Resizable = DataGridViewTriState.False, // 列大小不改变
+                };
+                // 插入到第0列
+                dgvItems.Columns.Insert(0, checkbox);
+                dgvItems.CellMouseClick += (sender, e) => { Dgv_CellMouseClick(sender, e); };
+            }
+
+            private void Dgv_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+            {
+                // 不对序号列和标题列处理
+                if (e.RowIndex != -1 && e.ColumnIndex != -1)
+                {
+                    // 复选框列的值进行改变
+                    if ((bool)dgvItems.Rows[e.RowIndex].Cells[0].EditedFormattedValue == true)
+                    {
+                        dgvItems.Rows[e.RowIndex].Cells[0].Value = false;
+                        dgvSelectedItems.Remove(DgvItems[e.RowIndex]);
+                    }
+                    else
+                    {
+                        dgvItems.Rows[e.RowIndex].Cells[0].Value = true;
+                        dgvSelectedItems.Add(DgvItems[e.RowIndex]);
+                    }
+                }
             }
         }
     }

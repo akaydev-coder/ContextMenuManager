@@ -25,7 +25,7 @@ namespace ContextMenuManager.Methods
         // 主页——第一板块
         File, Folder, Directory, Background, Desktop, Drive, AllObjects, Computer, RecycleBin, Library,
         // 主页——第二板块
-        NewItem, SendTo, OpenWith,
+        New, SendTo, OpenWith,
         // 主页——第三板块
         WinX,
         // 文件类型——第一板块
@@ -43,9 +43,10 @@ namespace ContextMenuManager.Methods
     }
 
     // 备份选项
-    public enum BackupTarget
+    public enum BackupMode
     {
-        Basic, AllHomePage
+        All,    // 备份全部菜单项目
+        OnlyVisible // 仅备份已启用的菜单项目
     };
 
     // 恢复模式
@@ -59,61 +60,80 @@ namespace ContextMenuManager.Methods
     {
         /*******************************外部变量、函数************************************/
 
+        // 右键菜单备份恢复全部场景（确保顺序与右键菜单场景Scenes相同）
+        public static string[] BackupRestoreAllScenesText = new string[] {
+            // 主页——第一板块
+            AppString.SideBar.File, AppString.SideBar.Folder, AppString.SideBar.Directory, AppString.SideBar.Background,
+            AppString.SideBar.Desktop, AppString.SideBar.Drive, AppString.SideBar.AllObjects, AppString.SideBar.Computer,
+            AppString.SideBar.RecycleBin, AppString.SideBar.Library,
+            // 主页——第二板块
+            AppString.SideBar.New, AppString.SideBar.SendTo, AppString.SideBar.OpenWith,
+            // 主页——第三板块
+            AppString.SideBar.WinX,
+        };
+
         public int backupCount = 0; // 备份项目总数量
         public int changeCount = 0; // 备份恢复改变项目数量
         public string createTime;   // 本次备份文件创建时间
         public string filePath; // 本次备份文件名
 
-        public void BackupItems(BackupTarget mode)
+        public void BackupItems(List<string> sceneTexts, BackupMode backupMode)
         {
             ClearBackupList();
+            GetBackupRestoreScenes(sceneTexts);
+            this.backupMode = backupMode;
             string date = DateTime.Today.ToString("yyyy-MM-dd");
             string time = DateTime.Now.ToString("HH-mm-ss");
             createTime = $@"{date} {time}";
             filePath = $@"{AppConfig.MenuBackupDir}\{createTime}.xml";
             // 加载备份文件到缓冲区
-            BackupRestoreItems(mode, true);
+            BackupRestoreItems(true);
             // 保存缓冲区的备份文件
             SaveBackupList(filePath);
             backupCount = GetBackupListCount();
             ClearBackupList();
         }
 
-        public void RestoreItems(BackupTarget mode, string filePath, RestoreMode restoreMode)
+        public void RestoreItems(string filePath, List<string> sceneTexts, RestoreMode restoreMode)
         {
             ClearBackupList();
-            changeCount = 0;
+            GetBackupRestoreScenes(sceneTexts);
             this.restoreMode = restoreMode;
+            changeCount = 0;
             // 加载备份文件到缓冲区
             LoadBackupList(filePath);
             // 还原缓冲区的备份文件
-            BackupRestoreItems(mode, false);
+            BackupRestoreItems(false);
             ClearBackupList();
         }
 
         /*******************************内部变量、函数************************************/
 
         private Scenes currentScene;    // 目前处理场景
-        private RestoreMode restoreMode;    // 备份恢复模式
+        private BackupMode backupMode;  // 目前备份模式
+        private RestoreMode restoreMode;    // 目前恢复模式
+        private List<Scenes> currentScenes = new List<Scenes>();   // 目前备份恢复场景
 
-        // 初始化备份恢复场景
-        private void BackupRestoreItems(BackupTarget mode, bool backup)
+        // 获取目前备份恢复场景
+        private void GetBackupRestoreScenes(List<string> sceneTexts)
         {
-            Scenes[] scenes = new Scenes[] {
-                Scenes.File, Scenes.Folder, Scenes.Directory, Scenes.Background, Scenes.Desktop,
-                Scenes.Drive, Scenes.AllObjects, Scenes.Computer, Scenes.RecycleBin, Scenes.Library,
-                Scenes.NewItem, Scenes.SendTo, Scenes.OpenWith, Scenes.WinX
-            };
-            switch (mode)
+            currentScenes.Clear();
+            for (int i = 0; i < BackupRestoreAllScenesText.Length; i++)
             {
-                case BackupTarget.Basic:
-                    break;
-                case BackupTarget.AllHomePage:
-                    break;
+                string text = BackupRestoreAllScenesText[i];
+                if (sceneTexts.Contains(text))
+                {
+                    currentScenes.Add((Scenes)i);
+                }
             }
-            for (int i = 0; i < scenes.Length; i++)
+        }
+
+        // 按照目前处理场景逐个备份
+        private void BackupRestoreItems(bool backup)
+        {
+            foreach(Scenes scene in currentScenes)
             {
-                currentScene = scenes[i];
+                currentScene = scene;
                 // 加载某个Scene的恢复列表
                 if (!backup)
                 {
@@ -128,7 +148,7 @@ namespace ContextMenuManager.Methods
         {
             switch (currentScene)
             {
-                case Scenes.NewItem:
+                case Scenes.New:
                     // 新建
                     GetShellNewListBackupItems(backup); break;
                 case Scenes.SendTo:
