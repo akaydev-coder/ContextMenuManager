@@ -1,7 +1,6 @@
 ﻿using BluePointLilac.Controls;
 using ContextMenuManager.Controls.Interfaces;
 using ContextMenuManager.Methods;
-using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 
@@ -9,7 +8,7 @@ namespace ContextMenuManager.Controls
 {
     interface ITsiRestoreFile
     {
-        void RestoreItems(string restoreFile, List<string> sceneTexts, RestoreMode restoreMode);
+        void RestoreItems(string restoreFile);
     }
 
     sealed class RestoreItem : MyListItem, IBtnShowMenuItem, ITsiFilePathItem, ITsiDeleteItem, ITsiRestoreItem
@@ -66,20 +65,7 @@ namespace ContextMenuManager.Controls
 
         public void RestoreMe()
         {
-            RestoreMode restoreMode;
-            List<string> restoreScenes;
-            using (BackupDialog dlg = new BackupDialog())
-            {
-                dlg.Title = "恢复一个备份";
-                dlg.CmbTitle = "恢复模式：";
-                dlg.CmbItems = new[] { "不处理不存在于备份列表上的菜单项", "关闭不存在于备份列表上的菜单项" };
-                dlg.DgvTitle = "恢复内容：";
-                dlg.DgvItems = BackupHelper.BackupRestoreAllScenesText;
-                if (dlg.ShowDialog() != DialogResult.OK) return;
-                restoreMode = dlg.CmbSelectedIndex == 0 ? RestoreMode.NotHandleNotOnList : RestoreMode.DisableNotOnList;
-                restoreScenes = dlg.DgvSelectedItems;
-            }
-            restoreInterface.RestoreItems(filePath, restoreScenes, restoreMode);
+            restoreInterface.RestoreItems(filePath);
         }
     }
 }
