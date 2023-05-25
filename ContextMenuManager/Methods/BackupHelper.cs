@@ -59,6 +59,9 @@ namespace ContextMenuManager.Methods
     {
         /*******************************外部变量、函数************************************/
 
+        // 目前备份版本号
+        public const int BackupVersion = 1;
+
         // 右键菜单备份场景，包含全部场景（确保顺序与右键菜单场景Scenes相同）
         public static string[] BackupScenesText = new string[] {
             // 主页——第一板块
@@ -129,8 +132,6 @@ namespace ContextMenuManager.Methods
         }
 
         /*******************************内部变量、函数************************************/
-
-        private const int BackupVersion = 1;    // 目前备份版本号
 
         private Scenes currentScene;    // 目前处理场景
         private BackupMode backupMode;  // 目前备份模式

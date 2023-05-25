@@ -86,6 +86,11 @@ namespace ContextMenuManager.Controls
             RestoreMode restoreMode;
             List<string> restoreScenes;
             BackupList.LoadBackupDataMetaData(filePath);
+            // 备份版本提示
+            if (BackupList.metaData.Version < BackupHelper.BackupVersion)
+            {
+                AppMessageBox.Show("该备份版本并非最新版本，部分备份数据可能无法完全恢复！");
+            }
             helper.GetBackupRestoreScenesText(BackupList.metaData.BackupScenes);
             using (BackupDialog dlg = new BackupDialog())
             {
