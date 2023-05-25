@@ -988,7 +988,7 @@ namespace ContextMenuManager.Methods
             // 获取MetaData对象
             metaData = myData.MetaData;
 
-            // 清理backupRestoreList空间
+            // 清理backupRestoreList变量
             backupRestoreList.Clear();
             backupRestoreList = null;
 
@@ -1020,7 +1020,10 @@ namespace ContextMenuManager.Methods
                     // 寻找第一个<MetaData>节点
                     reader.ReadToFollowing("MetaData");
 
-                    // 反序列化 <MetaData> 节点为 MetaData 对象
+                    // 清理metaData变量
+                    metaData = null;
+
+                    // 反序列化<MetaData>节点为MetaData对象
                     metaData = (MetaData)metaDataSerializer.Deserialize(reader);
                 }
             }

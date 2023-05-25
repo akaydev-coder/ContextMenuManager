@@ -15,19 +15,19 @@ namespace ContextMenuManager.Controls
             string rootPath = AppConfig.MenuBackupRootDir;
             // 获取rootPath下的所有子目录
             string[] deviceDirs = Directory.GetDirectories(rootPath);
+            // 仅获取deviceDir下的.xml备份文件
             foreach (string deviceDir in deviceDirs)
             {
-                // 解析设备名称
-                string deviceName = Path.GetFileName(deviceDir);
                 // 获取当前设备目录下的所有XML文件
                 string[] xmlFiles = Directory.GetFiles(deviceDir, "*.xml");
                 // 遍历所有XML文件
                 foreach (string xmlFile in xmlFiles)
                 {
-                    // 解析源文件名称
-                    string sourceFileName = Path.GetFileName(xmlFile);
-                    // 添加备份项目
-                    string createTime = sourceFileName.Substring(0, sourceFileName.Length - 4);
+                    // 加载项目元数据
+                    BackupList.LoadBackupDataMetaData(xmlFile);
+                    // 新增备份项目
+                    string deviceName = BackupList.metaData.Device;
+                    string createTime = BackupList.metaData.CreateTime.ToString("G");
                     AddItem(new RestoreItem(this, xmlFile, deviceName, createTime));
                 }
             }
@@ -39,33 +39,41 @@ namespace ContextMenuManager.Controls
         {
             NewItem newItem = new NewItem("新建一个备份");
             InsertItem(newItem, 0);
-            newItem.AddNewItem += () =>
+            newItem.AddNewItem += BackupItems;
+        }
+
+        private void BackupItems()
+        {
+            // 获取备份选项
+            BackupMode backupMode;
+            List<string> backupScenes;
+            using (BackupDialog dlg = new BackupDialog())
             {
-                BackupMode backupMode;
-                List<string> backupScenes;
-                using (BackupDialog dlg = new BackupDialog())
-                {
-                    dlg.Title = "新建一个备份";
-                    dlg.DgvTitle = "备份内容：";
-                    dlg.DgvItems = BackupHelper.BackupScenesText;
-                    dlg.CmbTitle = "备份模式：";
-                    dlg.CmbItems = new[] { "备份全部菜单项目", "仅备份已启用的菜单项目" };
-                    if (dlg.ShowDialog() != DialogResult.OK) return;
-                    backupMode = dlg.CmbSelectedIndex == 0 ? BackupMode.All : BackupMode.OnlyVisible;
-                    backupScenes = dlg.DgvSelectedItems;
-                }
-                // 开始备份
-                Cursor = Cursors.WaitCursor;
-                helper.BackupItems(backupScenes, backupMode);
-                AddItem(new RestoreItem(this, helper.filePath, AppConfig.ComputerHostName, helper.createTime));
-                Cursor = Cursors.Default;
-                int backupCount = helper.backupCount;
-                AppMessageBox.Show("备份完成！共处理了" + backupCount.ToString() + "个菜单项目！");
-            };
+                dlg.Title = "新建一个备份";
+                dlg.DgvTitle = "备份内容：";
+                dlg.DgvItems = BackupHelper.BackupScenesText;
+                dlg.CmbTitle = "备份模式：";
+                dlg.CmbItems = new[] { "备份全部菜单项目", "仅备份已启用的菜单项目" };
+                if (dlg.ShowDialog() != DialogResult.OK) return;
+                backupMode = dlg.CmbSelectedIndex == 0 ? BackupMode.All : BackupMode.OnlyVisible;
+                backupScenes = dlg.DgvSelectedItems;
+            }
+            // 开始备份项目
+            Cursor = Cursors.WaitCursor;
+            helper.BackupItems(backupScenes, backupMode);
+            Cursor = Cursors.Default;
+            // 新增备份项目（项目已加载元数据）
+            string deviceName = BackupList.metaData.Device;
+            string createTime = BackupList.metaData.CreateTime.ToString("G");
+            AddItem(new RestoreItem(this, helper.filePath, deviceName, createTime));
+            // 弹窗提示结果
+            int backupCount = helper.backupCount;
+            AppMessageBox.Show("备份完成！共处理了" + backupCount.ToString() + "个菜单项目！");
         }
 
         public void RestoreItems(string filePath)
         {
+            // 获取恢复选项
             RestoreMode restoreMode;
             List<string> restoreScenes;
             BackupList.LoadBackupDataMetaData(filePath);
@@ -76,15 +84,16 @@ namespace ContextMenuManager.Controls
                 dlg.DgvTitle = "恢复内容：";
                 dlg.DgvItems = BackupHelper.RestoreScenesText;
                 dlg.CmbTitle = "恢复模式：";
-                dlg.CmbItems = new[] { "不处理不存在于备份列表上的菜单项", "关闭不存在于备份列表上的菜单项" };
+                dlg.CmbItems = new[] { "不处理不存在于备份列表上的菜单项", "禁用不存在于备份列表上的菜单项" };
                 if (dlg.ShowDialog() != DialogResult.OK) return;
                 restoreMode = dlg.CmbSelectedIndex == 0 ? RestoreMode.NotHandleNotOnList : RestoreMode.DisableNotOnList;
                 restoreScenes = dlg.DgvSelectedItems;
             }
-            // 开始恢复
+            // 开始恢复项目
             Cursor = Cursors.WaitCursor;
             helper.RestoreItems(filePath, restoreScenes, restoreMode);
             Cursor = Cursors.Default;
+            // 弹窗提示结果
             int changeCount = helper.changeCount;
             AppMessageBox.Show("恢复完成！共处理了" + changeCount.ToString() + "个菜单项目！");
         }
