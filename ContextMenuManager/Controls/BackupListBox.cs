@@ -53,9 +53,18 @@ namespace ContextMenuManager.Controls
                 dlg.DgvTitle = "备份内容：";
                 dlg.DgvItems = BackupHelper.BackupScenesText;
                 dlg.CmbTitle = "备份模式：";
-                dlg.CmbItems = new[] { "备份全部菜单项目", "仅备份已启用的菜单项目" };
+                dlg.CmbItems = new[] { "备份全部菜单项目", "仅备份启用的菜单项目", "仅备份禁用的菜单项目" };
                 if (dlg.ShowDialog() != DialogResult.OK) return;
-                backupMode = dlg.CmbSelectedIndex == 0 ? BackupMode.All : BackupMode.OnlyVisible;
+                switch (dlg.CmbSelectedIndex)
+                {
+                    case 0:
+                    default:
+                        backupMode = BackupMode.All; break;
+                    case 1:
+                        backupMode = BackupMode.OnlyVisible; break;
+                    case 2:
+                        backupMode = BackupMode.OnlyInvisible; break;
+                }
                 backupScenes = dlg.DgvSelectedItems;
             }
             // 开始备份项目

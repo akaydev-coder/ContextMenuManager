@@ -44,7 +44,8 @@ namespace ContextMenuManager.Methods
     public enum BackupMode
     {
         All,    // 备份全部菜单项目
-        OnlyVisible // 仅备份已启用的菜单项目
+        OnlyVisible, // 仅备份启用的菜单项目
+        OnlyInvisible   // 仅备份禁用的菜单项目
     };
 
     // 恢复模式
@@ -151,7 +152,7 @@ namespace ContextMenuManager.Methods
             }
         }
 
-        // 按照目前处理场景逐个备份
+        // 按照目前处理场景逐个备份或恢复
         private void BackupRestoreItems(bool backup)
         {
             foreach(Scenes scene in currentScenes)
@@ -165,8 +166,8 @@ namespace ContextMenuManager.Methods
                 GetBackupItems(backup);
             }
         }
-        
-        // 开始进行备份
+
+        // 开始进行备份或恢复
         private void GetBackupItems(bool backup)
         {
             switch (currentScene)
@@ -196,7 +197,19 @@ namespace ContextMenuManager.Methods
             if (backup)
             {
                 // 加入备份列表
-                AddItem(keyName, backupItemType, ifItemInMenu, currentScene);
+                switch (backupMode)
+                {
+                    case BackupMode.All:
+                    default:
+                        AddItem(keyName, backupItemType, ifItemInMenu, currentScene);
+                        break;
+                    case BackupMode.OnlyVisible:
+                        if (ifItemInMenu) AddItem(keyName, backupItemType, ifItemInMenu, currentScene);
+                        break;
+                    case BackupMode.OnlyInvisible:
+                        if (!ifItemInMenu) AddItem(keyName, backupItemType, ifItemInMenu, currentScene);
+                        break;
+                }
             }
             else
             {
