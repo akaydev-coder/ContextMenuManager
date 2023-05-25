@@ -1,7 +1,6 @@
 ﻿using BluePointLilac.Methods;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -9,16 +8,16 @@ namespace BluePointLilac.Controls
 {
     public class BackupDialog : CommonDialog
     {
-        public string Title { get; set; }
+        public string Title { get; set; }   // 窗口标题
 
-        public string CmbTitle { get; set; }
-        public string[] CmbItems { get; set; }
-        public int CmbSelectedIndex { get; set; }
-        public string CmbSelectedText { get; set; }
+        public string CmbTitle { get; set; }    // cmb标题
+        public string[] CmbItems { get; set; }  // cmb可供选择内容
+        public int CmbSelectedIndex { get; set; }   // cmb选择内容索引
+        public string CmbSelectedText { get; set; } // cmb选择内容文字
 
-        public string DgvTitle { get; set; }
-        public string[] DgvItems { get; set; }
-        public List<string> DgvSelectedItems { get; set; }
+        public string DgvTitle { get; set; }    // dgv可供选择内容
+        public string[] DgvItems { get; set; }  // dgv选择内容索引
+        public List<string> DgvSelectedItems { get; set; }  // Dgv选择内容文字
 
         public override void Reset() { }
 
@@ -144,6 +143,13 @@ namespace BluePointLilac.Controls
                 ReadOnly = true,
             };
 
+            readonly CheckBox checkAll = new CheckBox
+            {
+                Name = "CheckAll",
+                Text = "全选",
+                AutoSize = true,
+            };
+
             readonly Label cmbInfo = new Label { AutoSize = true };
             readonly ComboBox cmbItems = new ComboBox
             {
@@ -171,11 +177,11 @@ namespace BluePointLilac.Controls
 
             private void InitializeComponents()
             {
-                Controls.AddRange(new Control[] { dgvInfo, dgvItems, cmbInfo, cmbItems, btnOK, btnCancel });
+                Controls.AddRange(new Control[] { dgvInfo, checkAll, dgvItems, cmbInfo, cmbItems, btnOK, btnCancel });
                 int margin = 20.DpiZoom();
                 int cmbItemsWidth = 240.DpiZoom();
                 int dgvHeight = 300.DpiZoom();
-                dgvInfo.Top = margin;
+                dgvInfo.Top = checkAll.Top = margin;
                 dgvInfo.Left = dgvItems.Left = cmbInfo.Left = margin;
                 dgvItems.Top = dgvInfo.Bottom + 5.DpiZoom();
                 dgvItems.Height = dgvHeight;
@@ -187,6 +193,8 @@ namespace BluePointLilac.Controls
                 btnCancel.Left = btnOK.Right + margin;
                 ClientSize = new Size(cmbItems.Right + margin, btnCancel.Bottom + margin);
                 dgvItems.Width = ClientSize.Width - 2 * margin;
+                checkAll.Left = dgvItems.Right - checkAll.Width;
+                checkAll.Click += (sender, e) => { CheckAll_CheckBoxMouseClick(sender, e); };
                 cmbItems.AutosizeDropDownWidth();
             }
 
@@ -231,13 +239,37 @@ namespace BluePointLilac.Controls
                     {
                         dgvItems.Rows[e.RowIndex].Cells[0].Value = false;
                         dgvSelectedItems.Remove(DgvItems[e.RowIndex]);
+                        if (checkAll.Checked)
+                        {
+                            checkAll.Checked = false;
+                            checkAll.Enabled = true;
+                        }
                     }
                     else
                     {
                         dgvItems.Rows[e.RowIndex].Cells[0].Value = true;
                         dgvSelectedItems.Add(DgvItems[e.RowIndex]);
+                        if (dgvSelectedItems.Count == dgvItemsValue.Length)
+                        {
+                            checkAll.Checked = true;
+                            checkAll.Enabled = false;
+                        }
                     }
                 }
+            }
+
+            private void CheckAll_CheckBoxMouseClick(object sender, EventArgs e)
+            {
+                checkAll.Checked = true;
+                for (int i = 0; i < dgvItems.Rows.Count; i++)
+                {
+                    if ((bool)dgvItems.Rows[i].Cells[0].EditedFormattedValue == false)
+                    {
+                        dgvItems.Rows[i].Cells[0].Value = true;
+                        dgvSelectedItems.Add(DgvItems[i]);
+                    }
+                }
+                checkAll.Enabled = false;
             }
         }
     }
