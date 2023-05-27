@@ -18,7 +18,7 @@ namespace ContextMenuManager.Controls
             InitializeComponents();
             restoreInterface = item;
             FilePath = filePath;
-            Text = $@"备份（源计算机：{deviceName}；创建于{creatTime}）";
+            Text = $@"备份（源计算机：{deviceName}；创建于 {creatTime}）";
             Image = AppImage.BackupItem;
         }
 

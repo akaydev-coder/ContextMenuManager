@@ -26,9 +26,9 @@ namespace ContextMenuManager.Controls
                     // 加载项目元数据
                     BackupList.LoadBackupDataMetaData(xmlFile);
                     // 新增备份项目
-                    string deviceName = BackupList.metaData.Device;
-                    string createTime = BackupList.metaData.CreateTime.ToString("G");
-                    AddItem(new RestoreItem(this, xmlFile, deviceName, createTime));
+                    string deviceName = BackupList.metaData?.Device;
+                    string createTime = BackupList.metaData?.CreateTime.ToString("G");
+                    AddItem(new RestoreItem(this, xmlFile, deviceName ?? "未知设备", createTime ?? "未知时间"));
                 }
             }
             SortItemByText();
