@@ -17,7 +17,7 @@ namespace ContextMenuManager.Methods
 {
     /*******************************外部枚举变量************************************/
 
-    // 右键菜单场景
+    // 右键菜单场景（新增备份类别处1）
     public enum Scenes
     {
         // 主页——第一板块
@@ -33,7 +33,7 @@ namespace ContextMenuManager.Methods
         CommandStore, DragDrop, CustomRegPath, MenuAnalysis, CustomExtensionPerceivedType,
     };
 
-    // 备份项目类型
+    // 备份项目类型（新增备份类别处3）
     public enum BackupItemType
     {
         ShellItem, ShellExItem, UwpModelItem, VisibleRegRuleItem, ShellNewItem, SendToItem,
@@ -62,7 +62,7 @@ namespace ContextMenuManager.Methods
         // 目前备份版本号
         public const int BackupVersion = 1;
 
-        // 右键菜单备份场景，包含全部场景（确保顺序与右键菜单场景Scenes相同）
+        // 右键菜单备份场景，包含全部场景（确保顺序与右键菜单场景Scenes相同）（新增备份类别处2）
         public static string[] BackupScenesText = new string[] {
             // 主页——第一板块
             AppString.SideBar.File, AppString.SideBar.Folder, AppString.SideBar.Directory, AppString.SideBar.Background,
@@ -72,6 +72,8 @@ namespace ContextMenuManager.Methods
             AppString.SideBar.New, AppString.SideBar.SendTo, AppString.SideBar.OpenWith,
             // 主页——第三板块
             AppString.SideBar.WinX,
+            // 文件类型——第一板块
+            AppString.SideBar.LnkFile, AppString.SideBar.UwpLnk, AppString.SideBar.ExeFile,
         };
 
         // 右键菜单恢复场景，包含元数据中的场景
@@ -214,7 +216,7 @@ namespace ContextMenuManager.Methods
             }
             else
             {
-                // 恢复备份列表
+                // 恢复备份列表（新增备份类别处4）
                 if (CheckItemNeedChange(keyName, backupItemType, ifItemInMenu))
                 {
                     switch (backupItemType)
@@ -273,6 +275,7 @@ namespace ContextMenuManager.Methods
 
         /*******************************ShellList.cs************************************/
 
+        // （新增备份类别处5）
         private void GetShellListItems(bool backup)
         {
             string scenePath = null;
@@ -302,6 +305,14 @@ namespace ContextMenuManager.Methods
                     //Vista系统没有这一项
                     if (WinOsVersion.Current == WinOsVersion.Vista) return;
                     scenePath = MENUPATH_LIBRARY; break;
+                case Scenes.LnkFile:
+                    scenePath = GetOpenModePath(".lnk"); break;
+                case Scenes.UwpLnk:
+                    //Win8之前没有Uwp
+                    if (WinOsVersion.Current < WinOsVersion.Win8) return;
+                    scenePath = MENUPATH_UWPLNK; break;
+                case Scenes.ExeFile:
+                    scenePath = GetSysAssExtPath(".exe"); break;
             }
 #if DEBUG
             if (AppConfig.EnableLog)
@@ -397,6 +408,9 @@ namespace ContextMenuManager.Methods
                         GetBackupShellItems(GetShellPath(scenePath), backup);
                         GetBackupShellExItems(GetShellExPath(scenePath), backup);
                     }
+                    break;
+                case Scenes.ExeFile:
+                    GetBackupItems(GetOpenModePath(".exe"), backup);
                     break;
             }
         }

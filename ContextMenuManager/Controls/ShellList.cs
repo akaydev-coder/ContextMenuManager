@@ -160,9 +160,9 @@ namespace ContextMenuManager.Controls
 
         public static string GetShellPath(string scenePath) => $@"{scenePath}\shell";
         public static string GetShellExPath(string scenePath) => $@"{scenePath}\ShellEx";
-        private static string GetSysAssExtPath(string typeName) => typeName != null ? $@"{SYSFILEASSPATH}\{typeName}" : null;
+        public static string GetSysAssExtPath(string typeName) => typeName != null ? $@"{SYSFILEASSPATH}\{typeName}" : null;
         private static string GetOpenMode(string extension) => FileExtension.GetOpenMode(extension);
-        private static string GetOpenModePath(string extension) => extension != null ? $@"{RegistryEx.CLASSES_ROOT}\{GetOpenMode(extension)}" : null;
+        public static string GetOpenModePath(string extension) => extension != null ? $@"{RegistryEx.CLASSES_ROOT}\{GetOpenMode(extension)}" : null;
         private static string GetPerceivedType(string extension) => Registry.GetValue($@"{RegistryEx.CLASSES_ROOT}\{extension}", "PerceivedType", null)?.ToString();
 
         public Scenes Scene { get; set; }
@@ -196,7 +196,6 @@ namespace ContextMenuManager.Controls
                     //Vista系统没有这一项
                     if (WinOsVersion.Current == WinOsVersion.Vista) return;
                     scenePath = MENUPATH_LIBRARY; break;
-                // TODO:此处往下没有进行备份
                 case Scenes.LnkFile:
                     scenePath = GetOpenModePath(".lnk"); break;
                 case Scenes.UwpLnk:
@@ -205,6 +204,7 @@ namespace ContextMenuManager.Controls
                     scenePath = MENUPATH_UWPLNK; break;
                 case Scenes.ExeFile:
                     scenePath = GetSysAssExtPath(".exe"); break;
+                // TODO:此处往下没有进行备份
                 case Scenes.UnknownType:
                     scenePath = MENUPATH_UNKNOWN; break;
                 case Scenes.CustomExtension:
