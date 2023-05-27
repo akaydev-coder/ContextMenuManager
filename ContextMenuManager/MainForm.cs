@@ -120,6 +120,7 @@ namespace ContextMenuManager
             AppString.SideBar.DirectoryType,
             null,
             AppString.SideBar.UnknownType,
+            null,
             AppString.SideBar.MenuAnalysis
         };
         static readonly string[] TypeItemInfos =

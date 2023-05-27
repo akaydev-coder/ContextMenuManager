@@ -204,9 +204,9 @@ namespace ContextMenuManager.Controls
                     scenePath = MENUPATH_UWPLNK; break;
                 case Scenes.ExeFile:
                     scenePath = GetSysAssExtPath(".exe"); break;
-                // TODO:此处往下没有进行备份
                 case Scenes.UnknownType:
                     scenePath = MENUPATH_UNKNOWN; break;
+                // TODO:此处往下没有进行备份
                 case Scenes.CustomExtension:
                     bool isLnk = CurrentExtension?.ToLower() == ".lnk";
                     if(isLnk) scenePath = GetOpenModePath(".lnk");

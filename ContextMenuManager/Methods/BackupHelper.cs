@@ -29,8 +29,17 @@ namespace ContextMenuManager.Methods
         // 文件类型——第一板块
         LnkFile, UwpLnk, ExeFile,
         // 文件类型——第二板块
-        UnknownType, CustomExtension, PerceivedType, DirectoryType,
-        CommandStore, DragDrop, CustomRegPath, MenuAnalysis, CustomExtensionPerceivedType,
+        /* 无 */
+        // 文件类型——第三板块
+        UnknownType,
+        // 文件类型——第四板块
+        /* 无 */
+        // 其他规则
+        /* 无 */
+        // 不予备份的项目
+        MenuAnalysis,
+        CustomExtension, PerceivedType, DirectoryType,
+        CommandStore, DragDrop, CustomRegPath, CustomExtensionPerceivedType,
     };
 
     // 备份项目类型（新增备份类别处3）
@@ -74,6 +83,10 @@ namespace ContextMenuManager.Methods
             AppString.SideBar.WinX,
             // 文件类型——第一板块
             AppString.SideBar.LnkFile, AppString.SideBar.UwpLnk, AppString.SideBar.ExeFile,
+            // 文件类型——第二板块
+            /* 无 */
+            // 文件类型——第三板块
+            AppString.SideBar.UnknownType,
         };
 
         // 右键菜单恢复场景，包含元数据中的场景
@@ -313,6 +326,8 @@ namespace ContextMenuManager.Methods
                     scenePath = MENUPATH_UWPLNK; break;
                 case Scenes.ExeFile:
                     scenePath = GetSysAssExtPath(".exe"); break;
+                case Scenes.UnknownType:
+                    scenePath = MENUPATH_UNKNOWN; break;
             }
 #if DEBUG
             if (AppConfig.EnableLog)
