@@ -28,7 +28,7 @@ namespace ContextMenuManager.Controls
                     // 新增备份项目
                     string deviceName = BackupList.metaData?.Device;
                     string createTime = BackupList.metaData?.CreateTime.ToString("G");
-                    AddItem(new RestoreItem(this, xmlFile, deviceName ?? "未知设备", createTime ?? "未知时间"));
+                    AddItem(new RestoreItem(this, xmlFile, deviceName ?? AppString.Other.Unknown, createTime ?? AppString.Other.Unknown));
                 }
             }
             SortItemByText();
@@ -37,7 +37,7 @@ namespace ContextMenuManager.Controls
 
         private void AddNewBackupItem()
         {
-            NewItem newItem = new NewItem("新建一个备份");
+            NewItem newItem = new NewItem(AppString.Dialog.NewBackupItem);
             InsertItem(newItem, 0);
             newItem.AddNewItem += BackupItems;
         }
@@ -49,11 +49,11 @@ namespace ContextMenuManager.Controls
             List<string> backupScenes;
             using (BackupDialog dlg = new BackupDialog())
             {
-                dlg.Title = "新建一个备份";
-                dlg.DgvTitle = "备份内容：";
+                dlg.Title = AppString.Dialog.NewBackupItem;
+                dlg.DgvTitle = AppString.Dialog.BackupContent;
                 dlg.DgvItems = BackupHelper.BackupScenesText;
-                dlg.CmbTitle = "备份模式：";
-                dlg.CmbItems = new[] { "备份全部菜单项目", "仅备份启用的菜单项目", "仅备份禁用的菜单项目" };
+                dlg.CmbTitle = AppString.Dialog.BackupMode;
+                dlg.CmbItems = new[] { AppString.Dialog.BackupMode1, AppString.Dialog.BackupMode2, AppString.Dialog.BackupMode3 };
                 if (dlg.ShowDialog() != DialogResult.OK) return;
                 switch (dlg.CmbSelectedIndex)
                 {
@@ -77,7 +77,8 @@ namespace ContextMenuManager.Controls
             AddItem(new RestoreItem(this, helper.filePath, deviceName, createTime));
             // 弹窗提示结果
             int backupCount = helper.backupCount;
-            AppMessageBox.Show("备份完成！共处理了" + backupCount.ToString() + "个菜单项目！");
+            AppMessageBox.Show(AppString.Message.BackupSucceeded.Replace("%s", backupCount.ToString()));
+            // .Replace("%s", CurrentExtension);
         }
 
         public void RestoreItems(string filePath)
@@ -89,16 +90,16 @@ namespace ContextMenuManager.Controls
             // 备份版本提示
             if (BackupList.metaData.Version < BackupHelper.BackupVersion)
             {
-                AppMessageBox.Show("该备份版本并非最新版本，部分备份数据可能无法完全恢复！");
+                AppMessageBox.Show(AppString.Message.OldBackupVersion);
             }
             helper.GetBackupRestoreScenesText(BackupList.metaData.BackupScenes);
             using (BackupDialog dlg = new BackupDialog())
             {
-                dlg.Title = "恢复一个备份";
-                dlg.DgvTitle = "恢复内容：";
+                dlg.Title = AppString.Dialog.RestoreBackupItem;
+                dlg.DgvTitle = AppString.Dialog.RestoreContent;
                 dlg.DgvItems = BackupHelper.RestoreScenesText;
-                dlg.CmbTitle = "恢复模式：";
-                dlg.CmbItems = new[] { "不处理不位于备份列表上的菜单项", "禁用不位于备份列表上的菜单项", "启用不位于备份列表上的菜单项" };
+                dlg.CmbTitle = AppString.Dialog.RestoreMode;
+                dlg.CmbItems = new[] { AppString.Dialog.RestoreMode1, AppString.Dialog.RestoreMode2, AppString.Dialog.RestoreMode3 };
                 if (dlg.ShowDialog() != DialogResult.OK) return;
                 switch (dlg.CmbSelectedIndex)
                 {
@@ -117,8 +118,8 @@ namespace ContextMenuManager.Controls
             helper.RestoreItems(filePath, restoreScenes, restoreMode);
             Cursor = Cursors.Default;
             // 弹窗提示结果
-            int changeCount = helper.changeCount;
-            AppMessageBox.Show("恢复完成！共处理了" + changeCount.ToString() + "个菜单项目！");
+            int restoreCount = helper.restoreCount;
+            AppMessageBox.Show(AppString.Message.BackupSucceeded.Replace("%s", restoreCount.ToString()));
         }
     }
 }

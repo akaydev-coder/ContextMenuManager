@@ -94,7 +94,7 @@ namespace ContextMenuManager.Methods
         public static string[] RestoreScenesText;
 
         public int backupCount = 0; // 备份项目总数量
-        public int changeCount = 0; // 备份恢复改变项目数量
+        public int restoreCount = 0; // 恢复改变项目数量
         public string createTime;   // 本次备份文件创建时间
         public string filePath; // 本次备份文件目录
 
@@ -139,7 +139,7 @@ namespace ContextMenuManager.Methods
             ClearBackupList();
             GetBackupRestoreScenes(sceneTexts);
             this.restoreMode = restoreMode;
-            changeCount = 0;
+            restoreCount = 0;
             // 加载备份文件到缓冲区
             LoadBackupList(filePath);
             // 还原缓冲区的备份文件
@@ -267,7 +267,7 @@ namespace ContextMenuManager.Methods
                 {
                     if (item.ItemVisible != itemVisible)
                     {
-                        changeCount++;
+                        restoreCount++;
                         return true;
                     }
                     else
@@ -279,7 +279,7 @@ namespace ContextMenuManager.Methods
             if ((restoreMode == RestoreMode.DisableNotOnList && itemVisible) || 
                 (restoreMode == RestoreMode.EnableNotOnList && !itemVisible))
             {
-                changeCount++;
+                restoreCount++;
                 return true;
             }
             return false;

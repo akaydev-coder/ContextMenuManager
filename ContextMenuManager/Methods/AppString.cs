@@ -82,6 +82,7 @@ namespace ContextMenuManager.Methods
             public static string Dictionaries { get; set; }
             public static string AppLanguage { get; set; }
             public static string Donate { get; set; }
+            public static string BackupRestore { get; set; }
         }
 
         /// <summary>状态栏</summary>
@@ -213,6 +214,18 @@ namespace ContextMenuManager.Methods
             public static string OldTranslation { get; set; }
             public static string NewTranslation { get; set; }
             public static string DonateInfo { get; set; }
+            public static string NewBackupItem { get; set; }
+            public static string BackupContent { get; set; }
+            public static string BackupMode { get; set; }
+            public static string RestoreBackupItem { get; set; }
+            public static string RestoreContent { get; set; }
+            public static string RestoreMode { get; set; }
+            public static string BackupMode1 { get; set; }
+            public static string BackupMode2 { get; set; }
+            public static string BackupMode3 { get; set; }
+            public static string RestoreMode1 { get; set; }
+            public static string RestoreMode2 { get; set; }
+            public static string RestoreMode3 { get; set; }
         }
 
         /// <summary>消息</summary>
@@ -253,6 +266,9 @@ namespace ContextMenuManager.Methods
             public static string WebDataReadFailed { get; set; }
             public static string OpenWebUrl { get; set; }
             public static string SelectSubMenuMode { get; set; }
+            public static string OldBackupVersion { get; set; }
+            public static string BackupSucceeded { get; set; }
+            public static string RestoreSucceeded { get; set; }
         }
 
         /// <summary>提示文本</summary>
@@ -328,6 +344,8 @@ namespace ContextMenuManager.Methods
             public static string SetPerceivedType { get; set; }
             public static string SetDefaultDropEffect { get; set; }
             public static string TopMost { get; set; }
+            public static string Unknown { get; set; }
+            public static string RestoreItemText { get; set; }
         }
     }
 }

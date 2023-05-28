@@ -166,7 +166,7 @@ namespace ContextMenuManager
         {
             AppString.SideBar.AppSetting,
             AppString.SideBar.AppLanguage,
-            "备份恢复",
+            AppString.SideBar.BackupRestore,
             AppString.SideBar.Dictionaries,
             AppString.SideBar.AboutApp,
             AppString.SideBar.Donate,

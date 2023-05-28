@@ -1,4 +1,5 @@
 ﻿using BluePointLilac.Methods;
+using ContextMenuManager.Methods;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -146,7 +147,7 @@ namespace BluePointLilac.Controls
             readonly CheckBox checkAll = new CheckBox
             {
                 Name = "CheckAll",
-                Text = "全选",
+                Text = AppString.Dialog.SelectAll,
                 AutoSize = true,
             };
 
@@ -179,7 +180,7 @@ namespace BluePointLilac.Controls
             {
                 Controls.AddRange(new Control[] { dgvInfo, checkAll, dgvItems, cmbInfo, cmbItems, btnOK, btnCancel });
                 int margin = 20.DpiZoom();
-                int cmbItemsWidth = 270.DpiZoom();
+                int cmbItemsWidth = 300.DpiZoom();
                 int dgvHeight = 300.DpiZoom();
                 dgvInfo.Top = checkAll.Top = margin;
                 dgvInfo.Left = dgvItems.Left = cmbInfo.Left = margin;
