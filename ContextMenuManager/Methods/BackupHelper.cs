@@ -60,8 +60,9 @@ namespace ContextMenuManager.Methods
     // 恢复模式
     public enum RestoreMode
     {
-        NotHandleNotOnList,     // 启用备份列表上可见的菜单项，禁用备份列表上不可见的菜单项，不处理不存在于备份列表上的菜单项
-        DisableNotOnList,       // 启用备份列表上可见的菜单项，禁用备份列表上不可见以及不存在于备份列表上的菜单项
+        NotHandleNotOnList,     // 启用备份列表上可见的菜单项，禁用备份列表上不可见的菜单项，不处理不位于备份列表上的菜单项
+        DisableNotOnList,       // 启用备份列表上可见的菜单项，禁用备份列表上不可见以及不位于备份列表上的菜单项
+        EnableNotOnList,        // 启用备份列表上可见的菜单项以及不位于备份列表上的菜单项，禁用备份列表上不可见
     };
 
     sealed class BackupHelper
@@ -275,15 +276,13 @@ namespace ContextMenuManager.Methods
                     }
                 }
             }
-            switch (restoreMode)
+            if ((restoreMode == RestoreMode.DisableNotOnList && itemVisible) || 
+                (restoreMode == RestoreMode.EnableNotOnList && !itemVisible))
             {
-                case RestoreMode.DisableNotOnList:
-                    if (itemVisible) changeCount++;
-                    return itemVisible;
-                case RestoreMode.NotHandleNotOnList:
-                default:
-                    return false;
+                changeCount++;
+                return true;
             }
+            return false;
         }
 
         /*******************************ShellList.cs************************************/

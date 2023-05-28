@@ -98,9 +98,18 @@ namespace ContextMenuManager.Controls
                 dlg.DgvTitle = "恢复内容：";
                 dlg.DgvItems = BackupHelper.RestoreScenesText;
                 dlg.CmbTitle = "恢复模式：";
-                dlg.CmbItems = new[] { "不处理不存在于备份列表上的菜单项", "禁用不存在于备份列表上的菜单项" };
+                dlg.CmbItems = new[] { "不处理不位于备份列表上的菜单项", "禁用不位于备份列表上的菜单项", "启用不位于备份列表上的菜单项" };
                 if (dlg.ShowDialog() != DialogResult.OK) return;
-                restoreMode = dlg.CmbSelectedIndex == 0 ? RestoreMode.NotHandleNotOnList : RestoreMode.DisableNotOnList;
+                switch (dlg.CmbSelectedIndex)
+                {
+                    case 0:
+                    default:
+                        restoreMode = RestoreMode.NotHandleNotOnList; break;
+                    case 1:
+                        restoreMode = RestoreMode.DisableNotOnList; break;
+                    case 2:
+                        restoreMode = RestoreMode.EnableNotOnList; break;
+                }
                 restoreScenes = dlg.DgvSelectedItems;
             }
             // 开始恢复项目
