@@ -78,7 +78,6 @@ namespace ContextMenuManager.Controls
             // 弹窗提示结果
             int backupCount = helper.backupCount;
             AppMessageBox.Show(AppString.Message.BackupSucceeded.Replace("%s", backupCount.ToString()));
-            // .Replace("%s", CurrentExtension);
         }
 
         public void RestoreItems(string filePath)

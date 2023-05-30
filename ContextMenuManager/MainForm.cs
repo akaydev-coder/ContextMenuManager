@@ -134,6 +134,7 @@ namespace ContextMenuManager
             AppString.StatusBar.DirectoryType,
             null,
             AppString.StatusBar.UnknownType,
+            null,
             AppString.StatusBar.MenuAnalysis
         };
 
