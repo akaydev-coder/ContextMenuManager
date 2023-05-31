@@ -118,7 +118,7 @@ namespace ContextMenuManager.Controls
             Cursor = Cursors.Default;
             // 弹窗提示结果
             int restoreCount = helper.restoreCount;
-            AppMessageBox.Show(AppString.Message.BackupSucceeded.Replace("%s", restoreCount.ToString()));
+            AppMessageBox.Show(AppString.Message.RestoreSucceeded.Replace("%s", restoreCount.ToString()));
         }
     }
 }

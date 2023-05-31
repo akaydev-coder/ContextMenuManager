@@ -207,29 +207,21 @@ namespace ContextMenuManager.Controls
                 case Scenes.UnknownType:
                     scenePath = MENUPATH_UNKNOWN; break;
                 // TODO:此处往下没有进行备份
-                case Scenes.CustomExtension:
+                case Scenes.CustomExtension: // 自选格式
                     bool isLnk = CurrentExtension?.ToLower() == ".lnk";
                     if(isLnk) scenePath = GetOpenModePath(".lnk");
                     else scenePath = GetSysAssExtPath(CurrentExtension);
                     break;
-                case Scenes.PerceivedType:
+                case Scenes.PerceivedType: // 感知类型
                     scenePath = GetSysAssExtPath(CurrentPerceivedType); break;
-                case Scenes.DirectoryType:
+                case Scenes.DirectoryType: // 目录类型
                     if (CurrentDirectoryType == null) scenePath = null;
                     else scenePath = GetSysAssExtPath($"Directory.{CurrentDirectoryType}"); break;
-                case Scenes.MenuAnalysis:
+                case Scenes.MenuAnalysis: // 菜单分析
                     AddItem(new SelectItem(Scene));
                     LoadAnalysisItems();
                     return;
-                case Scenes.CustomRegPath:
-                    scenePath = CurrentCustomRegPath; break;
-                case Scenes.CommandStore:
-                    //Vista系统没有这一项
-                    if (WinOsVersion.Current == WinOsVersion.Vista) return;
-                    AddNewItem(RegistryEx.GetParentPath(ShellItem.CommandStorePath));
-                    LoadStoreItems();
-                    return;
-                case Scenes.DragDrop:
+                case Scenes.DragDrop: // 右键拖拽
                     AddItem(new SelectItem(Scene));
                     AddNewItem(MENUPATH_FOLDER);
                     LoadShellExItems(GetShellExPath(MENUPATH_FOLDER));
@@ -237,18 +229,16 @@ namespace ContextMenuManager.Controls
                     LoadShellExItems(GetShellExPath(MENUPATH_DRIVE));
                     LoadShellExItems(GetShellExPath(MENUPATH_ALLOBJECTS));
                     return;
+                case Scenes.CommandStore: // 公共引用
+                    //Vista系统没有这一项
+                    if (WinOsVersion.Current == WinOsVersion.Vista) return;
+                    AddNewItem(RegistryEx.GetParentPath(ShellItem.CommandStorePath));
+                    LoadStoreItems();
+                    return;
+                case Scenes.CustomRegPath: // 自选路径
+                    scenePath = CurrentCustomRegPath; break;
             }
             AddNewItem(scenePath); // 新建一个菜单项目
-#if DEBUG
-            if (AppConfig.EnableLog)
-            {
-                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
-                {
-                    sw.WriteLine($@"LoadShellListItems: {Scene}");
-                }
-            }
-            int i = 0;
-#endif
             LoadItems(scenePath);
             if(WinOsVersion.Current >= WinOsVersion.Win10)
             {
@@ -259,60 +249,14 @@ namespace ContextMenuManager.Controls
                 case Scenes.Background:
                     VisibleRegRuleItem item = new VisibleRegRuleItem(VisibleRegRuleItem.CustomFolder);
                     AddItem(item);
-#if DEBUG
-                    string regPath = item.RegPath;
-                    string valueName = item.ValueName;
-                    string itemName = item.Text;
-                    bool ifItemInMenu = item.ItemVisible;
-                    i++;
-                    if (AppConfig.EnableLog)
-                    {
-                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
-                        {
-                            sw.WriteLine("\tBackupAddedItems");
-                            sw.WriteLine("\t\t" + $@"{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
-                        }
-                    }
-#endif
-                    
                     break;
                 case Scenes.Computer:
                     item = new VisibleRegRuleItem(VisibleRegRuleItem.NetworkDrive);
                     AddItem(item);
-#if DEBUG
-                    regPath = item.RegPath;
-                    valueName = item.ValueName;
-                    itemName = item.Text;
-                    ifItemInMenu = item.ItemVisible;
-                    i++;
-                    if (AppConfig.EnableLog)
-                    {
-                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
-                        {
-                            sw.WriteLine("\tBackupAddedItems");
-                            sw.WriteLine("\t\t" + $@"{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
-                        }
-                    }
-#endif
                     break;
                 case Scenes.RecycleBin:
                     item = new VisibleRegRuleItem(VisibleRegRuleItem.RecycleBinProperties);
                     AddItem(item);
-#if DEBUG
-                    regPath = item.RegPath;
-                    valueName = item.ValueName;
-                    itemName = item.Text;
-                    ifItemInMenu = item.ItemVisible;
-                    i++;
-                    if (AppConfig.EnableLog)
-                    {
-                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
-                        {
-                            sw.WriteLine("\tBackupAddedItems");
-                            sw.WriteLine("\t\t" + $@"{i}. {valueName} {itemName} {ifItemInMenu} {regPath}");
-                        }
-                    }
-#endif
                     break;
                 case Scenes.Library:
                     LoadItems(MENUPATH_LIBRARY_BACKGROUND);
@@ -325,8 +269,10 @@ namespace ContextMenuManager.Controls
                 case Scenes.PerceivedType:
                 case Scenes.DirectoryType:
                 case Scenes.CustomRegPath:
-                    InsertItem(new SelectItem(Scene), 0);
-                    if(Scene == Scenes.CustomExtension && CurrentExtension != null)
+                    InsertItem(new SelectItem(Scene), 0); // 请选择一个文件扩展名项目
+                    // 自选文件扩展名后加载对应的右键菜单
+                    // TODO:此处往下没有进行备份
+                    if (Scene == Scenes.CustomExtension && CurrentExtension != null)
                     {
                         LoadItems(GetOpenModePath(CurrentExtension));
                         InsertItem(new SelectItem(Scenes.CustomExtensionPerceivedType), 1);

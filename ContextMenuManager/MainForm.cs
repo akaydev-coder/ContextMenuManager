@@ -70,6 +70,7 @@ namespace ContextMenuManager
         readonly BackupListBox backupListBox = new BackupListBox();
         readonly ExplorerRestarter explorerRestarter = new ExplorerRestarter();
 
+        // 主页
         static readonly string[] GeneralItems =
         {
             AppString.SideBar.File,
@@ -109,6 +110,7 @@ namespace ContextMenuManager
             AppString.StatusBar.WinX
         };
 
+        // 文件类型
         static readonly string[] TypeItems =
         {
             AppString.SideBar.LnkFile,
@@ -138,6 +140,7 @@ namespace ContextMenuManager
             AppString.StatusBar.MenuAnalysis
         };
 
+        // 其他规则
         static readonly string[] OtherRuleItems =
         {
             AppString.SideBar.EnhanceMenu,
@@ -163,6 +166,7 @@ namespace ContextMenuManager
             AppString.StatusBar.IEMenu
         };
 
+        // 关于
         static readonly string[] AboutItems =
         {
             AppString.SideBar.AppSetting,
@@ -209,6 +213,7 @@ namespace ContextMenuManager
             Scenes.DirectoryType,
             null,
             Scenes.UnknownType,
+            null,
             Scenes.MenuAnalysis
         };
 
