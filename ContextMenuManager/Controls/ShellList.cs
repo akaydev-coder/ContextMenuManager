@@ -206,21 +206,21 @@ namespace ContextMenuManager.Controls
                     scenePath = GetSysAssExtPath(".exe"); break;
                 case Scenes.UnknownType:
                     scenePath = MENUPATH_UNKNOWN; break;
-                // TODO:此处往下没有进行备份
-                case Scenes.CustomExtension: // 自选格式
+                case Scenes.CustomExtension:
                     bool isLnk = CurrentExtension?.ToLower() == ".lnk";
                     if(isLnk) scenePath = GetOpenModePath(".lnk");
                     else scenePath = GetSysAssExtPath(CurrentExtension);
                     break;
-                case Scenes.PerceivedType: // 感知类型
+                case Scenes.PerceivedType:
                     scenePath = GetSysAssExtPath(CurrentPerceivedType); break;
-                case Scenes.DirectoryType: // 目录类型
+                case Scenes.DirectoryType:
                     if (CurrentDirectoryType == null) scenePath = null;
                     else scenePath = GetSysAssExtPath($"Directory.{CurrentDirectoryType}"); break;
-                case Scenes.MenuAnalysis: // 菜单分析
+                case Scenes.MenuAnalysis:
                     AddItem(new SelectItem(Scene));
                     LoadAnalysisItems();
                     return;
+                // TODO:此处往下没有进行备份
                 case Scenes.DragDrop: // 右键拖拽
                     AddItem(new SelectItem(Scene));
                     AddNewItem(MENUPATH_FOLDER);

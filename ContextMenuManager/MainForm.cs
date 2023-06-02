@@ -116,13 +116,11 @@ namespace ContextMenuManager
             AppString.SideBar.LnkFile,
             AppString.SideBar.UwpLnk,
             AppString.SideBar.ExeFile,
+            AppString.SideBar.UnknownType,
             null,
             AppString.SideBar.CustomExtension,
             AppString.SideBar.PerceivedType,
             AppString.SideBar.DirectoryType,
-            null,
-            AppString.SideBar.UnknownType,
-            null,
             AppString.SideBar.MenuAnalysis
         };
         static readonly string[] TypeItemInfos =
@@ -130,13 +128,11 @@ namespace ContextMenuManager
             AppString.StatusBar.LnkFile,
             AppString.StatusBar.UwpLnk,
             AppString.StatusBar.ExeFile,
+            AppString.StatusBar.UnknownType,
             null,
             AppString.StatusBar.CustomExtension,
             AppString.StatusBar.PerceivedType,
             AppString.StatusBar.DirectoryType,
-            null,
-            AppString.StatusBar.UnknownType,
-            null,
             AppString.StatusBar.MenuAnalysis
         };
 
@@ -207,13 +203,11 @@ namespace ContextMenuManager
             Scenes.LnkFile,
             Scenes.UwpLnk,
             Scenes.ExeFile,
+            Scenes.UnknownType,
             null,
             Scenes.CustomExtension,
             Scenes.PerceivedType,
             Scenes.DirectoryType,
-            null,
-            Scenes.UnknownType,
-            null,
             Scenes.MenuAnalysis
         };
 

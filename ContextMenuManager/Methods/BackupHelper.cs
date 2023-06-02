@@ -27,18 +27,10 @@ namespace ContextMenuManager.Methods
         // 主页——第三板块
         WinX,
         // 文件类型——第一板块
-        LnkFile, UwpLnk, ExeFile,
-        // 文件类型——第二板块
-        /* 无 */
-        // 文件类型——第三板块
-        UnknownType,
-        // 文件类型——第四板块
-        /* 无 */
+        LnkFile, UwpLnk, ExeFile, UnknownType,
+        // 文件类型——第二板块（不予备份）
+        CustomExtension, PerceivedType, DirectoryType, MenuAnalysis,
         // 其他规则
-        /* 无 */
-        // 不予备份的项目
-        MenuAnalysis,
-        CustomExtension, PerceivedType, DirectoryType,
         CommandStore, DragDrop, CustomRegPath, CustomExtensionPerceivedType,
     };
 
@@ -83,11 +75,10 @@ namespace ContextMenuManager.Methods
             // 主页——第三板块
             AppString.SideBar.WinX,
             // 文件类型——第一板块
-            AppString.SideBar.LnkFile, AppString.SideBar.UwpLnk, AppString.SideBar.ExeFile,
-            // 文件类型——第二板块
-            /* 无 */
-            // 文件类型——第三板块
-            AppString.SideBar.UnknownType,
+            AppString.SideBar.LnkFile, AppString.SideBar.UwpLnk, AppString.SideBar.ExeFile, AppString.SideBar.UnknownType,
+            // 文件类型——第二板块（不予备份）
+            null, null, null, null,
+            // 其他规则
         };
 
         // 右键菜单恢复场景，包含元数据中的场景
