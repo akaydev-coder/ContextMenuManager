@@ -81,9 +81,9 @@ namespace ContextMenuManager.Controls
             AppString.Dialog.MoveDropEffect, AppString.Dialog.CreateLinkDropEffect
         };
 
-        private enum DropEffect { Default = 0, Copy = 1, Move = 2, CreateLink = 4 }
+        public enum DropEffect { Default = 0, Copy = 1, Move = 2, CreateLink = 4 }
 
-        private static DropEffect DefaultDropEffect
+        public static DropEffect DefaultDropEffect
         {
             get
             {
@@ -220,8 +220,7 @@ namespace ContextMenuManager.Controls
                     AddItem(new SelectItem(Scene));
                     LoadAnalysisItems();
                     return;
-                // TODO:此处往下没有进行备份
-                case Scenes.DragDrop: // 右键拖拽
+                case Scenes.DragDrop:
                     AddItem(new SelectItem(Scene));
                     AddNewItem(MENUPATH_FOLDER);
                     LoadShellExItems(GetShellExPath(MENUPATH_FOLDER));
@@ -229,13 +228,13 @@ namespace ContextMenuManager.Controls
                     LoadShellExItems(GetShellExPath(MENUPATH_DRIVE));
                     LoadShellExItems(GetShellExPath(MENUPATH_ALLOBJECTS));
                     return;
-                case Scenes.CommandStore: // 公共引用
+                case Scenes.PublicReferences:
                     //Vista系统没有这一项
                     if (WinOsVersion.Current == WinOsVersion.Vista) return;
                     AddNewItem(RegistryEx.GetParentPath(ShellItem.CommandStorePath));
                     LoadStoreItems();
                     return;
-                case Scenes.CustomRegPath: // 自选路径
+                case Scenes.CustomRegPath:
                     scenePath = CurrentCustomRegPath; break;
             }
             AddNewItem(scenePath); // 新建一个菜单项目
@@ -271,7 +270,6 @@ namespace ContextMenuManager.Controls
                 case Scenes.CustomRegPath:
                     InsertItem(new SelectItem(Scene), 0); // 请选择一个文件扩展名项目
                     // 自选文件扩展名后加载对应的右键菜单
-                    // TODO:此处往下没有进行备份
                     if (Scene == Scenes.CustomExtension && CurrentExtension != null)
                     {
                         LoadItems(GetOpenModePath(CurrentExtension));
@@ -376,32 +374,12 @@ namespace ContextMenuManager.Controls
 
         private void LoadStoreItems()
         {
-#if DEBUG
-            if (AppConfig.EnableLog)
-            {
-                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
-                {
-                    sw.WriteLine("\tLoadStoreItems: ");
-                }
-            }
-            int i = 0;
-#endif
             using (RegistryKey shellKey = RegistryEx.GetRegistryKey(ShellItem.CommandStorePath))
             {
                 foreach(string itemName in shellKey.GetSubKeyNames())
                 {
                     if(AppConfig.HideSysStoreItems && itemName.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase)) continue;
                     AddItem(new StoreShellItem($@"{ShellItem.CommandStorePath}\{itemName}", true, false));
-#if DEBUG
-                    i++;
-                    if (AppConfig.EnableLog)
-                    {
-                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
-                        {
-                            sw.WriteLine("\t\t" + $@"{i}. {itemName}");
-                        }
-                    }
-#endif
                 }
             }
         }
@@ -438,15 +416,6 @@ namespace ContextMenuManager.Controls
 
         private void LoadAnalysisItems()
         {
-#if DEBUG
-            if (AppConfig.EnableLog)
-            {
-                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
-                {
-                    sw.WriteLine("\tLoadAnalysisItems: ");
-                }
-            }
-#endif
             if (CurrentFileObjectPath == null) return;
 
             void AddFileItems(string filePath)
@@ -500,7 +469,7 @@ namespace ContextMenuManager.Controls
             else if(Directory.Exists(CurrentFileObjectPath)) AddDirItems(CurrentFileObjectPath);
         }
 
-        sealed class SelectItem : MyListItem
+        public class SelectItem : MyListItem
         {
             public SelectItem(Scenes scene)
             {
@@ -838,7 +807,7 @@ namespace ContextMenuManager.Controls
             newItem.AddNewItem += () =>
             {
                 bool isShell;
-                if (Scene == Scenes.CommandStore) isShell = true;
+                if (Scene == Scenes.PublicReferences) isShell = true;
                 else if (Scene == Scenes.DragDrop) isShell = false;
                 else
                 {
@@ -910,7 +879,7 @@ namespace ContextMenuManager.Controls
                     if (Controls[i] is NewItem)
                     {
                         ShellItem item;
-                        if (Scene != Scenes.CommandStore) item = new ShellItem(dlg.NewItemRegPath);
+                        if (Scene != Scenes.PublicReferences) item = new ShellItem(dlg.NewItemRegPath);
                         else item = new StoreShellItem(dlg.NewItemRegPath, true, false);
                         InsertItem(item, i + 1);
                         break;

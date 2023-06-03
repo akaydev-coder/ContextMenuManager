@@ -121,6 +121,7 @@ namespace ContextMenuManager
             AppString.SideBar.CustomExtension,
             AppString.SideBar.PerceivedType,
             AppString.SideBar.DirectoryType,
+            null,
             AppString.SideBar.MenuAnalysis
         };
         static readonly string[] TypeItemInfos =
@@ -133,6 +134,7 @@ namespace ContextMenuManager
             AppString.StatusBar.CustomExtension,
             AppString.StatusBar.PerceivedType,
             AppString.StatusBar.DirectoryType,
+            null,
             AppString.StatusBar.MenuAnalysis
         };
 
@@ -208,6 +210,7 @@ namespace ContextMenuManager
             Scenes.CustomExtension,
             Scenes.PerceivedType,
             Scenes.DirectoryType,
+            null,
             Scenes.MenuAnalysis
         };
 
@@ -361,7 +364,7 @@ namespace ContextMenuManager
                 case 3:
                     shellList.Scene = Scenes.DragDrop; shellList.LoadItems(); shellList.Visible = true; break;
                 case 4:
-                    shellList.Scene = Scenes.CommandStore; shellList.LoadItems(); shellList.Visible = true; break;
+                    shellList.Scene = Scenes.PublicReferences; shellList.LoadItems(); shellList.Visible = true; break;
                 case 5:
                     shellList.Scene = Scenes.CustomRegPath; shellList.LoadItems(); shellList.Visible = true; break;
                 case 7:

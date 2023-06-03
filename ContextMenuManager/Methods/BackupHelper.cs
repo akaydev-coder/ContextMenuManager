@@ -29,16 +29,19 @@ namespace ContextMenuManager.Methods
         // 文件类型——第一板块
         LnkFile, UwpLnk, ExeFile, UnknownType,
         // 文件类型——第二板块（不予备份）
-        CustomExtension, PerceivedType, DirectoryType, MenuAnalysis,
-        // 其他规则
-        CommandStore, DragDrop, CustomRegPath, CustomExtensionPerceivedType,
+        // 其他规则——第一板块
+
+        // 其他规则——第二板块
+        DragDrop, PublicReferences,
+        // 不予备份
+        CustomExtension, PerceivedType, DirectoryType, MenuAnalysis, CustomExtensionPerceivedType, CustomRegPath,
     };
 
     // 备份项目类型（新增备份类别处3）
     public enum BackupItemType
     {
         ShellItem, ShellExItem, UwpModelItem, VisibleRegRuleItem, ShellNewItem, SendToItem,
-        OpenWithItem, WinXItem
+        OpenWithItem, WinXItem, SelectItem, StoreShellItem
     }
 
     // 备份选项
@@ -77,8 +80,10 @@ namespace ContextMenuManager.Methods
             // 文件类型——第一板块
             AppString.SideBar.LnkFile, AppString.SideBar.UwpLnk, AppString.SideBar.ExeFile, AppString.SideBar.UnknownType,
             // 文件类型——第二板块（不予备份）
-            null, null, null, null,
-            // 其他规则
+            // 其他规则——第一板块
+
+            // 其他规则——第二板块
+            AppString.SideBar.DragDrop, AppString.SideBar.PublicReferences,
         };
 
         // 右键菜单恢复场景，包含元数据中的场景
@@ -253,7 +258,7 @@ namespace ContextMenuManager.Methods
         {
             foreach (BackupItem item in sceneRestoreList)
             {
-                // 成功匹配到后的处理方式
+                // 成功匹配到后的处理方式：KeyName和ItemType匹配后检查ItemVisible
                 if (item.KeyName == keyName && item.ItemType == itemType)
                 {
                     if (item.ItemVisible != itemVisible)
@@ -274,6 +279,44 @@ namespace ContextMenuManager.Methods
                 return true;
             }
             return false;
+        }
+
+        // SelectItem有多个选项，单独备份和恢复
+        private void BackupRestoreSelectItem(SelectItem item, string keyName, Scenes currentScene, bool backup)
+        {
+            if (backup)
+            {
+                AddItem(keyName, BackupItemType.SelectItem, true, currentScene);
+            }
+            else
+            {
+                foreach (BackupItem restoreItem in sceneRestoreList)
+                {
+                    // 成功匹配到后的处理方式：只需检查KeyName和ItemType
+                    if (restoreItem.ItemType == BackupItemType.SelectItem)
+                    {
+                        string restoreKeyName = restoreItem.KeyName;
+                        if (restoreKeyName != keyName)
+                        {
+                            int keyNameIndex;
+                            int.TryParse(restoreItem.KeyName, out keyNameIndex);
+                            switch (currentScene)
+                            {
+                                case Scenes.DragDrop:
+                                    DropEffect dropEffect = (DropEffect)keyNameIndex;
+                                    if (DefaultDropEffect != dropEffect)
+                                    {
+                                        DefaultDropEffect = dropEffect;
+                                    }
+                                    break;
+                            }
+                            restoreCount++;
+                        }
+                    }
+                }
+            }
+            item.Dispose();
+            return;
         }
 
         /*******************************ShellList.cs************************************/
@@ -318,6 +361,20 @@ namespace ContextMenuManager.Methods
                     scenePath = GetSysAssExtPath(".exe"); break;
                 case Scenes.UnknownType:
                     scenePath = MENUPATH_UNKNOWN; break;
+                case Scenes.DragDrop:
+                    SelectItem item = new SelectItem(currentScene);
+                    string dropEffect = ((int)DefaultDropEffect).ToString();
+                    BackupRestoreSelectItem(item, dropEffect, currentScene, backup);
+                    GetBackupShellExItems(GetShellExPath(MENUPATH_FOLDER), backup);
+                    GetBackupShellExItems(GetShellExPath(MENUPATH_DIRECTORY), backup);
+                    GetBackupShellExItems(GetShellExPath(MENUPATH_DRIVE), backup);
+                    GetBackupShellExItems(GetShellExPath(MENUPATH_ALLOBJECTS), backup);
+                    return;
+                case Scenes.PublicReferences:
+                    //Vista系统没有这一项
+                    if (WinOsVersion.Current == WinOsVersion.Vista) return;
+                    GetBackupStoreItems(backup);
+                    return;
             }
 #if DEBUG
             if (AppConfig.EnableLog)
@@ -526,6 +583,19 @@ namespace ContextMenuManager.Methods
                         }
 #endif
                     }
+                }
+            }
+        }
+
+        private void GetBackupStoreItems(bool backup)
+        {
+            using (RegistryKey shellKey = RegistryEx.GetRegistryKey(ShellItem.CommandStorePath))
+            {
+                foreach (string itemName in shellKey.GetSubKeyNames())
+                {
+                    if (AppConfig.HideSysStoreItems && itemName.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase)) continue;
+                    StoreShellItem item = new StoreShellItem($@"{ShellItem.CommandStorePath}\{itemName}", true, false);
+                    
                 }
             }
         }
