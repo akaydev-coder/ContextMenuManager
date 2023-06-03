@@ -32,9 +32,9 @@ namespace ContextMenuManager.Methods
         // 其他规则——第一板块
 
         // 其他规则——第二板块
-        DragDrop, PublicReferences,
+        DragDrop, PublicReferences, InternetExplorer,
         // 其他规则——第三板块（不予备份）
-        // 不予备份
+        // 不予备份的场景
         CustomExtension, PerceivedType, DirectoryType, MenuAnalysis, CustomRegPath, CustomExtensionPerceivedType,
     };
 
@@ -42,7 +42,7 @@ namespace ContextMenuManager.Methods
     public enum BackupItemType
     {
         ShellItem, ShellExItem, UwpModelItem, VisibleRegRuleItem, ShellNewItem, SendToItem,
-        OpenWithItem, WinXItem, SelectItem, StoreShellItem
+        OpenWithItem, WinXItem, SelectItem, StoreShellItem, IEItem
     }
 
     // 备份选项
@@ -84,7 +84,7 @@ namespace ContextMenuManager.Methods
             // 其他规则——第一板块
 
             // 其他规则——第二板块
-            AppString.SideBar.DragDrop, AppString.SideBar.PublicReferences,
+            AppString.SideBar.DragDrop, AppString.SideBar.PublicReferences, AppString.SideBar.IEMenu,
         };
 
         // 右键菜单恢复场景，包含元数据中的场景
@@ -187,20 +187,17 @@ namespace ContextMenuManager.Methods
         {
             switch (currentScene)
             {
-                case Scenes.New:
-                    // 新建
+                case Scenes.New:    // 新建
                     GetShellNewListBackupItems(backup); break;
-                case Scenes.SendTo:
-                    // 发送到
+                case Scenes.SendTo: // 发送到
                     GetSendToListItems(backup); break;
-                case Scenes.OpenWith:
-                    // 打开方式
+                case Scenes.OpenWith:   // 打开方式
                     GetOpenWithListItems(backup); break;
-                case Scenes.WinX:
-                    // Win+X
+                case Scenes.WinX:   // Win+X
                     GetWinXListItems(backup); break;
-                default:
-                    // 位于ShellList.cs内的备份项目
+                case Scenes.InternetExplorer:   // IE浏览器
+                    GetIEItems(backup); break;
+                default:    // 位于ShellList.cs内的备份项目
                     GetShellListItems(backup); break;
             }
         }
@@ -251,6 +248,8 @@ namespace ContextMenuManager.Methods
                             ((WinXItem)item).ItemVisible = !ifItemInMenu; break;
                         case BackupItemType.StoreShellItem:
                             ((StoreShellItem)item).ItemVisible = !ifItemInMenu; break;
+                        case BackupItemType.IEItem:
+                            ((IEItem)item).ItemVisible = !ifItemInMenu; break;
                     }
                 }
             }
@@ -1036,6 +1035,38 @@ namespace ContextMenuManager.Methods
                 {
                     ExplorerRestarter.Show();
                     AppMessageBox.Show(AppString.Message.WinXSorted);
+                }
+            }
+        }
+
+        /*******************************IEList.cs************************************/
+
+        private void GetIEItems(bool backup)
+        {
+            List<string> names = new List<string>();
+            using (RegistryKey ieKey = RegistryEx.GetRegistryKey(IEList.IEPath))
+            {
+                if (ieKey == null) return;
+                foreach (string part in IEItem.MeParts)
+                {
+                    using (RegistryKey meKey = ieKey.OpenSubKey(part))
+                    {
+                        if (meKey == null) continue;
+                        foreach (string keyName in meKey.GetSubKeyNames())
+                        {
+                            if (names.Contains(keyName, StringComparer.OrdinalIgnoreCase)) continue;
+                            using (RegistryKey key = meKey.OpenSubKey(keyName))
+                            {
+                                if (!string.IsNullOrEmpty(key.GetValue("")?.ToString()))
+                                {
+                                    IEItem item = new IEItem(key.Name);
+                                    bool ifItemInMenu = item.ItemVisible;
+                                    BackupRestoreItem(item, keyName, BackupItemType.IEItem, ifItemInMenu, currentScene, backup);
+                                    names.Add(keyName);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
