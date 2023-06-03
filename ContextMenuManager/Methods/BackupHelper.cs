@@ -247,6 +247,8 @@ namespace ContextMenuManager.Methods
                             ((OpenWithItem)item).ItemVisible = !ifItemInMenu; break;
                         case BackupItemType.WinXItem:
                             ((WinXItem)item).ItemVisible = !ifItemInMenu; break;
+                        case BackupItemType.StoreShellItem:
+                            ((StoreShellItem)item).ItemVisible = !ifItemInMenu; break;
                     }
                 }
             }
