@@ -146,10 +146,10 @@ namespace ContextMenuManager
             null,
             AppString.SideBar.DragDrop,
             AppString.SideBar.PublicReferences,
-            AppString.SideBar.CustomRegPath,
+            AppString.SideBar.IEMenu,
             null,
             AppString.SideBar.GuidBlocked,
-            AppString.SideBar.IEMenu
+            AppString.SideBar.CustomRegPath,
         };
         static readonly string[] OtherRuleItemInfos =
         {
@@ -158,10 +158,10 @@ namespace ContextMenuManager
             null,
             AppString.StatusBar.DragDrop,
             AppString.StatusBar.PublicReferences,
-            AppString.StatusBar.CustomRegPath,
+            AppString.StatusBar.IEMenu,
             null,
             AppString.StatusBar.GuidBlocked,
-            AppString.StatusBar.IEMenu
+            AppString.StatusBar.CustomRegPath,
         };
 
         // 关于
@@ -366,11 +366,11 @@ namespace ContextMenuManager
                 case 4:
                     shellList.Scene = Scenes.PublicReferences; shellList.LoadItems(); shellList.Visible = true; break;
                 case 5:
-                    shellList.Scene = Scenes.CustomRegPath; shellList.LoadItems(); shellList.Visible = true; break;
+                    iEList.LoadItems(); iEList.Visible = true; break;
                 case 7:
                     guidBlockedList.LoadItems(); guidBlockedList.Visible = true; break;
                 case 8:
-                    iEList.LoadItems(); iEList.Visible = true; break;
+                    shellList.Scene = Scenes.CustomRegPath; shellList.LoadItems(); shellList.Visible = true; break;
             }
         }
 

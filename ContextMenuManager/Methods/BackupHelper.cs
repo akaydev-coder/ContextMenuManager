@@ -33,8 +33,9 @@ namespace ContextMenuManager.Methods
 
         // 其他规则——第二板块
         DragDrop, PublicReferences,
+        // 其他规则——第三板块（不予备份）
         // 不予备份
-        CustomExtension, PerceivedType, DirectoryType, MenuAnalysis, CustomExtensionPerceivedType, CustomRegPath,
+        CustomExtension, PerceivedType, DirectoryType, MenuAnalysis, CustomRegPath, CustomExtensionPerceivedType,
     };
 
     // 备份项目类型（新增备份类别处3）
@@ -181,6 +182,7 @@ namespace ContextMenuManager.Methods
         }
 
         // 开始进行备份或恢复
+        // （新增备份类别处5）
         private void GetBackupItems(bool backup)
         {
             switch (currentScene)
@@ -323,7 +325,6 @@ namespace ContextMenuManager.Methods
 
         /*******************************ShellList.cs************************************/
 
-        // （新增备份类别处5）
         private void GetShellListItems(bool backup)
         {
             string scenePath = null;
