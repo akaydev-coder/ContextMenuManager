@@ -589,13 +589,36 @@ namespace ContextMenuManager.Methods
 
         private void GetBackupStoreItems(bool backup)
         {
+#if DEBUG
+            if (AppConfig.EnableLog)
+            {
+                using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                {
+                    sw.WriteLine($@"BackupItems: {currentScene}");
+                }
+            }
+            int i = 0;
+#endif
             using (RegistryKey shellKey = RegistryEx.GetRegistryKey(ShellItem.CommandStorePath))
             {
                 foreach (string itemName in shellKey.GetSubKeyNames())
                 {
                     if (AppConfig.HideSysStoreItems && itemName.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase)) continue;
                     StoreShellItem item = new StoreShellItem($@"{ShellItem.CommandStorePath}\{itemName}", true, false);
-                    
+                    string regPath = item.RegPath;
+                    bool ifItemInMenu = item.ItemVisible;
+                    BackupRestoreItem(item, itemName, BackupItemType.StoreShellItem, ifItemInMenu, currentScene, backup);
+#if DEBUG
+                    i++;
+                    if (AppConfig.EnableLog)
+                    {
+                        using (StreamWriter sw = new StreamWriter(AppConfig.DebugLogPath, true))
+                        {
+                            sw.WriteLine("\tBackupStoreItems");
+                            sw.WriteLine("\t\t" + $@"{i}. {itemName} {itemName} {ifItemInMenu} {regPath}");
+                        }
+                    }
+#endif
                 }
             }
         }
