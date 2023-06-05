@@ -48,8 +48,8 @@ namespace ContextMenuManager.Methods
     // 备份选项
     public enum BackupMode
     {
-        All,    // 备份全部菜单项目
-        OnlyVisible, // 仅备份启用的菜单项目
+        All,            // 备份全部菜单项目
+        OnlyVisible,    // 仅备份启用的菜单项目
         OnlyInvisible   // 仅备份禁用的菜单项目
     };
 
@@ -87,23 +87,20 @@ namespace ContextMenuManager.Methods
             AppString.SideBar.DragDrop, AppString.SideBar.PublicReferences, AppString.SideBar.IEMenu,
         };
 
-        // 右键菜单恢复场景，包含元数据中的场景
-        public static string[] RestoreScenesText;
-
         public int backupCount = 0; // 备份项目总数量
         public int restoreCount = 0; // 恢复改变项目数量
         public string createTime;   // 本次备份文件创建时间
         public string filePath; // 本次备份文件目录
 
         // 获取目前备份恢复场景文字
-        public void GetBackupRestoreScenesText(List<Scenes> scenes)
+        public string[] GetBackupRestoreScenesText(List<Scenes> scenes)
         {
             List<string> scenesTextList = new List<string>();
             foreach(Scenes scene in scenes)
             {
                 scenesTextList.Add(BackupScenesText[(int)scene]);
             }
-            RestoreScenesText = scenesTextList.ToArray();
+            return scenesTextList.ToArray();
         }
 
         // 备份指定场景内容
@@ -111,6 +108,7 @@ namespace ContextMenuManager.Methods
         {
             ClearBackupList();
             GetBackupRestoreScenes(sceneTexts);
+            backup = true;
             this.backupMode = backupMode;
             DateTime dateTime = DateTime.Now;
             string date = DateTime.Today.ToString("yyyy-MM-dd");
@@ -123,7 +121,7 @@ namespace ContextMenuManager.Methods
             metaData.BackupScenes = currentScenes;
             metaData.Version = BackupVersion;
             // 加载备份文件到缓冲区
-            BackupRestoreItems(true);
+            BackupRestoreItems();
             // 保存缓冲区的备份文件
             SaveBackupList(filePath);
             backupCount = GetBackupListCount();
@@ -135,17 +133,19 @@ namespace ContextMenuManager.Methods
         {
             ClearBackupList();
             GetBackupRestoreScenes(sceneTexts);
+            backup = false;
             this.restoreMode = restoreMode;
             restoreCount = 0;
             // 加载备份文件到缓冲区
             LoadBackupList(filePath);
             // 还原缓冲区的备份文件
-            BackupRestoreItems(false);
+            BackupRestoreItems();
             ClearBackupList();
         }
 
         /*******************************内部变量、函数************************************/
 
+        private bool backup;    // 目前备份还是恢复
         private Scenes currentScene;    // 目前处理场景
         private BackupMode backupMode;  // 目前备份模式
         private RestoreMode restoreMode;    // 目前恢复模式
@@ -160,14 +160,14 @@ namespace ContextMenuManager.Methods
                 string text = BackupScenesText[i];
                 if (sceneTexts.Contains(text))
                 {
-                    // 顺序一一对应，直接转换
+                    // 顺序对应，直接转换
                     currentScenes.Add((Scenes)i);
                 }
             }
         }
 
         // 按照目前处理场景逐个备份或恢复
-        private void BackupRestoreItems(bool backup)
+        private void BackupRestoreItems()
         {
             foreach(Scenes scene in currentScenes)
             {
@@ -177,34 +177,34 @@ namespace ContextMenuManager.Methods
                 {
                     LoadTempRestoreList(currentScene);
                 }
-                GetBackupItems(backup);
+                GetBackupItems();
             }
         }
 
         // 开始进行备份或恢复
         // （新增备份类别处5）
-        private void GetBackupItems(bool backup)
+        private void GetBackupItems()
         {
             switch (currentScene)
             {
                 case Scenes.New:    // 新建
-                    GetShellNewListBackupItems(backup); break;
+                    GetShellNewListBackupItems(); break;
                 case Scenes.SendTo: // 发送到
-                    GetSendToListItems(backup); break;
+                    GetSendToListItems(); break;
                 case Scenes.OpenWith:   // 打开方式
-                    GetOpenWithListItems(backup); break;
+                    GetOpenWithListItems(); break;
                 case Scenes.WinX:   // Win+X
-                    GetWinXListItems(backup); break;
+                    GetWinXListItems(); break;
                 case Scenes.InternetExplorer:   // IE浏览器
-                    GetIEItems(backup); break;
+                    GetIEItems(); break;
                 default:    // 位于ShellList.cs内的备份项目
-                    GetShellListItems(backup); break;
+                    GetShellListItems(); break;
             }
         }
 
         /*******************************单个Item处理************************************/
 
-        private void BackupRestoreItem(MyListItem item, string keyName, BackupItemType backupItemType, bool ifItemInMenu, Scenes currentScene, bool backup)
+        private void BackupRestoreItem(MyListItem item, string keyName, BackupItemType backupItemType, bool ifItemInMenu, Scenes currentScene)
         {
             if (backup)
             {
@@ -285,7 +285,7 @@ namespace ContextMenuManager.Methods
         }
 
         // SelectItem有多个选项，单独备份和恢复
-        private void BackupRestoreSelectItem(SelectItem item, string keyName, Scenes currentScene, bool backup)
+        private void BackupRestoreSelectItem(SelectItem item, string keyName, Scenes currentScene)
         {
             if (backup)
             {
@@ -324,7 +324,7 @@ namespace ContextMenuManager.Methods
 
         /*******************************ShellList.cs************************************/
 
-        private void GetShellListItems(bool backup)
+        private void GetShellListItems()
         {
             string scenePath = null;
             switch (currentScene)
@@ -366,16 +366,16 @@ namespace ContextMenuManager.Methods
                 case Scenes.DragDrop:
                     SelectItem item = new SelectItem(currentScene);
                     string dropEffect = ((int)DefaultDropEffect).ToString();
-                    BackupRestoreSelectItem(item, dropEffect, currentScene, backup);
-                    GetBackupShellExItems(GetShellExPath(MENUPATH_FOLDER), backup);
-                    GetBackupShellExItems(GetShellExPath(MENUPATH_DIRECTORY), backup);
-                    GetBackupShellExItems(GetShellExPath(MENUPATH_DRIVE), backup);
-                    GetBackupShellExItems(GetShellExPath(MENUPATH_ALLOBJECTS), backup);
+                    BackupRestoreSelectItem(item, dropEffect, currentScene);
+                    GetBackupShellExItems(GetShellExPath(MENUPATH_FOLDER));
+                    GetBackupShellExItems(GetShellExPath(MENUPATH_DIRECTORY));
+                    GetBackupShellExItems(GetShellExPath(MENUPATH_DRIVE));
+                    GetBackupShellExItems(GetShellExPath(MENUPATH_ALLOBJECTS));
                     return;
                 case Scenes.PublicReferences:
                     //Vista系统没有这一项
                     if (WinOsVersion.Current == WinOsVersion.Vista) return;
-                    GetBackupStoreItems(backup);
+                    GetBackupStoreItems();
                     return;
             }
 #if DEBUG
@@ -389,11 +389,11 @@ namespace ContextMenuManager.Methods
             int i = 0;
 #endif
             // 获取ShellItem与ShellExItem类的备份项目
-            GetBackupItems(scenePath, backup);
+            GetBackupItems(scenePath);
             if (WinOsVersion.Current >= WinOsVersion.Win10)
             {
                 // 获取UwpModeItem类的备份项目
-                GetBackupUwpModeItem(backup);
+                GetBackupUwpModeItem();
             }
             switch (currentScene)
             {
@@ -403,7 +403,7 @@ namespace ContextMenuManager.Methods
                     string valueName = item.ValueName;
                     string itemName = item.Text;
                     bool ifItemInMenu = item.ItemVisible;
-                    BackupRestoreItem(item, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene, backup);
+                    BackupRestoreItem(item, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene);
 #if DEBUG
                     i++;
                     if (AppConfig.EnableLog)
@@ -422,7 +422,7 @@ namespace ContextMenuManager.Methods
                     valueName = item.ValueName;
                     itemName = item.Text;
                     ifItemInMenu = item.ItemVisible;
-                    BackupRestoreItem(item, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene, backup);
+                    BackupRestoreItem(item, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene);
 #if DEBUG
                     i++;
                     if (AppConfig.EnableLog)
@@ -441,7 +441,7 @@ namespace ContextMenuManager.Methods
                     valueName = item.ValueName;
                     itemName = item.Text;
                     ifItemInMenu = item.ItemVisible;
-                    BackupRestoreItem(item, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene, backup);
+                    BackupRestoreItem(item, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene);
 #if DEBUG
                     i++;
                     if (AppConfig.EnableLog)
@@ -469,25 +469,25 @@ namespace ContextMenuManager.Methods
                     for (int j = 0; j < AddedScenePathes.Length; j++)
                     {
                         scenePath = AddedScenePathes[j];
-                        GetBackupShellItems(GetShellPath(scenePath), backup);
-                        GetBackupShellExItems(GetShellExPath(scenePath), backup);
+                        GetBackupShellItems(GetShellPath(scenePath));
+                        GetBackupShellExItems(GetShellExPath(scenePath));
                     }
                     break;
                 case Scenes.ExeFile:
-                    GetBackupItems(GetOpenModePath(".exe"), backup);
+                    GetBackupItems(GetOpenModePath(".exe"));
                     break;
             }
         }
 
-        private void GetBackupItems(string scenePath, bool backup)
+        private void GetBackupItems(string scenePath)
         {
             if (scenePath == null) return;
             RegTrustedInstaller.TakeRegKeyOwnerShip(scenePath);
-            GetBackupShellItems(GetShellPath(scenePath), backup);
-            GetBackupShellExItems(GetShellExPath(scenePath), backup);
+            GetBackupShellItems(GetShellPath(scenePath));
+            GetBackupShellExItems(GetShellExPath(scenePath));
         }
 
-        private void GetBackupShellItems(string shellPath, bool backup)
+        private void GetBackupShellItems(string shellPath)
         {
 #if DEBUG
             if (AppConfig.EnableLog)
@@ -509,7 +509,7 @@ namespace ContextMenuManager.Methods
                     ShellItem item = new ShellItem(regPath);
                     string itemName = item.ItemText;
                     bool ifItemInMenu = item.ItemVisible;
-                    BackupRestoreItem(item, keyName, BackupItemType.ShellItem, ifItemInMenu, currentScene, backup);
+                    BackupRestoreItem(item, keyName, BackupItemType.ShellItem, ifItemInMenu, currentScene);
 #if DEBUG
                     i++;
                     if (AppConfig.EnableLog)
@@ -524,7 +524,7 @@ namespace ContextMenuManager.Methods
             }
         }
 
-        private void GetBackupShellExItems(string shellExPath, bool backup)
+        private void GetBackupShellExItems(string shellExPath)
         {
 #if DEBUG
             if (AppConfig.EnableLog)
@@ -572,7 +572,7 @@ namespace ContextMenuManager.Methods
                             item.FoldGroupItem = groupItem;
                             item.Indent();
                         }
-                        BackupRestoreItem(item, keyName, BackupItemType.ShellExItem, ifItemInMenu, currentScene, backup);
+                        BackupRestoreItem(item, keyName, BackupItemType.ShellExItem, ifItemInMenu, currentScene);
                         names.Add(keyName);
 #if DEBUG
                         i++;
@@ -589,7 +589,7 @@ namespace ContextMenuManager.Methods
             }
         }
 
-        private void GetBackupStoreItems(bool backup)
+        private void GetBackupStoreItems()
         {
 #if DEBUG
             if (AppConfig.EnableLog)
@@ -609,7 +609,7 @@ namespace ContextMenuManager.Methods
                     StoreShellItem item = new StoreShellItem($@"{ShellItem.CommandStorePath}\{itemName}", true, false);
                     string regPath = item.RegPath;
                     bool ifItemInMenu = item.ItemVisible;
-                    BackupRestoreItem(item, itemName, BackupItemType.StoreShellItem, ifItemInMenu, currentScene, backup);
+                    BackupRestoreItem(item, itemName, BackupItemType.StoreShellItem, ifItemInMenu, currentScene);
 #if DEBUG
                     i++;
                     if (AppConfig.EnableLog)
@@ -625,7 +625,7 @@ namespace ContextMenuManager.Methods
             }
         }
 
-        private void GetBackupUwpModeItem(bool backup)
+        private void GetBackupUwpModeItem()
         {
 #if DEBUG
             if (AppConfig.EnableLog)
@@ -658,7 +658,7 @@ namespace ContextMenuManager.Methods
                                 // TODO:修复名称显示错误的问题
                                 string itemName = keyName;  // 右键菜单名称
                                 bool ifItemInMenu = uwpItem.ItemVisible;
-                                BackupRestoreItem(uwpItem, keyName, BackupItemType.UwpModelItem, ifItemInMenu, currentScene, backup);
+                                BackupRestoreItem(uwpItem, keyName, BackupItemType.UwpModelItem, ifItemInMenu, currentScene);
 #if DEBUG
                                 i++;
                                 if (AppConfig.EnableLog)
@@ -705,7 +705,7 @@ namespace ContextMenuManager.Methods
 
         /*******************************ShellNewList.cs************************************/
 
-        private void GetShellNewListBackupItems(bool backup)
+        private void GetShellNewListBackupItems()
         {
 #if DEBUG
             if (AppConfig.EnableLog)
@@ -729,7 +729,7 @@ namespace ContextMenuManager.Methods
                 }
 #endif
                 string[] extensions = (string[])Registry.GetValue(ShellNewPath, "Classes", null);
-                GetShellNewBackupItems(extensions.ToList(), backup);
+                GetShellNewBackupItems(extensions.ToList());
             }
             else
             {
@@ -747,12 +747,12 @@ namespace ContextMenuManager.Methods
                 {
                     extensions.AddRange(Array.FindAll(root.GetSubKeyNames(), keyName => keyName.StartsWith(".")));
                     if (WinOsVersion.Current < WinOsVersion.Win10) extensions.Add("Briefcase");//公文包(Win10没有)
-                    GetShellNewBackupItems(extensions, backup);
+                    GetShellNewBackupItems(extensions);
                 }
             }
         }
 
-        private void GetShellNewBackupItems(List<string> extensions, bool backup)
+        private void GetShellNewBackupItems(List<string> extensions)
         {
 #if DEBUG
             int i = 0;
@@ -796,7 +796,7 @@ namespace ContextMenuManager.Methods
                                         string openMode = item.OpenMode;
                                         string itemName = item.Text;
                                         bool ifItemInMenu = item.ItemVisible;
-                                        BackupRestoreItem(item, openMode, BackupItemType.ShellNewItem, ifItemInMenu, currentScene, backup);
+                                        BackupRestoreItem(item, openMode, BackupItemType.ShellNewItem, ifItemInMenu, currentScene);
 #if DEBUG
                                         i++;
                                         if (AppConfig.EnableLog)
@@ -819,7 +819,7 @@ namespace ContextMenuManager.Methods
 
         /*******************************SendToList.cs************************************/
 
-        private void GetSendToListItems(bool backup)
+        private void GetSendToListItems()
         {
 #if DEBUG
             if (AppConfig.EnableLog)
@@ -842,7 +842,7 @@ namespace ContextMenuManager.Methods
                 itemFileName = sendToItem.ItemFileName;
                 itemName = sendToItem.Text;
                 ifItemInMenu = sendToItem.ItemVisible;
-                BackupRestoreItem(sendToItem, itemFileName, BackupItemType.SendToItem, ifItemInMenu, currentScene, backup);
+                BackupRestoreItem(sendToItem, itemFileName, BackupItemType.SendToItem, ifItemInMenu, currentScene);
 #if DEBUG
                 i = 0;
                 i++;
@@ -860,7 +860,7 @@ namespace ContextMenuManager.Methods
             string valueName = item.ValueName;
             itemName = item.Text;
             ifItemInMenu = item.ItemVisible;
-            BackupRestoreItem(item, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene, backup);
+            BackupRestoreItem(item, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene);
 #if DEBUG
             i = 0;
             i++;
@@ -878,7 +878,7 @@ namespace ContextMenuManager.Methods
             valueName = item.ValueName;
             itemName = item.Text;
             ifItemInMenu = item.ItemVisible;
-            BackupRestoreItem(item, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene, backup);
+            BackupRestoreItem(item, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene);
 #if DEBUG
             i++;
             if (AppConfig.EnableLog)
@@ -893,7 +893,7 @@ namespace ContextMenuManager.Methods
 
         /*******************************OpenWithList.cs************************************/
 
-        private void GetOpenWithListItems(bool backup)
+        private void GetOpenWithListItems()
         {
 #if DEBUG
             if (AppConfig.EnableLog)
@@ -936,7 +936,7 @@ namespace ContextMenuManager.Methods
                                 string itemFileName = item.ItemFileName;
                                 string itemName = item.Text;
                                 bool ifItemInMenu = item.ItemVisible;
-                                BackupRestoreItem(item, itemFileName, BackupItemType.OpenWithItem, ifItemInMenu, currentScene, backup);
+                                BackupRestoreItem(item, itemFileName, BackupItemType.OpenWithItem, ifItemInMenu, currentScene);
 #if DEBUG
                                 i++;
                                 if (AppConfig.EnableLog)
@@ -961,7 +961,7 @@ namespace ContextMenuManager.Methods
                 string valueName = storeItem.ValueName;
                 string itemName = storeItem.Text;
                 bool ifItemInMenu = storeItem.ItemVisible;
-                BackupRestoreItem(storeItem, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene, backup);
+                BackupRestoreItem(storeItem, valueName, BackupItemType.VisibleRegRuleItem, ifItemInMenu, currentScene);
 #if DEBUG
                 i = 1;
                 if (AppConfig.EnableLog)
@@ -978,7 +978,7 @@ namespace ContextMenuManager.Methods
 
         /*******************************WinXList.cs************************************/
 
-        private void GetWinXListItems(bool backup)
+        private void GetWinXListItems()
         {
 #if DEBUG
             if (AppConfig.EnableLog)
@@ -1017,7 +1017,7 @@ namespace ContextMenuManager.Methods
                         string fileName = item.FileName;
                         string itemName = item.Text;
                         bool ifItemInMenu = item.ItemVisible;
-                        BackupRestoreItem(item, fileName, BackupItemType.WinXItem, ifItemInMenu, currentScene, backup);
+                        BackupRestoreItem(item, fileName, BackupItemType.WinXItem, ifItemInMenu, currentScene);
 #if DEBUG
                         i++;
                         if (AppConfig.EnableLog)
@@ -1041,7 +1041,7 @@ namespace ContextMenuManager.Methods
 
         /*******************************IEList.cs************************************/
 
-        private void GetIEItems(bool backup)
+        private void GetIEItems()
         {
             List<string> names = new List<string>();
             using (RegistryKey ieKey = RegistryEx.GetRegistryKey(IEList.IEPath))
@@ -1061,7 +1061,7 @@ namespace ContextMenuManager.Methods
                                 {
                                     IEItem item = new IEItem(key.Name);
                                     bool ifItemInMenu = item.ItemVisible;
-                                    BackupRestoreItem(item, keyName, BackupItemType.IEItem, ifItemInMenu, currentScene, backup);
+                                    BackupRestoreItem(item, keyName, BackupItemType.IEItem, ifItemInMenu, currentScene);
                                     names.Add(keyName);
                                 }
                             }

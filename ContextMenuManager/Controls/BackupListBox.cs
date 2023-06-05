@@ -28,7 +28,8 @@ namespace ContextMenuManager.Controls
                     // 新增备份项目
                     string deviceName = BackupList.metaData?.Device;
                     string createTime = BackupList.metaData?.CreateTime.ToString("G");
-                    AddItem(new RestoreItem(this, xmlFile, deviceName ?? AppString.Other.Unknown, createTime ?? AppString.Other.Unknown));
+                    AddItem(new RestoreItem(this, xmlFile, deviceName ?? AppString.Other.Unknown, 
+                        createTime ?? AppString.Other.Unknown));
                 }
             }
             SortItemByText();
@@ -47,13 +48,15 @@ namespace ContextMenuManager.Controls
             // 获取备份选项
             BackupMode backupMode;
             List<string> backupScenes;
+            // 构建备份对话框
             using (BackupDialog dlg = new BackupDialog())
             {
                 dlg.Title = AppString.Dialog.NewBackupItem;
                 dlg.DgvTitle = AppString.Dialog.BackupContent;
                 dlg.DgvItems = BackupHelper.BackupScenesText;
                 dlg.CmbTitle = AppString.Dialog.BackupMode;
-                dlg.CmbItems = new[] { AppString.Dialog.BackupMode1, AppString.Dialog.BackupMode2, AppString.Dialog.BackupMode3 };
+                dlg.CmbItems = new[] { AppString.Dialog.BackupMode1, AppString.Dialog.BackupMode2, 
+                    AppString.Dialog.BackupMode3 };
                 if (dlg.ShowDialog() != DialogResult.OK) return;
                 switch (dlg.CmbSelectedIndex)
                 {
@@ -91,12 +94,12 @@ namespace ContextMenuManager.Controls
             {
                 AppMessageBox.Show(AppString.Message.OldBackupVersion);
             }
-            helper.GetBackupRestoreScenesText(BackupList.metaData.BackupScenes);
+            // 构建恢复对话框
             using (BackupDialog dlg = new BackupDialog())
             {
                 dlg.Title = AppString.Dialog.RestoreBackupItem;
                 dlg.DgvTitle = AppString.Dialog.RestoreContent;
-                dlg.DgvItems = BackupHelper.RestoreScenesText;
+                dlg.DgvItems = helper.GetBackupRestoreScenesText(BackupList.metaData.BackupScenes);
                 dlg.CmbTitle = AppString.Dialog.RestoreMode;
                 dlg.CmbItems = new[] { AppString.Dialog.RestoreMode1, AppString.Dialog.RestoreMode2, AppString.Dialog.RestoreMode3 };
                 if (dlg.ShowDialog() != DialogResult.OK) return;
