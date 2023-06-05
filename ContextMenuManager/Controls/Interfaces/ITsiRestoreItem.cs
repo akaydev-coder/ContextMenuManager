@@ -1,12 +1,4 @@
-﻿using BluePointLilac.Controls;
-using BluePointLilac.Methods;
-using ContextMenuManager.Methods;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ContextMenuManager.Methods;
 using System.Windows.Forms;
 
 namespace ContextMenuManager.Controls.Interfaces
@@ -19,7 +11,7 @@ namespace ContextMenuManager.Controls.Interfaces
 
     sealed class RestoreMeMenuItem : ToolStripMenuItem
     {
-        public RestoreMeMenuItem(ITsiRestoreItem item) : base("恢复备份")
+        public RestoreMeMenuItem(ITsiRestoreItem item) : base(AppString.Menu.RestoreBackup)
         {
             Click += (sender, e) =>
             {

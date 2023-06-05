@@ -161,6 +161,8 @@ namespace ContextMenuManager.Methods
             public static string Save { get; set; }
             public static string FoldAll { get; set; }
             public static string UnfoldAll { get; set; }
+            public static string RestoreBackup { get; set; }
+            public static string DeleteBackup { get; set; }
         }
 
         /// <summary>对话框子窗口</summary>
@@ -269,6 +271,7 @@ namespace ContextMenuManager.Methods
             public static string OldBackupVersion { get; set; }
             public static string BackupSucceeded { get; set; }
             public static string RestoreSucceeded { get; set; }
+            public static string ConfirmDeleteBackupPermanently { get; set; }
         }
 
         /// <summary>提示文本</summary>

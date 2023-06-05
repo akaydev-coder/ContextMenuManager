@@ -21,7 +21,7 @@ namespace ContextMenuManager.Controls.Interfaces
 
     sealed class DeleteMeMenuItem : ToolStripMenuItem
     {
-        public DeleteMeMenuItem(ITsiDeleteItem item) : base(item is RestoreItem ? "删除备份" : AppString.Menu.Delete)
+        public DeleteMeMenuItem(ITsiDeleteItem item) : base(item is RestoreItem ? AppString.Menu.DeleteBackup : AppString.Menu.Delete)
         {
             Click += (sender, e) =>
             {
@@ -37,7 +37,7 @@ namespace ContextMenuManager.Controls.Interfaces
                     Directory.CreateDirectory(Path.GetDirectoryName(filePath));
                     ExternalProgram.ExportRegistry(regItem.RegPath, filePath);
                 }
-                else if (AppMessageBox.Show(item is RestoreItem ? "确认是否永久删除此备份？" : AppString.Message.ConfirmDeletePermanently, 
+                else if (AppMessageBox.Show(item is RestoreItem ? AppString.Message.ConfirmDeleteBackupPermanently : AppString.Message.ConfirmDeletePermanently, 
                     MessageBoxButtons.YesNo) != DialogResult.Yes)
                 {
                     return;
