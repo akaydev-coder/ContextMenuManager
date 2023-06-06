@@ -186,7 +186,6 @@ namespace ContextMenuManager.Methods
                     {
                         File.Delete(xmlFile);
                     }
-
                 }
                 // 如果设备目录为空且不为本机目录，则删除该设备目录
                 string device = Path.GetFileName(deviceDir);
