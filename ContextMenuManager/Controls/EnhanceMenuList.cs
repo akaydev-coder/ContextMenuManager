@@ -6,7 +6,7 @@ using System.Xml;
 
 namespace ContextMenuManager.Controls
 {
-    sealed class EnhanceMenusList : SwitchDicList // 其他菜单 增强菜单
+    sealed class EnhanceMenuList : SwitchDicList // 其他菜单 增强菜单
     {
         public string ScenePath { get; set; }
 

@@ -222,7 +222,7 @@
     <Compile Include="Controls\EnhanceMenusItem.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\EnhanceMenusList.cs">
+    <Compile Include="Controls\EnhanceMenuList.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\IEItem.cs">

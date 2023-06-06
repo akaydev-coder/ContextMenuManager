@@ -57,7 +57,7 @@ namespace ContextMenuManager
         readonly OpenWithList openWithList = new OpenWithList();
         readonly WinXList winXList = new WinXList();
 
-        readonly EnhanceMenusList enhanceMenusList = new EnhanceMenusList();
+        readonly EnhanceMenuList enhanceMenusList = new EnhanceMenuList();
         readonly DetailedEditList detailedEditList = new DetailedEditList();
         readonly GuidBlockedList guidBlockedList = new GuidBlockedList();
         readonly IEList iEList = new IEList();

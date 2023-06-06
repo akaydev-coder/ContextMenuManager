@@ -14,7 +14,7 @@ namespace ContextMenuManager.Controls
         protected override bool RunDialog(IntPtr hwndOwner)
         {
             using(SubItemsForm frm = new SubItemsForm())
-            using(EnhanceMenusList list = new EnhanceMenusList())
+            using(EnhanceMenuList list = new EnhanceMenuList())
             {
                 frm.Text = AppString.SideBar.EnhanceMenu;
                 frm.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
