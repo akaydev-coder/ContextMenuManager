@@ -18,12 +18,15 @@ namespace ContextMenuManager.Controls
         {
             base.LoadItems();
             int index = UseUserDic ? 1 : 0;
+            // 获取系统字典或用户字典
             XmlDocument doc = XmlDicHelper.DetailedEditDic[index];
             if(doc?.DocumentElement == null) return;
+            // 遍历所有子节点
             foreach(XmlNode groupXN in doc.DocumentElement.ChildNodes)
             {
                 try
                 {
+                    // 获取Guid列表
                     List<Guid> guids = new List<Guid>();
                     XmlNodeList guidList = groupXN.SelectNodes("Guid");
                     foreach(XmlNode guidXN in guidList)
@@ -35,6 +38,7 @@ namespace ContextMenuManager.Controls
                     }
                     if(guidList.Count > 0 && guids.Count == 0) continue;
 
+                    // 获取groupItem列表
                     FoldGroupItem groupItem;
                     bool isIniGroup = groupXN.SelectSingleNode("IsIniGroup") != null;
                     string attribute = isIniGroup ? "FilePath" : "RegPath";
@@ -55,12 +59,14 @@ namespace ContextMenuManager.Controls
                         if(filePath != null)
                         {
                             ToolStripMenuItem tsi = new ToolStripMenuItem(AppString.Menu.FileLocation);
+                            // 打开文件夹
                             tsi.Click += (sender, e) => ExternalProgram.JumpExplorer(filePath, AppConfig.OpenMoreExplorer);
                             groupItem.ContextMenuStrip.Items.Add(tsi);
                         }
                         if(clsidPath != null)
                         {
                             ToolStripMenuItem tsi = new ToolStripMenuItem(AppString.Menu.ClsidLocation);
+                            // 打开注册表
                             tsi.Click += (sender, e) => ExternalProgram.JumpRegEdit(clsidPath, null, AppConfig.OpenMoreRegedit);
                             groupItem.ContextMenuStrip.Items.Add(tsi);
                         }
@@ -79,6 +85,7 @@ namespace ContextMenuManager.Controls
                         return regPath;
                     };
 
+                    // 遍历groupItem内所有Item节点
                     foreach(XmlElement itemXE in groupXN.SelectNodes("Item"))
                     {
                         try
@@ -86,6 +93,8 @@ namespace ContextMenuManager.Controls
                             if(!XmlDicHelper.JudgeOSVersion(itemXE)) continue;
                             RuleItem ruleItem;
                             ItemInfo info = new ItemInfo();
+
+                            // 获取文本、提示文本
                             foreach(XmlElement textXE in itemXE.SelectNodes("Text"))
                             {
                                 if(XmlDicHelper.JudgeCulture(textXE)) info.Text = ResourceString.GetDirectString(textXE.GetAttribute("Value"));
@@ -96,6 +105,7 @@ namespace ContextMenuManager.Controls
                             }
                             info.RestartExplorer = itemXE.SelectSingleNode("RestartExplorer") != null;
 
+                            // 如果是数值类型的，初始化默认值、最大值、最小值
                             int defaultValue = 0, maxValue = 0, minValue = 0;
                             if(itemXE.SelectSingleNode("IsNumberItem") != null)
                             {
@@ -105,11 +115,12 @@ namespace ContextMenuManager.Controls
                                 minValue = ruleXE.HasAttribute("Min") ? Convert.ToInt32(ruleXE.GetAttribute("Min")) : int.MinValue;
                             }
 
+                            // 建立三种类型的RuleItem
                             if(isIniGroup)
                             {
                                 XmlElement ruleXE = (XmlElement)itemXE.SelectSingleNode("Rule");
-                                string iniPath = ruleXE.GetAttribute("FilePath");
-                                if(iniPath.IsNullOrWhiteSpace()) iniPath = groupItem.GroupPath;
+                                string iniPath = ruleXE.GetAttribute("FilePath");   // 主索引
+                                if (iniPath.IsNullOrWhiteSpace()) iniPath = groupItem.GroupPath;
                                 string section = ruleXE.GetAttribute("Section");
                                 string keyName = ruleXE.GetAttribute("KeyName");
                                 if(itemXE.SelectSingleNode("IsNumberItem") != null)
@@ -150,7 +161,7 @@ namespace ContextMenuManager.Controls
                             }
                             else
                             {
-                                if(itemXE.SelectSingleNode("IsNumberItem") != null)
+                                if (itemXE.SelectSingleNode("IsNumberItem") != null)
                                 {
                                     XmlElement ruleXE = (XmlElement)itemXE.SelectSingleNode("Rule");
                                     var rule = new NumberRegRuleItem.RegRule
@@ -163,6 +174,8 @@ namespace ContextMenuManager.Controls
                                         MinValue = minValue
                                     };
                                     ruleItem = new NumberRegRuleItem(rule, info);
+                                    int itemValue = ((NumberRegRuleItem)ruleItem).ItemValue;// 备份值
+                                    string RegPath = ((NumberRegRuleItem)ruleItem).RegPath; // 主索引
                                 }
                                 else if(itemXE.SelectSingleNode("IsStringItem") != null)
                                 {
@@ -173,6 +186,8 @@ namespace ContextMenuManager.Controls
                                         ValueName = ruleXE.GetAttribute("ValueName"),
                                     };
                                     ruleItem = new StringRegRuleItem(rule, info);
+                                    string itemValue = ((StringRegRuleItem)ruleItem).ItemValue; // 备份值
+                                    string RegPath = ((StringRegRuleItem)ruleItem).RegPath;     // 主索引
                                 }
                                 else
                                 {
@@ -183,7 +198,7 @@ namespace ContextMenuManager.Controls
                                         XmlElement ruleXE = (XmlElement)ruleXNList[i];
                                         rules[i] = new VisibleRegRuleItem.RegRule
                                         {
-                                            RegPath = GetRuleFullRegPath(ruleXE.GetAttribute("RegPath")),
+                                            RegPath = GetRuleFullRegPath(ruleXE.GetAttribute("RegPath")),   // 主索引
                                             ValueName = ruleXE.GetAttribute("ValueName"),
                                             ValueKind = XmlDicHelper.GetValueKind(ruleXE.GetAttribute("ValueKind"), RegistryValueKind.DWord)
                                         };
@@ -208,6 +223,8 @@ namespace ContextMenuManager.Controls
                                         }
                                     }
                                     ruleItem = new VisibleRegRuleItem(rules, info);
+                                    bool itemVisible = ((VisibleRegRuleItem)ruleItem).ItemVisible;  // 备份值
+                                    string RegPath = ((VisibleRegRuleItem)ruleItem).RegPath;        // 默认第一个RegPath为主索引
                                 }
                             }
                             AddItem(ruleItem);

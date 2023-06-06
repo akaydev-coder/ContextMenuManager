@@ -12,6 +12,7 @@ namespace ContextMenuManager.Controls
 
         public void LoadItems()
         {
+            // 获取备份根目录
             string rootPath = AppConfig.MenuBackupRootDir;
             // 获取rootPath下的所有子目录
             string[] deviceDirs = Directory.GetDirectories(rootPath);
@@ -90,7 +91,12 @@ namespace ContextMenuManager.Controls
             List<string> restoreScenes;
             BackupList.LoadBackupDataMetaData(filePath);
             // 备份版本提示
-            if (BackupList.metaData.Version < BackupHelper.BackupVersion)
+            if (BackupList.metaData.Version <= BackupHelper.DeprecatedBackupVersion)
+            {
+                AppMessageBox.Show(AppString.Message.DeprecatedBackupVersion);
+                return;
+            }
+            else if (BackupList.metaData.Version < BackupHelper.BackupVersion)
             {
                 AppMessageBox.Show(AppString.Message.OldBackupVersion);
             }

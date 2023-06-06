@@ -42,7 +42,8 @@ namespace ContextMenuManager.Methods
     public enum BackupItemType
     {
         ShellItem, ShellExItem, UwpModelItem, VisibleRegRuleItem, ShellNewItem, SendToItem,
-        OpenWithItem, WinXItem, SelectItem, StoreShellItem, IEItem
+        OpenWithItem, WinXItem, SelectItem, StoreShellItem, IEItem,
+        NumberIniRuleItem, StringIniRuleItem, VisbleIniRuleItem, NumberRegRuleItem, StringRegRuleItem
     }
 
     // 备份选项
@@ -66,7 +67,10 @@ namespace ContextMenuManager.Methods
         /*******************************外部变量、函数************************************/
 
         // 目前备份版本号
-        public const int BackupVersion = 1;
+        public const int BackupVersion = 2;
+
+        // 弃用备份版本号
+        public const int DeprecatedBackupVersion = 1;
 
         // 右键菜单备份场景，包含全部场景（确保顺序与右键菜单场景Scenes相同）（新增备份类别处2）
         public static string[] BackupScenesText = new string[] {
@@ -87,12 +91,17 @@ namespace ContextMenuManager.Methods
             AppString.SideBar.DragDrop, AppString.SideBar.PublicReferences, AppString.SideBar.IEMenu,
         };
 
-        public int backupCount = 0; // 备份项目总数量
-        public int restoreCount = 0; // 恢复改变项目数量
-        public string createTime;   // 本次备份文件创建时间
-        public string filePath; // 本次备份文件目录
+        public int backupCount = 0;     // 备份项目总数量
+        public int restoreCount = 0;    // 恢复改变项目数量
+        public string createTime;       // 本次备份文件创建时间
+        public string filePath;         // 本次备份文件目录
 
-        // 获取目前备份恢复场景文字
+        public BackupHelper()
+        {
+            CheckDeprecatedBackup();
+        }
+
+        // 获取备份恢复场景文字
         public string[] GetBackupRestoreScenesText(List<Scenes> scenes)
         {
             List<string> scenesTextList = new List<string>();
@@ -145,12 +154,48 @@ namespace ContextMenuManager.Methods
 
         /*******************************内部变量、函数************************************/
 
-        private bool backup;    // 目前备份还是恢复
-        private Scenes currentScene;    // 目前处理场景
-        private BackupMode backupMode;  // 目前备份模式
+        // 目前备份恢复场景
+        private readonly List<Scenes> currentScenes = new List<Scenes>();
+
+        private bool backup;                // 目前备份还是恢复
+        private Scenes currentScene;        // 目前处理场景
+        private BackupMode backupMode;      // 目前备份模式
         private RestoreMode restoreMode;    // 目前恢复模式
-        private readonly List<Scenes> currentScenes = new List<Scenes>();   // 目前备份恢复场景
-        
+
+        // 删除弃用版本的备份
+        private void CheckDeprecatedBackup()
+        {
+            string rootPath = AppConfig.MenuBackupRootDir;
+            string[] deviceDirs = Directory.GetDirectories(rootPath);
+            foreach (string deviceDir in deviceDirs)
+            {
+                string[] xmlFiles = Directory.GetFiles(deviceDir, "*.xml");
+                foreach (string xmlFile in xmlFiles)
+                {
+                    // 加载项目元数据
+                    LoadBackupDataMetaData(xmlFile);
+                    // 如果备份版本号小于等于最高弃用备份版本号，则删除该备份
+                    try
+                    {
+                        if (metaData.Version <= DeprecatedBackupVersion)
+                        {
+                            File.Delete(xmlFile);
+                        }
+                    }
+                    catch
+                    {
+                        File.Delete(xmlFile);
+                    }
+
+                }
+                // 如果设备目录为空，则删除该设备目录
+                if (Directory.GetFiles(deviceDir).Length == 0)
+                {
+                    Directory.Delete(deviceDir);
+                }
+            }
+        }
+
         // 获取目前备份恢复场景
         private void GetBackupRestoreScenes(List<string> sceneTexts)
         {
@@ -264,7 +309,16 @@ namespace ContextMenuManager.Methods
                 // 成功匹配到后的处理方式：KeyName和ItemType匹配后检查ItemVisible
                 if (item.KeyName == keyName && item.ItemType == itemType)
                 {
-                    if (item.ItemVisible != itemVisible)
+                    bool itemData = false;
+                    try
+                    {
+                        itemData = Convert.ToBoolean(item.ItemData);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                    if (itemData != itemVisible)
                     {
                         restoreCount++;
                         return true;
@@ -284,25 +338,24 @@ namespace ContextMenuManager.Methods
             return false;
         }
 
-        // SelectItem有多个选项，单独备份和恢复
-        private void BackupRestoreSelectItem(SelectItem item, string keyName, Scenes currentScene)
+        // SelectItem有单独的备份恢复机制
+        private void BackupRestoreSelectItem(SelectItem item, string itemData, Scenes currentScene)
         {
             if (backup)
             {
-                AddItem(keyName, BackupItemType.SelectItem, true, currentScene);
+                AddItem("", BackupItemType.SelectItem, itemData, currentScene);
             }
             else
             {
                 foreach (BackupItem restoreItem in sceneRestoreList)
                 {
-                    // 成功匹配到后的处理方式：只需检查KeyName和ItemType
+                    // 成功匹配到后的处理方式：只需检查ItemData和ItemType
                     if (restoreItem.ItemType == BackupItemType.SelectItem)
                     {
-                        string restoreKeyName = restoreItem.KeyName;
-                        if (restoreKeyName != keyName)
+                        string restoreItemData = restoreItem.ItemData;
+                        if (restoreItemData != itemData)
                         {
-                            int keyNameIndex;
-                            int.TryParse(restoreItem.KeyName, out keyNameIndex);
+                            int.TryParse(restoreItem.KeyName, out int keyNameIndex);
                             switch (currentScene)
                             {
                                 case Scenes.DragDrop:
@@ -1099,15 +1152,25 @@ namespace ContextMenuManager.Methods
             namespaces.Add(string.Empty, string.Empty);
         }
 
-        public static void AddItem(string keyName, BackupItemType backupItemType, bool itemVisible, Scenes scene)
+        public static void AddItem(string keyName, BackupItemType backupItemType, string itemData, Scenes scene)
         {
             backupRestoreList.Add(new BackupItem
             {
                 KeyName = keyName,
                 ItemType = backupItemType,
-                ItemVisible = itemVisible,
+                ItemData = itemData,
                 BackupScene = scene,
             });
+        }
+
+        public static void AddItem(string keyName, BackupItemType backupItemType, bool itemData, Scenes scene)
+        {
+            AddItem(keyName, backupItemType, itemData.ToString(), scene);
+        }
+
+        public static void AddItem(string keyName, BackupItemType backupItemType, int itemData, Scenes scene)
+        {
+            AddItem(keyName, backupItemType, itemData.ToString(), scene);
         }
 
         public static int GetBackupListCount()
@@ -1211,8 +1274,8 @@ namespace ContextMenuManager.Methods
         [XmlElement("ItemType")]
         public BackupItemType ItemType { get; set; } // 备份项目类型
 
-        [XmlElement("ItemVisible")]
-        public bool ItemVisible { get; set; } // 是否位于右键菜单中
+        [XmlElement("ItemData")]
+        public string ItemData { get; set; } // 备份数据：是否位于右键菜单中，数字，或者字符串
 
         [XmlElement("Scene")]
         public Scenes BackupScene { get; set; } // 右键菜单位置
