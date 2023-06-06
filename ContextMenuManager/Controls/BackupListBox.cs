@@ -53,8 +53,8 @@ namespace ContextMenuManager.Controls
             using (BackupDialog dlg = new BackupDialog())
             {
                 dlg.Title = AppString.Dialog.NewBackupItem;
-                dlg.DgvTitle = AppString.Dialog.BackupContent;
-                dlg.DgvItems = BackupHelper.BackupScenesText;
+                dlg.TvTitle = AppString.Dialog.BackupContent;
+                dlg.TvItems = BackupHelper.BackupScenesText;
                 dlg.CmbTitle = AppString.Dialog.BackupMode;
                 dlg.CmbItems = new[] { AppString.Dialog.BackupMode1, AppString.Dialog.BackupMode2, 
                     AppString.Dialog.BackupMode3 };
@@ -69,7 +69,12 @@ namespace ContextMenuManager.Controls
                     case 2:
                         backupMode = BackupMode.OnlyInvisible; break;
                 }
-                backupScenes = dlg.DgvSelectedItems;
+                backupScenes = dlg.TvSelectedItems;
+            }
+            // 无备份项目，不进行备份
+            if (backupScenes.Count == 0)
+            {
+                return;
             }
             // 开始备份项目
             Cursor = Cursors.WaitCursor;
@@ -104,8 +109,8 @@ namespace ContextMenuManager.Controls
             using (BackupDialog dlg = new BackupDialog())
             {
                 dlg.Title = AppString.Dialog.RestoreBackupItem;
-                dlg.DgvTitle = AppString.Dialog.RestoreContent;
-                dlg.DgvItems = helper.GetBackupRestoreScenesText(BackupList.metaData.BackupScenes);
+                dlg.TvTitle = AppString.Dialog.RestoreContent;
+                dlg.TvItems = helper.GetBackupRestoreScenesText(BackupList.metaData.BackupScenes);
                 dlg.CmbTitle = AppString.Dialog.RestoreMode;
                 dlg.CmbItems = new[] { AppString.Dialog.RestoreMode1, AppString.Dialog.RestoreMode2, AppString.Dialog.RestoreMode3 };
                 if (dlg.ShowDialog() != DialogResult.OK) return;
@@ -119,7 +124,12 @@ namespace ContextMenuManager.Controls
                     case 2:
                         restoreMode = RestoreMode.EnableNotOnList; break;
                 }
-                restoreScenes = dlg.DgvSelectedItems;
+                restoreScenes = dlg.TvSelectedItems;
+            }
+            // 无恢复项目，不进行备份
+            if (restoreScenes.Count == 0)
+            {
+                return;
             }
             // 开始恢复项目
             Cursor = Cursors.WaitCursor;

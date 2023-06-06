@@ -91,6 +91,29 @@ namespace ContextMenuManager.Methods
             AppString.SideBar.DragDrop, AppString.SideBar.PublicReferences, AppString.SideBar.IEMenu,
         };
 
+        // 右键菜单备份场景，包含主页、文件类型、其他规则三个板块
+        public static string[] HomeBackupScenesText = new string[] {
+                // 主页——第一板块
+                AppString.SideBar.File, AppString.SideBar.Folder, AppString.SideBar.Directory, AppString.SideBar.Background,
+                AppString.SideBar.Desktop, AppString.SideBar.Drive, AppString.SideBar.AllObjects, AppString.SideBar.Computer,
+                AppString.SideBar.RecycleBin, AppString.SideBar.Library,
+                // 主页——第二板块
+                AppString.SideBar.New, AppString.SideBar.SendTo, AppString.SideBar.OpenWith,
+                // 主页——第三板块
+                AppString.SideBar.WinX,
+            };
+        public static string[] TypeBackupScenesText = new string[] {
+                // 文件类型——第一板块
+                AppString.SideBar.LnkFile, AppString.SideBar.UwpLnk, AppString.SideBar.ExeFile, AppString.SideBar.UnknownType,
+                // 文件类型——第二板块（不予备份）
+            };
+        public static string[] RuleBackupScenesText = new string[] {
+                // 其他规则——第一板块
+                AppString.SideBar.EnhanceMenu, AppString.SideBar.DetailedEdit,
+                // 其他规则——第二板块
+                AppString.SideBar.DragDrop, AppString.SideBar.PublicReferences, AppString.SideBar.IEMenu,
+            };
+
         public int backupCount = 0;     // 备份项目总数量
         public int restoreCount = 0;    // 恢复改变项目数量
         public string createTime;       // 本次备份文件创建时间

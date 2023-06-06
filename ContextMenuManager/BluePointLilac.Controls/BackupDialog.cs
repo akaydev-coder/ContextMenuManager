@@ -3,6 +3,7 @@ using ContextMenuManager.Methods;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace BluePointLilac.Controls
@@ -16,9 +17,9 @@ namespace BluePointLilac.Controls
         public int CmbSelectedIndex { get; set; }   // cmb选择内容索引
         public string CmbSelectedText { get; set; } // cmb选择内容文字
 
-        public string DgvTitle { get; set; }    // dgv可供选择内容
-        public string[] DgvItems { get; set; }  // dgv选择内容索引
-        public List<string> DgvSelectedItems { get; set; }  // Dgv选择内容文字
+        public string TvTitle { get; set; }    // tv可供选择内容
+        public string[] TvItems { get; set; }  // tv选择内容索引
+        public List<string> TvSelectedItems { get; set; }  // tv选择内容文字
 
         public override void Reset() { }
 
@@ -29,8 +30,8 @@ namespace BluePointLilac.Controls
                 frm.Text = Title;
                 frm.CmbTitle = CmbTitle;
                 frm.CmbItems = CmbItems;
-                frm.DgvTitle = DgvTitle;
-                frm.DgvItems = DgvItems;
+                frm.TvTitle = TvTitle;
+                frm.TvItems = TvItems;
                 if (CmbSelectedText != null) frm.CmbSelectedText = CmbSelectedText;
                 else frm.CmbSelectedIndex = CmbSelectedIndex;
                 Form owner = (Form)Control.FromHandle(hwndOwner);
@@ -40,7 +41,7 @@ namespace BluePointLilac.Controls
                 {
                     CmbSelectedText = frm.CmbSelectedText;
                     CmbSelectedIndex = frm.CmbSelectedIndex;
-                    DgvSelectedItems = frm.DgvSelectedItems;
+                    TvSelectedItems = frm.TvSelectedItems;
                 }
                 return flag;
             }
@@ -102,47 +103,42 @@ namespace BluePointLilac.Controls
                 set => cmbItems.Text = value;
             }
 
-            public string DgvTitle
+            public string TvTitle
             {
-                get => dgvInfo.Text;
-                set => dgvInfo.Text = value;
+                get => tvInfo.Text;
+                set => tvInfo.Text = value;
             }
-            private string[] dgvItemsValue;
-            public string[] DgvItems
+            private string[] tvValue;
+            public string[] TvItems
             {
                 get
                 {
-                    return dgvItemsValue;
+                    return tvValue;
                 }
                 set
                 {
-                    dgvItemsValue = value;
-                    ShowDgvList(value);
+                    tvValue = value;
+                    ShowTreeView();
                 }
             }
-            // dgv选中的项目
-            private readonly List<string> dgvSelectedItems = new List<string>();
-            public List<string> DgvSelectedItems
+            // tv选中的项目
+            private readonly List<string> tvSelectedItems = new List<string>();
+            public List<string> TvSelectedItems
             {
-                get => dgvSelectedItems;
+                get => GetSortedTvSelectedItems(tvSelectedItems);
             }
 
             /*************************************内部控件***********************************/
 
-            readonly Label dgvInfo = new Label { AutoSize = true };
-            readonly DataGridView dgvItems = new DataGridView
+            readonly Label tvInfo = new Label { AutoSize = true };
+            readonly TreeView treeView = new TreeView
             {
-                ColumnHeadersVisible = false,   // 隐藏列标题
-                RowHeadersVisible = false,  // 隐藏行标题
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells,
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect, // 整行一起选中
-                BackgroundColor = SystemColors.Control,
-                BorderStyle = BorderStyle.None,
-                AllowUserToResizeRows = false,
-                AllowUserToAddRows = false,
-                MultiSelect = false,
-                ReadOnly = true,
+                CheckBoxes = true,
+                Indent = 20.DpiZoom(),
+                ItemHeight = 25.DpiZoom(),
             };
+            private bool isFirst = true;
+            private bool changeDone = false;
 
             readonly CheckBox checkAll = new CheckBox
             {
@@ -178,99 +174,212 @@ namespace BluePointLilac.Controls
 
             private void InitializeComponents()
             {
-                Controls.AddRange(new Control[] { dgvInfo, checkAll, dgvItems, cmbInfo, cmbItems, btnOK, btnCancel });
+                Controls.AddRange(new Control[] { tvInfo, treeView, checkAll, cmbInfo, cmbItems, btnOK, btnCancel });
                 int margin = 20.DpiZoom();
                 int cmbItemsWidth = 300.DpiZoom();
-                int dgvHeight = 300.DpiZoom();
-                dgvInfo.Top = checkAll.Top = margin;
-                dgvInfo.Left = dgvItems.Left = cmbInfo.Left = margin;
-                dgvItems.Top = dgvInfo.Bottom + 5.DpiZoom();
-                dgvItems.Height = dgvHeight;
-                cmbInfo.Top = cmbItems.Top = dgvItems.Bottom + margin;
+                int tvHeight = 300.DpiZoom();
+                tvInfo.Top = checkAll.Top = margin;
+                tvInfo.Left = treeView.Left = cmbInfo.Left = margin;
+                treeView.Top = tvInfo.Bottom + 5.DpiZoom();
+                treeView.Height = tvHeight;
+                cmbInfo.Top = cmbItems.Top = treeView.Bottom + margin;
                 cmbItems.Left = cmbInfo.Right;
                 cmbItems.Width = cmbItemsWidth;
                 btnOK.Top = btnCancel.Top = cmbItems.Bottom + margin;
                 btnOK.Left = (cmbItems.Width + cmbInfo.Width + 2 * margin - margin) / 2 - btnOK.Width;
                 btnCancel.Left = btnOK.Right + margin;
                 ClientSize = new Size(cmbItems.Right + margin, btnCancel.Bottom + margin);
-                dgvItems.Width = ClientSize.Width - 2 * margin;
-                checkAll.Left = dgvItems.Right - checkAll.Width;
+                treeView.Width = ClientSize.Width - 2 * margin;
+                checkAll.Left = treeView.Right - checkAll.Width;
                 checkAll.Click += (sender, e) => { CheckAll_CheckBoxMouseClick(sender, e); };
                 cmbItems.AutosizeDropDownWidth();
             }
 
-            private void ShowDgvList(string[] value)
+            private void ShowTreeView()
             {
-                // 显示1列数据列
-                int headLength = 1;
-                dgvItems.ColumnCount = headLength;
-                dgvItems.Columns[headLength - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                for (int m = 0; m < headLength; m++)
+                treeView.Nodes.Add(new TreeNode(AppString.ToolBar.Home));
+                treeView.Nodes.Add(new TreeNode(AppString.ToolBar.Type));
+                treeView.Nodes.Add(new TreeNode(AppString.ToolBar.Rule));
+
+                for (int i = 0; i < TvItems.Length; i++)
                 {
-                    dgvItems.Columns[m].HeaderText = value[m];
+                    string treeNodeText = TvItems[i];
+
+                    // 判断treeNodeText是否在BackupHelper.HomeBackupScenesText中
+                    if (BackupHelper.HomeBackupScenesText.Contains(treeNodeText))
+                    {
+                        treeView.Nodes[0].Nodes.Add(new TreeNode(treeNodeText));
+                    }
+                    else if (BackupHelper.TypeBackupScenesText.Contains(treeNodeText))
+                    {
+                        treeView.Nodes[1].Nodes.Add(new TreeNode(treeNodeText));
+                    }
+                    else if (BackupHelper.RuleBackupScenesText.Contains(treeNodeText))
+                    {
+                        treeView.Nodes[2].Nodes.Add(new TreeNode(treeNodeText));
+                    }
                 }
-                for (int i = 0; i < value.Length; i++)
+
+                for (int i = 0; i < treeView.Nodes.Count; i++)
                 {
-                    string[] line = new string[headLength];
-                    string temp = value[i];
-                    line[0] = temp;
-                    dgvItems.Rows.Add(line);
+                    // 如果该根节点下不存在任何子节点，则删除该根节点
+                    if (treeView.Nodes[i].Nodes.Count == 0)
+                    {
+                        treeView.Nodes.RemoveAt(i);
+                        i--;
+                    }
                 }
-                // 增加复选框列
-                DataGridViewCheckBoxColumn checkbox = new DataGridViewCheckBoxColumn()
-                {
-                    TrueValue = true,
-                    FalseValue = false,
-                    DataPropertyName = "IsChecked",
-                    Width = 50.DpiZoom(),
-                    Resizable = DataGridViewTriState.False, // 列大小不改变
-                };
-                // 插入到第0列
-                dgvItems.Columns.Insert(0, checkbox);
-                dgvItems.CellMouseClick += (sender, e) => { Dgv_CellMouseClick(sender, e); };
+
+                // 取消第一个根节点CheckBox的默认选中状态
+                treeView.BeforeCheck += TreeView_BeforeCheck;
+
+                // 点击节点文字事件
+                treeView.AfterSelect += TreeView_AfterSelect;
+
+                // 节点Checked改变事件
+                treeView.AfterCheck += TreeView_AfterCheck;
             }
 
-            private void Dgv_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+            private void TreeView_BeforeCheck(object sender, TreeViewCancelEventArgs e)
             {
-                // 不对序号列和标题列处理
-                if (e.RowIndex != -1 && e.ColumnIndex != -1)
+                // 第一次取消第一个根节点的CheckBox选中状态
+                if (e.Node == treeView.Nodes[0] && isFirst)
                 {
-                    // 复选框列的值进行改变
-                    if ((bool)dgvItems.Rows[e.RowIndex].Cells[0].EditedFormattedValue == true)
+                    e.Cancel = true;
+                    isFirst = false;
+                }
+            }
+
+            private void TreeView_AfterCheck(object sender, TreeViewEventArgs e)
+            {
+                if (e.Node != null && !changeDone)
+                {
+                    TreeNode node = e.Node;
+                    bool isChecked = node.Checked;
+                    string nodeText = e.Node.Text;
+
+                    changeDone = true;
+
+                    if ((nodeText == AppString.ToolBar.Home) || (nodeText == AppString.ToolBar.Type) || (nodeText == AppString.ToolBar.Rule))
                     {
-                        dgvItems.Rows[e.RowIndex].Cells[0].Value = false;
-                        dgvSelectedItems.Remove(DgvItems[e.RowIndex]);
-                        if (checkAll.Checked)
+                        // 所有子节点状态同父节点
+                        for (int i = 0; i < node.Nodes.Count; i++)
                         {
-                            checkAll.Checked = false;
-                            checkAll.Enabled = true;
+                            TreeNode childNode = node.Nodes[i];
+                            childNode.Checked = isChecked;
+                            if (isChecked)
+                            {
+                                tvSelectedItems.Add(childNode.Text);
+                                if (tvSelectedItems.Count == tvValue.Length)
+                                {
+                                    checkAll.Checked = true;
+                                }
+                            } 
+                            else
+                            {
+                                tvSelectedItems.Remove(childNode.Text);
+                                if (tvSelectedItems.Count < tvValue.Length)
+                                {
+                                    checkAll.Checked = false;
+                                }
+                            }
                         }
                     }
                     else
                     {
-                        dgvItems.Rows[e.RowIndex].Cells[0].Value = true;
-                        dgvSelectedItems.Add(DgvItems[e.RowIndex]);
-                        if (dgvSelectedItems.Count == dgvItemsValue.Length)
+                        // 兄弟节点被选中的个数 
+                        int brotherNodeCheckedCount = 0;
+                        foreach (TreeNode tn in node.Parent.Nodes)
                         {
-                            checkAll.Checked = true;
-                            checkAll.Enabled = false;
+                            if (tn.Checked == true)
+                            {
+                                brotherNodeCheckedCount++;
+                            }
+                        }
+
+                        // 兄弟节点全没选，其父节点也不选 
+                        if (brotherNodeCheckedCount == 0)
+                        {
+                            node.Parent.Checked = false;
+                        }
+                        // 兄弟节点只要有一个被选，其父节点也被选 
+                        if (brotherNodeCheckedCount >= 1)
+                        {
+                            node.Parent.Checked = true;
+                        }
+
+                        if (isChecked)
+                        {
+                            tvSelectedItems.Add(node.Text);
+                            if (tvSelectedItems.Count == tvValue.Length)
+                            {
+                                checkAll.Checked = true;
+                            }
+                        }
+                        else
+                        {
+                            tvSelectedItems.Remove(node.Text);
+                            if (tvSelectedItems.Count < tvValue.Length)
+                            {
+                                checkAll.Checked = false;
+                            }
                         }
                     }
+
+                    changeDone = false;
+                }
+            }
+
+            private void TreeView_AfterSelect(object sender, TreeViewEventArgs e)
+            {
+                if (e.Node != null)
+                {
+                    // 传递节点Checked改变
+                    e.Node.Checked = !e.Node.Checked;
+
+                    // 取消选中，去除蓝色背景
+                    treeView.SelectedNode = null;
                 }
             }
 
             private void CheckAll_CheckBoxMouseClick(object sender, EventArgs e)
             {
-                checkAll.Checked = true;
-                for (int i = 0; i < dgvItems.Rows.Count; i++)
+                // 传递根节点Checked改变
+                for (int i = 0; i < treeView.Nodes.Count; i++)
                 {
-                    if ((bool)dgvItems.Rows[i].Cells[0].EditedFormattedValue == false)
+                    treeView.Nodes[i].Checked = checkAll.Checked;
+                }
+            }
+
+            private List<string> GetSortedTvSelectedItems(List<string> tvSelectedItems)
+            {
+                List<string> sortedTvSelectedItems = new List<string>();
+
+                for (int i = 0; i < BackupHelper.HomeBackupScenesText.Length; i++)
+                {
+                    if (tvSelectedItems.Contains(BackupHelper.HomeBackupScenesText[i]))
                     {
-                        dgvItems.Rows[i].Cells[0].Value = true;
-                        dgvSelectedItems.Add(DgvItems[i]);
+                        sortedTvSelectedItems.Add(BackupHelper.HomeBackupScenesText[i]);
                     }
                 }
-                checkAll.Enabled = false;
+
+                for (int i = 0; i < BackupHelper.TypeBackupScenesText.Length; i++)
+                {
+                    if (tvSelectedItems.Contains(BackupHelper.TypeBackupScenesText[i]))
+                    {
+                        sortedTvSelectedItems.Add(BackupHelper.TypeBackupScenesText[i]);
+                    }
+                }
+
+                for (int i = 0; i < BackupHelper.RuleBackupScenesText.Length; i++)
+                {
+                    if (tvSelectedItems.Contains(BackupHelper.RuleBackupScenesText[i]))
+                    {
+                        sortedTvSelectedItems.Add(BackupHelper.RuleBackupScenesText[i]);
+                    }
+                }
+
+                return sortedTvSelectedItems;
             }
         }
     }
