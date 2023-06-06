@@ -12,7 +12,6 @@ using static ContextMenuManager.Methods.BackupList;
 using System.Xml.Serialization;
 using static ContextMenuManager.Controls.ShellNewList;
 using BluePointLilac.Controls;
-using System.Windows.Forms;
 
 namespace ContextMenuManager.Methods
 {
@@ -43,8 +42,8 @@ namespace ContextMenuManager.Methods
     public enum BackupItemType
     {
         ShellItem, ShellExItem, UwpModelItem, VisibleRegRuleItem, ShellNewItem, SendToItem,
-        OpenWithItem, WinXItem, SelectItem, StoreShellItem, IEItem,
-        NumberIniRuleItem, StringIniRuleItem, VisbleIniRuleItem, NumberRegRuleItem, StringRegRuleItem
+        OpenWithItem, WinXItem, SelectItem, StoreShellItem, IEItem, EnhanceShellItem, EnhanceShellExItem,
+        NumberIniRuleItem, StringIniRuleItem, VisbleIniRuleItem, NumberRegRuleItem, StringRegRuleItem,
     }
 
     // 备份选项
@@ -243,8 +242,10 @@ namespace ContextMenuManager.Methods
                     GetWinXListItems(); break;
                 case Scenes.InternetExplorer:   // IE浏览器
                     GetIEItems(); break;
+                case Scenes.EnhanceMenu:   // 增强菜单
+                    GetEnhanceMenuListItems(); break;
                 case Scenes.DetailedEdit:   // 详细编辑
-                    GetDetailedEditItems(); break;
+                    GetDetailedEditListItems(); break;
                 default:    // 位于ShellList.cs内的备份项目
                     GetShellListItems(); break;
             }
@@ -300,6 +301,10 @@ namespace ContextMenuManager.Methods
                             ((IEItem)item).ItemVisible = !itemData; break;
                         case BackupItemType.VisbleIniRuleItem:
                             ((VisbleIniRuleItem)item).ItemVisible = !itemData; break;
+                        case BackupItemType.EnhanceShellItem:
+                            ((EnhanceShellItem)item).ItemVisible = !itemData; break;
+                        case BackupItemType.EnhanceShellExItem:
+                            ((EnhanceShellExItem)item).ItemVisible = !itemData; break;
                     }
                 }
             }
@@ -1242,7 +1247,7 @@ namespace ContextMenuManager.Methods
 
         /*******************************DetailedEditList.cs************************************/
 
-        public void GetDetailedEditItems()
+        private void GetDetailedEditListItems()
         {
             for (int index = 0; index < 2; index++)
             {
@@ -1440,6 +1445,147 @@ namespace ContextMenuManager.Methods
                     }
                     catch { continue; }
                 }
+            }
+        }
+
+        /*******************************EnhanceMenusListList.cs************************************/
+
+        private void GetEnhanceMenuListItems()
+        {
+            for (int index = 0; index < 2; index++)
+            {
+                XmlDocument doc = XmlDicHelper.EnhanceMenusDic[index];
+                if (doc?.DocumentElement == null) return;
+                foreach (XmlNode xn in doc.DocumentElement.ChildNodes)
+                {
+                    try
+                    {
+                        string text = null;
+                        string path = xn.SelectSingleNode("RegPath")?.InnerText;
+                        foreach (XmlElement textXE in xn.SelectNodes("Text"))
+                        {
+                            if (XmlDicHelper.JudgeCulture(textXE))
+                            {
+                                text = ResourceString.GetDirectString(textXE.GetAttribute("Value"));
+                            }
+                        }
+                        if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(text)) continue;
+
+                        FoldGroupItem groupItem = new FoldGroupItem(path, ObjectPath.PathType.Registry)
+                        {
+                            Image = null,
+                            Text = text
+                        };
+                        XmlNode shellXN = xn.SelectSingleNode("Shell");
+                        XmlNode shellExXN = xn.SelectSingleNode("ShellEx");
+                        if (shellXN != null) GetEnhanceMenuListShellItems(shellXN, groupItem);
+                        if (shellExXN != null) GetEnhanceMenuListShellExItems(shellExXN, groupItem);
+                        groupItem.Dispose();
+                    }
+                    catch { continue; }
+                }
+            }
+        }
+
+        private void GetEnhanceMenuListShellItems(XmlNode shellXN, FoldGroupItem groupItem)
+        {
+            foreach (XmlElement itemXE in shellXN.SelectNodes("Item"))
+            {
+                if (!XmlDicHelper.FileExists(itemXE)) continue;
+                if (!XmlDicHelper.JudgeCulture(itemXE)) continue;
+                if (!XmlDicHelper.JudgeOSVersion(itemXE)) continue;
+                string keyName = itemXE.GetAttribute("KeyName");
+                if (keyName.IsNullOrWhiteSpace()) continue;
+                EnhanceShellItem item = new EnhanceShellItem()
+                {
+                    RegPath = $@"{groupItem.GroupPath}\shell\{keyName}",
+                    FoldGroupItem = groupItem,
+                    ItemXE = itemXE
+                };
+                foreach (XmlElement szXE in itemXE.SelectNodes("Value/REG_SZ"))
+                {
+                    if (!XmlDicHelper.JudgeCulture(szXE)) continue;
+                    if (szXE.HasAttribute("MUIVerb")) item.Text = ResourceString.GetDirectString(szXE.GetAttribute("MUIVerb"));
+                    if (szXE.HasAttribute("Icon")) item.Image = ResourceIcon.GetIcon(szXE.GetAttribute("Icon"))?.ToBitmap();
+                    else if (szXE.HasAttribute("HasLUAShield")) item.Image = AppImage.Shield;
+                }
+                if (item.Image == null)
+                {
+                    XmlElement cmdXE = (XmlElement)itemXE.SelectSingleNode("SubKey/Command");
+                    if (cmdXE != null)
+                    {
+                        Icon icon = null;
+                        if (cmdXE.HasAttribute("Default"))
+                        {
+                            string filePath = ObjectPath.ExtractFilePath(cmdXE.GetAttribute("Default"));
+                            icon = ResourceIcon.GetIcon(filePath);
+                        }
+                        else
+                        {
+                            XmlNode fileXE = cmdXE.SelectSingleNode("FileName");
+                            if (fileXE != null)
+                            {
+                                string filePath = ObjectPath.ExtractFilePath(fileXE.InnerText);
+                                icon = ResourceIcon.GetIcon(filePath);
+                            }
+                        }
+                        item.Image = icon?.ToBitmap();
+                        icon?.Dispose();
+                    }
+                }
+                if (item.Image == null) item.Image = AppImage.NotFound;
+                if (item.Text.IsNullOrWhiteSpace()) item.Text = keyName;
+                string tip = "";
+                foreach (XmlElement tipXE in itemXE.SelectNodes("Tip"))
+                {
+                    if (XmlDicHelper.JudgeCulture(tipXE)) tip = tipXE.GetAttribute("Value");
+                }
+                if (itemXE.GetElementsByTagName("CreateFile").Count > 0)
+                {
+                    if (!tip.IsNullOrWhiteSpace()) tip += "\n";
+                    tip += AppString.Tip.CommandFiles;
+                }
+                ToolTipBox.SetToolTip(item.ChkVisible, tip);
+                string itemText = item.Text;
+                bool itemVisible = item.ItemVisible;
+                BackupRestoreItem(item, itemText, BackupItemType.EnhanceShellItem, itemVisible, currentScene);
+            }
+        }
+
+        private void GetEnhanceMenuListShellExItems(XmlNode shellExXN, FoldGroupItem groupItem)
+        {
+            foreach (XmlNode itemXN in shellExXN.SelectNodes("Item"))
+            {
+                if (!XmlDicHelper.FileExists(itemXN)) continue;
+                if (!XmlDicHelper.JudgeCulture(itemXN)) continue;
+                if (!XmlDicHelper.JudgeOSVersion(itemXN)) continue;
+                if (!GuidEx.TryParse(itemXN.SelectSingleNode("Guid")?.InnerText, out Guid guid)) continue;
+                EnhanceShellExItem item = new EnhanceShellExItem
+                {
+                    FoldGroupItem = groupItem,
+                    ShellExPath = $@"{groupItem.GroupPath}\ShellEx",
+                    Image = ResourceIcon.GetIcon(itemXN.SelectSingleNode("Icon")?.InnerText)?.ToBitmap() ?? AppImage.SystemFile,
+                    DefaultKeyName = itemXN.SelectSingleNode("KeyName")?.InnerText,
+                    Guid = guid
+                };
+                foreach (XmlNode textXE in itemXN.SelectNodes("Text"))
+                {
+                    if (XmlDicHelper.JudgeCulture(textXE))
+                    {
+                        item.Text = ResourceString.GetDirectString(textXE.InnerText);
+                    }
+                }
+                if (item.Text.IsNullOrWhiteSpace()) item.Text = GuidInfo.GetText(guid);
+                if (item.DefaultKeyName.IsNullOrWhiteSpace()) item.DefaultKeyName = guid.ToString("B");
+                string tip = "";
+                foreach (XmlElement tipXE in itemXN.SelectNodes("Tip"))
+                {
+                    if (XmlDicHelper.JudgeCulture(tipXE)) tip = tipXE.GetAttribute("Text");
+                }
+                ToolTipBox.SetToolTip(item.ChkVisible, tip);
+                string itemText = item.Text;
+                bool itemVisible = item.ItemVisible;
+                BackupRestoreItem(item, itemText, BackupItemType.EnhanceShellExItem, itemVisible, currentScene);
             }
         }
     }

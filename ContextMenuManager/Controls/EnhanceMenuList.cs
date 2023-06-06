@@ -114,6 +114,8 @@ namespace ContextMenuManager.Controls
                     tip += AppString.Tip.CommandFiles;
                 }
                 ToolTipBox.SetToolTip(item.ChkVisible, tip);
+                string itemText = item.Text;
+                bool itemVisible = item.ItemVisible;
                 AddItem(item);
             }
         }
@@ -149,6 +151,8 @@ namespace ContextMenuManager.Controls
                     if(XmlDicHelper.JudgeCulture(tipXE)) tip = tipXE.GetAttribute("Text");
                 }
                 ToolTipBox.SetToolTip(item.ChkVisible, tip);
+                string itemText = item.Text;
+                bool itemVisible = item.ItemVisible;
                 AddItem(item);
             }
         }
