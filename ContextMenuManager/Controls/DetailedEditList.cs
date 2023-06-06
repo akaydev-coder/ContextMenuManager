@@ -119,7 +119,7 @@ namespace ContextMenuManager.Controls
                             if(isIniGroup)
                             {
                                 XmlElement ruleXE = (XmlElement)itemXE.SelectSingleNode("Rule");
-                                string iniPath = ruleXE.GetAttribute("FilePath");   // 主索引
+                                string iniPath = ruleXE.GetAttribute("FilePath");
                                 if (iniPath.IsNullOrWhiteSpace()) iniPath = groupItem.GroupPath;
                                 string section = ruleXE.GetAttribute("Section");
                                 string keyName = ruleXE.GetAttribute("KeyName");
@@ -174,8 +174,6 @@ namespace ContextMenuManager.Controls
                                         MinValue = minValue
                                     };
                                     ruleItem = new NumberRegRuleItem(rule, info);
-                                    int itemValue = ((NumberRegRuleItem)ruleItem).ItemValue;// 备份值
-                                    string RegPath = ((NumberRegRuleItem)ruleItem).RegPath; // 主索引
                                 }
                                 else if(itemXE.SelectSingleNode("IsStringItem") != null)
                                 {
@@ -186,8 +184,6 @@ namespace ContextMenuManager.Controls
                                         ValueName = ruleXE.GetAttribute("ValueName"),
                                     };
                                     ruleItem = new StringRegRuleItem(rule, info);
-                                    string itemValue = ((StringRegRuleItem)ruleItem).ItemValue; // 备份值
-                                    string RegPath = ((StringRegRuleItem)ruleItem).RegPath;     // 主索引
                                 }
                                 else
                                 {
@@ -223,8 +219,6 @@ namespace ContextMenuManager.Controls
                                         }
                                     }
                                     ruleItem = new VisibleRegRuleItem(rules, info);
-                                    bool itemVisible = ((VisibleRegRuleItem)ruleItem).ItemVisible;  // 备份值
-                                    string RegPath = ((VisibleRegRuleItem)ruleItem).RegPath;        // 默认第一个RegPath为主索引
                                 }
                             }
                             AddItem(ruleItem);

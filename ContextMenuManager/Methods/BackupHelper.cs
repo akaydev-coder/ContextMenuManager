@@ -12,6 +12,7 @@ using static ContextMenuManager.Methods.BackupList;
 using System.Xml.Serialization;
 using static ContextMenuManager.Controls.ShellNewList;
 using BluePointLilac.Controls;
+using System.Windows.Forms;
 
 namespace ContextMenuManager.Methods
 {
@@ -30,7 +31,7 @@ namespace ContextMenuManager.Methods
         LnkFile, UwpLnk, ExeFile, UnknownType,
         // 文件类型——第二板块（不予备份）
         // 其他规则——第一板块
-
+        EnhanceMenu, DetailedEdit,
         // 其他规则——第二板块
         DragDrop, PublicReferences, InternetExplorer,
         // 其他规则——第三板块（不予备份）
@@ -86,7 +87,7 @@ namespace ContextMenuManager.Methods
             AppString.SideBar.LnkFile, AppString.SideBar.UwpLnk, AppString.SideBar.ExeFile, AppString.SideBar.UnknownType,
             // 文件类型——第二板块（不予备份）
             // 其他规则——第一板块
-
+            AppString.SideBar.EnhanceMenu, AppString.SideBar.DetailedEdit,
             // 其他规则——第二板块
             AppString.SideBar.DragDrop, AppString.SideBar.PublicReferences, AppString.SideBar.IEMenu,
         };
@@ -242,6 +243,8 @@ namespace ContextMenuManager.Methods
                     GetWinXListItems(); break;
                 case Scenes.InternetExplorer:   // IE浏览器
                     GetIEItems(); break;
+                case Scenes.DetailedEdit:   // 详细编辑
+                    GetDetailedEditItems(); break;
                 default:    // 位于ShellList.cs内的备份项目
                     GetShellListItems(); break;
             }
@@ -249,7 +252,7 @@ namespace ContextMenuManager.Methods
 
         /*******************************单个Item处理************************************/
 
-        private void BackupRestoreItem(MyListItem item, string keyName, BackupItemType backupItemType, bool ifItemInMenu, Scenes currentScene)
+        private void BackupRestoreItem(MyListItem item, string keyName, BackupItemType backupItemType, bool itemData, Scenes currentScene)
         {
             if (backup)
             {
@@ -258,43 +261,45 @@ namespace ContextMenuManager.Methods
                 {
                     case BackupMode.All:
                     default:
-                        AddItem(keyName, backupItemType, ifItemInMenu, currentScene);
+                        AddItem(keyName, backupItemType, itemData, currentScene);
                         break;
                     case BackupMode.OnlyVisible:
-                        if (ifItemInMenu) AddItem(keyName, backupItemType, ifItemInMenu, currentScene);
+                        if (itemData) AddItem(keyName, backupItemType, itemData, currentScene);
                         break;
                     case BackupMode.OnlyInvisible:
-                        if (!ifItemInMenu) AddItem(keyName, backupItemType, ifItemInMenu, currentScene);
+                        if (!itemData) AddItem(keyName, backupItemType, itemData, currentScene);
                         break;
                 }
             }
             else
             {
                 // 恢复备份列表（新增备份类别处4）
-                if (CheckItemNeedChange(keyName, backupItemType, ifItemInMenu))
+                if (CheckItemNeedChange(keyName, backupItemType, itemData))
                 {
                     switch (backupItemType)
                     {
                         case BackupItemType.ShellItem:
-                            ((ShellItem)item).ItemVisible = !ifItemInMenu; break;
+                            ((ShellItem)item).ItemVisible = !itemData; break;
                         case BackupItemType.ShellExItem:
-                            ((ShellExItem)item).ItemVisible = !ifItemInMenu; break;
+                            ((ShellExItem)item).ItemVisible = !itemData; break;
                         case BackupItemType.UwpModelItem:
-                            ((UwpModeItem)item).ItemVisible = !ifItemInMenu; break;
+                            ((UwpModeItem)item).ItemVisible = !itemData; break;
                         case BackupItemType.VisibleRegRuleItem:
-                            ((VisibleRegRuleItem)item).ItemVisible = !ifItemInMenu; break;
+                            ((VisibleRegRuleItem)item).ItemVisible = !itemData; break;
                         case BackupItemType.ShellNewItem:
-                            ((ShellNewItem)item).ItemVisible = !ifItemInMenu; break;
+                            ((ShellNewItem)item).ItemVisible = !itemData; break;
                         case BackupItemType.SendToItem:
-                            ((SendToItem)item).ItemVisible = !ifItemInMenu; break;
+                            ((SendToItem)item).ItemVisible = !itemData; break;
                         case BackupItemType.OpenWithItem:
-                            ((OpenWithItem)item).ItemVisible = !ifItemInMenu; break;
+                            ((OpenWithItem)item).ItemVisible = !itemData; break;
                         case BackupItemType.WinXItem:
-                            ((WinXItem)item).ItemVisible = !ifItemInMenu; break;
+                            ((WinXItem)item).ItemVisible = !itemData; break;
                         case BackupItemType.StoreShellItem:
-                            ((StoreShellItem)item).ItemVisible = !ifItemInMenu; break;
+                            ((StoreShellItem)item).ItemVisible = !itemData; break;
                         case BackupItemType.IEItem:
-                            ((IEItem)item).ItemVisible = !ifItemInMenu; break;
+                            ((IEItem)item).ItemVisible = !itemData; break;
+                        case BackupItemType.VisbleIniRuleItem:
+                            ((VisbleIniRuleItem)item).ItemVisible = !itemData; break;
                     }
                 }
             }
@@ -302,7 +307,7 @@ namespace ContextMenuManager.Methods
             item.Dispose();
         }
 
-        private bool CheckItemNeedChange(string keyName, BackupItemType itemType, bool itemVisible)
+        private bool CheckItemNeedChange(string keyName, BackupItemType itemType, bool currentItemData)
         {
             foreach (BackupItem item in sceneRestoreList)
             {
@@ -318,7 +323,7 @@ namespace ContextMenuManager.Methods
                     {
                         return false;
                     }
-                    if (itemData != itemVisible)
+                    if (itemData != currentItemData)
                     {
                         restoreCount++;
                         return true;
@@ -329,12 +334,123 @@ namespace ContextMenuManager.Methods
                     }
                 }
             }
-            if ((restoreMode == RestoreMode.DisableNotOnList && itemVisible) || 
-                (restoreMode == RestoreMode.EnableNotOnList && !itemVisible))
+            if ((restoreMode == RestoreMode.DisableNotOnList && currentItemData) || 
+                (restoreMode == RestoreMode.EnableNotOnList && !currentItemData))
             {
                 restoreCount++;
                 return true;
             }
+            return false;
+        }
+
+        private void BackupRestoreItem(MyListItem item, string keyName, BackupItemType backupItemType, int itemData, Scenes currentScene)
+        {
+            if (backup)
+            {
+                // 加入备份列表
+                AddItem(keyName, backupItemType, itemData, currentScene);
+            }
+            else
+            {
+                // 恢复备份列表（新增备份类别处4）
+                int restoreItemData;
+                if (CheckItemNeedChange(keyName, backupItemType, itemData, out restoreItemData))
+                {
+                    switch (backupItemType)
+                    {
+                        case BackupItemType.NumberIniRuleItem:
+                            ((NumberIniRuleItem)item).ItemValue = restoreItemData; break;
+                        case BackupItemType.NumberRegRuleItem:
+                            ((NumberRegRuleItem)item).ItemValue = restoreItemData; break;
+                    }
+                }
+            }
+            // 释放资源
+            item.Dispose();
+        }
+
+        private bool CheckItemNeedChange(string keyName, BackupItemType itemType, int currentItemData, out int restoreItemData)
+        {
+            foreach (BackupItem item in sceneRestoreList)
+            {
+                // 成功匹配到后的处理方式：KeyName和ItemType匹配后检查itemData
+                if (item.KeyName == keyName && item.ItemType == itemType)
+                {
+                    int itemData;
+                    try
+                    {
+                        itemData = Convert.ToInt32(item.ItemData);
+                    }
+                    catch
+                    {
+                        restoreItemData = 0;
+                        return false;
+                    }
+                    if (itemData != currentItemData)
+                    {
+                        restoreCount++;
+                        restoreItemData = itemData;
+                        return true;
+                    }
+                    else
+                    {
+                        restoreItemData = 0;
+                        return false;
+                    }
+                }
+            }
+            restoreItemData = 0;
+            return false;
+        }
+
+        private void BackupRestoreItem(MyListItem item, string keyName, BackupItemType backupItemType, string itemData, Scenes currentScene)
+        {
+            if (backup)
+            {
+                // 加入备份列表
+                AddItem(keyName, backupItemType, itemData, currentScene);
+            }
+            else
+            {
+                // 恢复备份列表（新增备份类别处4）
+                string restoreItemData;
+                if (CheckItemNeedChange(keyName, backupItemType, itemData, out restoreItemData))
+                {
+                    switch (backupItemType)
+                    {
+                        case BackupItemType.StringIniRuleItem:
+                            ((StringIniRuleItem)item).ItemValue = restoreItemData; break;
+                        case BackupItemType.StringRegRuleItem:
+                            ((StringRegRuleItem)item).ItemValue = restoreItemData; break;
+                    }
+                }
+            }
+            // 释放资源
+            item.Dispose();
+        }
+
+        private bool CheckItemNeedChange(string keyName, BackupItemType itemType, string currentItemData, out string restoreItemData)
+        {
+            foreach (BackupItem item in sceneRestoreList)
+            {
+                // 成功匹配到后的处理方式：KeyName和ItemType匹配后检查itemData
+                if (item.KeyName == keyName && item.ItemType == itemType)
+                {
+                    string itemData = item.ItemData;
+                    if (itemData != currentItemData)
+                    {
+                        restoreCount++;
+                        restoreItemData = itemData;
+                        return true;
+                    }
+                    else
+                    {
+                        restoreItemData = "";
+                        return false;
+                    }
+                }
+            }
+            restoreItemData = "";
             return false;
         }
 
@@ -355,11 +471,11 @@ namespace ContextMenuManager.Methods
                         string restoreItemData = restoreItem.ItemData;
                         if (restoreItemData != itemData)
                         {
-                            int.TryParse(restoreItem.KeyName, out int keyNameIndex);
+                            int.TryParse(restoreItem.KeyName, out int itemDataIndex);
                             switch (currentScene)
                             {
                                 case Scenes.DragDrop:
-                                    DropEffect dropEffect = (DropEffect)keyNameIndex;
+                                    DropEffect dropEffect = (DropEffect)itemDataIndex;
                                     if (DefaultDropEffect != dropEffect)
                                     {
                                         DefaultDropEffect = dropEffect;
@@ -1120,6 +1236,209 @@ namespace ContextMenuManager.Methods
                             }
                         }
                     }
+                }
+            }
+        }
+
+        /*******************************DetailedEditList.cs************************************/
+
+        public void GetDetailedEditItems()
+        {
+            for (int index = 0; index < 2; index++)
+            {
+                // 获取系统字典或用户字典
+                XmlDocument doc = XmlDicHelper.DetailedEditDic[index];
+                if (doc?.DocumentElement == null) return;
+                // 遍历所有子节点
+                foreach (XmlNode groupXN in doc.DocumentElement.ChildNodes)
+                {
+                    try
+                    {
+                        // 获取Guid列表
+                        List<Guid> guids = new List<Guid>();
+                        XmlNodeList guidList = groupXN.SelectNodes("Guid");
+                        foreach (XmlNode guidXN in guidList)
+                        {
+                            if (!GuidEx.TryParse(guidXN.InnerText, out Guid guid)) continue;
+                            if (!File.Exists(GuidInfo.GetFilePath(guid))) continue;
+                            guids.Add(guid);
+                        }
+                        if (guidList.Count > 0 && guids.Count == 0) continue;
+
+                        // 获取groupItem列表
+                        FoldGroupItem groupItem;
+                        bool isIniGroup = groupXN.SelectSingleNode("IsIniGroup") != null;
+                        string attribute = isIniGroup ? "FilePath" : "RegPath";
+                        ObjectPath.PathType pathType = isIniGroup ? ObjectPath.PathType.File : ObjectPath.PathType.Registry;
+                        groupItem = new FoldGroupItem(groupXN.SelectSingleNode(attribute)?.InnerText, pathType);
+
+                        string GetRuleFullRegPath(string regPath)
+                        {
+                            if (string.IsNullOrEmpty(regPath)) regPath = groupItem.GroupPath;
+                            else if (regPath.StartsWith("\\")) regPath = groupItem.GroupPath + regPath;
+                            return regPath;
+                        };
+
+                        // 遍历groupItem内所有Item节点
+                        foreach (XmlElement itemXE in groupXN.SelectNodes("Item"))
+                        {
+                            try
+                            {
+                                if (!XmlDicHelper.JudgeOSVersion(itemXE)) continue;
+                                RuleItem ruleItem;
+                                ItemInfo info = new ItemInfo();
+
+                                // 获取文本、提示文本
+                                foreach (XmlElement textXE in itemXE.SelectNodes("Text"))
+                                {
+                                    if (XmlDicHelper.JudgeCulture(textXE)) info.Text = ResourceString.GetDirectString(textXE.GetAttribute("Value"));
+                                }
+                                foreach (XmlElement tipXE in itemXE.SelectNodes("Tip"))
+                                {
+                                    if (XmlDicHelper.JudgeCulture(tipXE)) info.Tip = ResourceString.GetDirectString(tipXE.GetAttribute("Value"));
+                                }
+                                info.RestartExplorer = itemXE.SelectSingleNode("RestartExplorer") != null;
+
+                                // 如果是数值类型的，初始化默认值、最大值、最小值
+                                int defaultValue = 0, maxValue = 0, minValue = 0;
+                                if (itemXE.SelectSingleNode("IsNumberItem") != null)
+                                {
+                                    XmlElement ruleXE = (XmlElement)itemXE.SelectSingleNode("Rule");
+                                    defaultValue = ruleXE.HasAttribute("Default") ? Convert.ToInt32(ruleXE.GetAttribute("Default")) : 0;
+                                    maxValue = ruleXE.HasAttribute("Max") ? Convert.ToInt32(ruleXE.GetAttribute("Max")) : int.MaxValue;
+                                    minValue = ruleXE.HasAttribute("Min") ? Convert.ToInt32(ruleXE.GetAttribute("Min")) : int.MinValue;
+                                }
+
+                                // 建立三种类型的RuleItem
+                                if (isIniGroup)
+                                {
+                                    XmlElement ruleXE = (XmlElement)itemXE.SelectSingleNode("Rule");
+                                    string iniPath = ruleXE.GetAttribute("FilePath");
+                                    if (iniPath.IsNullOrWhiteSpace()) iniPath = groupItem.GroupPath;
+                                    string section = ruleXE.GetAttribute("Section");
+                                    string keyName = ruleXE.GetAttribute("KeyName");
+                                    if (itemXE.SelectSingleNode("IsNumberItem") != null)
+                                    {
+                                        var rule = new NumberIniRuleItem.IniRule
+                                        {
+                                            IniPath = iniPath,
+                                            Section = section,
+                                            KeyName = keyName,
+                                            DefaultValue = defaultValue,
+                                            MaxValue = maxValue,
+                                            MinValue = maxValue
+                                        };
+                                        ruleItem = new NumberIniRuleItem(rule, info);
+                                        string infoText = info.Text;
+                                        int itemValue = ((NumberIniRuleItem)ruleItem).ItemValue;
+                                        BackupRestoreItem(ruleItem, infoText, BackupItemType.NumberIniRuleItem, itemValue, currentScene);
+                                    }
+                                    else if (itemXE.SelectSingleNode("IsStringItem") != null)
+                                    {
+                                        var rule = new StringIniRuleItem.IniRule
+                                        {
+                                            IniPath = iniPath,
+                                            Secation = section,
+                                            KeyName = keyName
+                                        };
+                                        ruleItem = new StringIniRuleItem(rule, info);
+                                        string infoText = info.Text;
+                                        string itemValue = ((StringIniRuleItem)ruleItem).ItemValue;
+                                        BackupRestoreItem(ruleItem, infoText, BackupItemType.StringIniRuleItem, itemValue, currentScene);
+                                    }
+                                    else
+                                    {
+                                        var rule = new VisbleIniRuleItem.IniRule
+                                        {
+                                            IniPath = iniPath,
+                                            Section = section,
+                                            KeyName = keyName,
+                                            TurnOnValue = ruleXE.HasAttribute("On") ? ruleXE.GetAttribute("On") : null,
+                                            TurnOffValue = ruleXE.HasAttribute("Off") ? ruleXE.GetAttribute("Off") : null,
+                                        };
+                                        ruleItem = new VisbleIniRuleItem(rule, info);
+                                        string infoText = info.Text;
+                                        bool itemVisible = ((VisbleIniRuleItem)ruleItem).ItemVisible;
+                                        BackupRestoreItem(ruleItem, infoText, BackupItemType.VisbleIniRuleItem, itemVisible, currentScene);
+                                    }
+                                }
+                                else
+                                {
+                                    if (itemXE.SelectSingleNode("IsNumberItem") != null)
+                                    {
+                                        XmlElement ruleXE = (XmlElement)itemXE.SelectSingleNode("Rule");
+                                        var rule = new NumberRegRuleItem.RegRule
+                                        {
+                                            RegPath = GetRuleFullRegPath(ruleXE.GetAttribute("RegPath")),
+                                            ValueName = ruleXE.GetAttribute("ValueName"),
+                                            ValueKind = XmlDicHelper.GetValueKind(ruleXE.GetAttribute("ValueKind"), RegistryValueKind.DWord),
+                                            DefaultValue = defaultValue,
+                                            MaxValue = maxValue,
+                                            MinValue = minValue
+                                        };
+                                        ruleItem = new NumberRegRuleItem(rule, info);
+                                        string infoText = info.Text;
+                                        int itemValue = ((NumberRegRuleItem)ruleItem).ItemValue;// 备份值
+                                        BackupRestoreItem(ruleItem, infoText, BackupItemType.NumberRegRuleItem, itemValue, currentScene);
+                                    }
+                                    else if (itemXE.SelectSingleNode("IsStringItem") != null)
+                                    {
+                                        XmlElement ruleXE = (XmlElement)itemXE.SelectSingleNode("Rule");
+                                        var rule = new StringRegRuleItem.RegRule
+                                        {
+                                            RegPath = GetRuleFullRegPath(ruleXE.GetAttribute("RegPath")),
+                                            ValueName = ruleXE.GetAttribute("ValueName"),
+                                        };
+                                        ruleItem = new StringRegRuleItem(rule, info);
+                                        string infoText = info.Text;
+                                        string itemValue = ((StringRegRuleItem)ruleItem).ItemValue; // 备份值
+                                        BackupRestoreItem(ruleItem, infoText, BackupItemType.StringRegRuleItem, itemValue, currentScene);
+                                    }
+                                    else
+                                    {
+                                        XmlNodeList ruleXNList = itemXE.SelectNodes("Rule");
+                                        var rules = new VisibleRegRuleItem.RegRule[ruleXNList.Count];
+                                        for (int i = 0; i < ruleXNList.Count; i++)
+                                        {
+                                            XmlElement ruleXE = (XmlElement)ruleXNList[i];
+                                            rules[i] = new VisibleRegRuleItem.RegRule
+                                            {
+                                                RegPath = GetRuleFullRegPath(ruleXE.GetAttribute("RegPath")),
+                                                ValueName = ruleXE.GetAttribute("ValueName"),
+                                                ValueKind = XmlDicHelper.GetValueKind(ruleXE.GetAttribute("ValueKind"), RegistryValueKind.DWord)
+                                            };
+                                            string turnOn = ruleXE.HasAttribute("On") ? ruleXE.GetAttribute("On") : null;
+                                            string turnOff = ruleXE.HasAttribute("Off") ? ruleXE.GetAttribute("Off") : null;
+                                            switch (rules[i].ValueKind)
+                                            {
+                                                case RegistryValueKind.Binary:
+                                                    rules[i].TurnOnValue = turnOn != null ? XmlDicHelper.ConvertToBinary(turnOn) : null;
+                                                    rules[i].TurnOffValue = turnOff != null ? XmlDicHelper.ConvertToBinary(turnOff) : null;
+                                                    break;
+                                                case RegistryValueKind.DWord:
+                                                    if (turnOn == null) rules[i].TurnOnValue = null;
+                                                    else rules[i].TurnOnValue = Convert.ToInt32(turnOn);
+                                                    if (turnOff == null) rules[i].TurnOffValue = null;
+                                                    else rules[i].TurnOffValue = Convert.ToInt32(turnOff);
+                                                    break;
+                                                default:
+                                                    rules[i].TurnOnValue = turnOn;
+                                                    rules[i].TurnOffValue = turnOff;
+                                                    break;
+                                            }
+                                        }
+                                        ruleItem = new VisibleRegRuleItem(rules, info);
+                                        string infoText = info.Text;
+                                        bool itemVisible = ((VisibleRegRuleItem)ruleItem).ItemVisible;  // 备份值
+                                        BackupRestoreItem(ruleItem, infoText, BackupItemType.VisibleRegRuleItem, itemVisible, currentScene);
+                                    }
+                                }
+                                groupItem.Dispose();
+                            }
+                            catch { continue; }
+                        }
+                    }
+                    catch { continue; }
                 }
             }
         }
