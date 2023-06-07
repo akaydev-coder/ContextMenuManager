@@ -273,6 +273,8 @@ namespace ContextMenuManager.Methods
             public static string RestoreSucceeded { get; set; }
             public static string ConfirmDeleteBackupPermanently { get; set; }
             public static string DeprecatedBackupVersion { get; set; }
+            public static string NotChooseAnyBackup { get; set; }
+            public static string NotChooseAnyRestore { get; set; }
         }
 
         /// <summary>提示文本</summary>

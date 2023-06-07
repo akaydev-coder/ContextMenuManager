@@ -71,9 +71,10 @@ namespace ContextMenuManager.Controls
                 }
                 backupScenes = dlg.TvSelectedItems;
             }
-            // 无备份项目，不进行备份
+            // 未选择备份项目，不进行备份
             if (backupScenes.Count == 0)
             {
+                AppMessageBox.Show(AppString.Message.NotChooseAnyBackup);
                 return;
             }
             // 开始备份项目
@@ -126,9 +127,10 @@ namespace ContextMenuManager.Controls
                 }
                 restoreScenes = dlg.TvSelectedItems;
             }
-            // 无恢复项目，不进行备份
+            // 未选择恢复项目，不进行恢复
             if (restoreScenes.Count == 0)
             {
+                AppMessageBox.Show(AppString.Message.NotChooseAnyRestore);
                 return;
             }
             // 开始恢复项目
