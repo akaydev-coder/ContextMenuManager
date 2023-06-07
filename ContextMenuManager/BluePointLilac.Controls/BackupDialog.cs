@@ -125,7 +125,7 @@ namespace BluePointLilac.Controls
             private readonly List<string> tvSelectedItems = new List<string>();
             public List<string> TvSelectedItems
             {
-                get => GetSortedTvSelectedItems(tvSelectedItems);
+                get => GetSortedTvSelectedItems();
             }
 
             /*************************************内部控件***********************************/
@@ -269,7 +269,10 @@ namespace BluePointLilac.Controls
                             childNode.Checked = isChecked;
                             if (isChecked)
                             {
-                                tvSelectedItems.Add(childNode.Text);
+                                if (!tvSelectedItems.Contains(childNode.Text))
+                                {
+                                    tvSelectedItems.Add(childNode.Text);
+                                }
                                 if (tvSelectedItems.Count == tvValue.Length)
                                 {
                                     checkAll.Checked = true;
@@ -310,7 +313,10 @@ namespace BluePointLilac.Controls
 
                         if (isChecked)
                         {
-                            tvSelectedItems.Add(node.Text);
+                            if (!tvSelectedItems.Contains(node.Text))
+                            {
+                                tvSelectedItems.Add(node.Text);
+                            }
                             if (tvSelectedItems.Count == tvValue.Length)
                             {
                                 checkAll.Checked = true;
@@ -351,10 +357,23 @@ namespace BluePointLilac.Controls
                 }
             }
 
-            private List<string> GetSortedTvSelectedItems(List<string> tvSelectedItems)
+            private List<string> GetSortedTvSelectedItems()
             {
-                List<string> sortedTvSelectedItems = new List<string>();
+                // 获取Checked的节点
+                List<string> tvSelectedItems = new List<string>();
+                for (int i = 0; i < treeView.Nodes.Count; i++)
+                {
+                    for (int j = 0; j < treeView.Nodes[i].Nodes.Count; j++)
+                    {
+                        if (treeView.Nodes[i].Nodes[j].Checked)
+                        {
+                            tvSelectedItems.Add(treeView.Nodes[i].Nodes[j].Text);
+                        }
+                    }
+                }
 
+                // 对节点文字进行排序
+                List<string> sortedTvSelectedItems = new List<string>();
                 for (int i = 0; i < BackupHelper.HomeBackupScenesText.Length; i++)
                 {
                     if (tvSelectedItems.Contains(BackupHelper.HomeBackupScenesText[i]))
@@ -362,7 +381,6 @@ namespace BluePointLilac.Controls
                         sortedTvSelectedItems.Add(BackupHelper.HomeBackupScenesText[i]);
                     }
                 }
-
                 for (int i = 0; i < BackupHelper.TypeBackupScenesText.Length; i++)
                 {
                     if (tvSelectedItems.Contains(BackupHelper.TypeBackupScenesText[i]))
@@ -370,7 +388,6 @@ namespace BluePointLilac.Controls
                         sortedTvSelectedItems.Add(BackupHelper.TypeBackupScenesText[i]);
                     }
                 }
-
                 for (int i = 0; i < BackupHelper.RuleBackupScenesText.Length; i++)
                 {
                     if (tvSelectedItems.Contains(BackupHelper.RuleBackupScenesText[i]))
