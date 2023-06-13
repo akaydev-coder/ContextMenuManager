@@ -10,7 +10,7 @@
   [Gitee Releases][Gitee Releases]<br>
 * 下载说明：在Assets文件列表里面下载zip（建议）或者直接下载exe
 * .NET版本说明：程序基于.NET4.8，适用于Win10、8.1、8、7、Vista系统<br>
-  win8、win8.1、win10自带.NET4.8，Vista、win7系统既不自带.NET4.8<br>
+  win8、win8.1、win10自带.NET4.8，Vista、win7系统不自带.NET4.8<br>
   自带.NET可直接运行程序，不自带则需要安装对应版本的[.NET Framework运行库][.NET Framework]
 
 ## 主要功能
