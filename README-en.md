@@ -9,8 +9,8 @@
   [Github Releases][GitHub Releases]<br>
   [Gitee Releases][Gitee Releases]<br>
 * Download the zip file (recommended) or the exe file in the Assets list
-* About .NET versions: this application is based on the the .Net 4.8, and the .NET 3.5 and .NET 4.0 both are compatible with Windows Vista, 7, 8, 8.1, 10.<br>
- Win7 comes with .NET 3.5, Win8, 8.1, 10 come with .NET 4.0 and up. Vista does not come with .NET 3.5 or 4.0. <br> You may need to install the appropriate [.NET Framework Runtime Library][.NET Framework Runtime Library].
+* About .NET versions: this application is based on the the .Net 4.8, and it is compatible with Windows Vista, 7, 8, 8.1, 10.<br>
+ Win8, 8.1, 10 come with .NET 4.8. Vista and Win7 does not come with .NET 4.8. <br> You may need to install the appropriate [.NET Framework Runtime Library][.NET Framework Runtime Library].
 
 ## Key features
 * Enable and disable context menu options for files, folders, submenus (e.g. open, send to), Internet Explorer, and Win+X, etc., and backup and restore right-click menus

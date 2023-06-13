@@ -9,8 +9,8 @@
   [GitHub Releases][GitHub Releases]<br>
   [Gitee Releases][Gitee Releases]<br>
 * 下载说明：在Assets文件列表里面下载zip（建议）或者直接下载exe
-* .NET版本说明：程序仅包含.NET4.8版，均适用于Win10、8.1、8、7、Vista系统<br>
-  win7自带.NET3.5，win8、win8.1、win10自带.NET4.0以上版本，Vista系统既不自带.NET3.5也不自带4.0以上版本<br>
+* .NET版本说明：程序基于.NET4.8，适用于Win10、8.1、8、7、Vista系统<br>
+  win8、win8.1、win10自带.NET4.8，Vista、win7系统既不自带.NET4.8<br>
   自带.NET可直接运行程序，不自带则需要安装对应版本的[.NET Framework运行库][.NET Framework]
 
 ## 主要功能
