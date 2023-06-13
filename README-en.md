@@ -5,13 +5,15 @@
 > 🖱️ A program to manage the Windows right-click context menu.
 
 ## Download the binary
-* [Github Releases][GitHub Releases] or [Gitee Releases][Gitee Releases]
+* [Latest Version][Latest]<br>
+  [Github Releases][GitHub Releases]<br>
+  [Gitee Releases][Gitee Releases]<br>
 * Download the zip file (recommended) or the exe file in the Assets list
-* About .NET versions: the .NET 3.5 and .NET 4.0 both are compatible with Windows Vista, 7, 8, 8.1, 10.
+* About .NET versions: this application is based on the the .Net 4.8, and the .NET 3.5 and .NET 4.0 both are compatible with Windows Vista, 7, 8, 8.1, 10.<br>
  Win7 comes with .NET 3.5, Win8, 8.1, 10 come with .NET 4.0 and up. Vista does not come with .NET 3.5 or 4.0. <br> You may need to install the appropriate [.NET Framework Runtime Library][.NET Framework Runtime Library].
 
 ## Key features
-* Enable and disable context menu options for files, folders, submenus (e.g. open, send to), Internet Explorer, and Win+X
+* Enable and disable context menu options for files, folders, submenus (e.g. open, send to), Internet Explorer, and Win+X, etc., and backup and restore right-click menus
 * Modify menu names and icons
 * Delete context menu entries
 * Navigate menus in the registry or File Explorer
@@ -28,7 +30,7 @@
 
 ## Third-party resources
 * Main program icon from [EasyIcon][EasyIcon]<br>![][AppIcon]
-* [Button icons][AppImage] from [Alibaba Iconfont][IconFont]![](Screenshot/AppImage.png)
+* [Button icons][AppImage] from [Alibaba Iconfont][IconFont]![](Screenshot/AppImage.jpg)
 
 ## Updates
 * Program and dictionary updates can be installed within the program, overwriting the original files.
@@ -49,13 +51,14 @@
 This program is completely free of charge; if you find this program useful, you can donate in yuan by scanning the QR codes below（WeChat, Alipay, QQ) 
 <br>Any amount is welcome，thank you for your understanding and support! Please also don't forget to star this repo (It means a lot to me!）<br>[Donate List](Donate.md)<br>![][Donate]
 
+  [Latest]: https://github.com/Jack251970/ContextMenuManager/releases/latest
   [EasyIcon]: https://www.easyicon.net/1208132-mouse_icon.html
   [AppIcon]: ContextMenuManager/Properties/AppIcon.ico
   [AppImage]: ContextMenuManager/Properties/Resources/Images
   [IconFont]: https://www.iconfont.cn
   [HashLnk]: https://github.com/riverar/hashlnk
-  [GitHub Releases]: https://github.com/BluePointLilac/ContextMenuManager/releases
-  [Gitee Releases]: https://gitee.com/BluePointLilac/ContextMenuManager/releases
+  [GitHub Releases]: https://github.com/Jack251970/ContextMenuManager/releases
+  [Gitee Releases]: https://gitee.com/Jack251970/ContextMenuManager/releases
   [PcMoe]: http://www.pcmoe.net
   [Bilibili]: https://space.bilibili.com/34492771
   [Donate]: ContextMenuManager/Properties/Resources/Images/Donate.png

@@ -9,12 +9,12 @@
   [GitHub Releases][GitHub Releases]<br>
   [Gitee Releases][Gitee Releases]<br>
 * 下载说明：在Assets文件列表里面下载zip（建议）或者直接下载exe
-* .NET版本说明：程序分为.NET3.5版和.NET4.0版，均适用于Win10、8.1、8、7、Vista系统<br>
+* .NET版本说明：程序仅包含.NET4.8版，均适用于Win10、8.1、8、7、Vista系统<br>
   win7自带.NET3.5，win8、win8.1、win10自带.NET4.0以上版本，Vista系统既不自带.NET3.5也不自带4.0以上版本<br>
   自带.NET可直接运行程序，不自带则需要安装对应版本的[.NET Framework运行库][.NET Framework]
 
 ## 主要功能
-* 启用或禁用文件、文件夹、新建、发送到、打开方式、自定义文件格式、IE浏览器、WinX等右键菜单项目
+* 启用或禁用文件、文件夹、新建、发送到、打开方式、自定义文件格式、IE浏览器、WinX等右键菜单项目并对右键菜单进行备份和恢复
 * 对上述场景右键菜单项目进行修改名称、修改图标、导航注册表位置、导航文件位置、永久删除等操作
 * 对上述场景右键菜单自定义添加项目，自定义菜单命令
 
@@ -31,7 +31,7 @@
 * 程序主图标来自 [EasyIcon][EasyIcon]<br>
 ![][AppIcon]
 * [程序按钮图标][AppImage] 主要来自于 [阿里巴巴矢量图标资源库][IconFont]<br>
-![](Screenshot/AppImage.png)
+![](Screenshot/AppImage.jpg)
 
 ## 温馨提示
 * 程序需要对大量的注册表项和文件进行读写删改操作，这些行为比较敏感，<br>
@@ -59,9 +59,9 @@
 ## 项目收藏
 [![Stargazers over time](https://starchart.cc/BluePointLilac/ContextMenuManager.svg)](https://starchart.cc/BluePointLilac/ContextMenuManager)
 
-  [Latest]: https://github.com/BluePointLilac/ContextMenuManager/releases/latest
-  [GitHub Releases]: https://github.com/BluePointLilac/ContextMenuManager/releases
-  [Gitee Releases]: https://gitee.com/BluePointLilac/ContextMenuManager/releases
+  [Latest]: https://github.com/Jack251970/ContextMenuManager/releases/latest
+  [GitHub Releases]: https://github.com/Jack251970/ContextMenuManager/releases
+  [Gitee Releases]: https://gitee.com/Jack251970/ContextMenuManager/releases
   [.NET Framework]:https://dotnet.microsoft.com/download/dotnet-framework
   [EasyIcon]: https://www.easyicon.net/1208132-mouse_icon.html
   [AppIcon]: ContextMenuManager/Properties/AppIcon.ico
