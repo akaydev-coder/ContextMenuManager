@@ -40,6 +40,8 @@ namespace ContextMenuManager.Methods
         public static readonly Image Translate = Resources.Translate.ResizeImage(Scale);
         ///<summary>检查更新</summary>
         public static readonly Image CheckUpdate = Resources.CheckUpdate.ResizeImage(Scale);
+        ///<summary>菜单风格</summary>
+        public static readonly Image ContextMenuStyle = Resources.ContextMenuStyle.ResizeImage(Scale);
         ///<summary>上</summary>
         public static readonly Image Up = Resources.Up.ResizeImage(Scale);
         ///<summary>下</summary>

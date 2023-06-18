@@ -237,6 +237,24 @@ namespace ContextMenuManager.Controls
                 case Scenes.CustomRegPath:
                     scenePath = CurrentCustomRegPath; break;
             }
+            //Win11系统切换旧版菜单
+            if (WinOsVersion.Current >= WinOsVersion.Win11)
+            {
+                switch (Scene)
+                {
+                    case Scenes.File:
+                    case Scenes.Folder:
+                    case Scenes.Directory:
+                    case Scenes.Background:
+                    case Scenes.Desktop:
+                    case Scenes.Drive:
+                    case Scenes.AllObjects:
+                    case Scenes.Computer:
+                    case Scenes.RecycleBin:
+                    case Scenes.Library:
+                        AddItem(new SwitchContextMenuStyleItem()); break;
+                }
+            }
             AddNewItem(scenePath); // 新建一个菜单项目
             LoadItems(scenePath);
             if(WinOsVersion.Current >= WinOsVersion.Win10)
@@ -962,6 +980,70 @@ namespace ContextMenuManager.Controls
                     AppMessageBox.Show(AppString.Message.MalformedGuid);
                 }
             }
+        }
+
+        sealed class SwitchContextMenuStyleItem : MyListItem
+        {
+            const string registryKeyPath = @"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}";
+            const string registrySubKeyPath = @"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32";
+
+            public SwitchContextMenuStyleItem()
+            {
+                Text = AppString.Menu.SwitchUserContextMenuStyle;
+                Image = AppImage.ContextMenuStyle;
+                AddCtr(cmbDic);
+                cmbDic.AutosizeDropDownWidth();
+                cmbDic.Font = new Font(Font.FontFamily, Font.Size + 1F);
+                cmbDic.Items.AddRange(new[] { AppString.Menu.Win11DefaultContextMenuStyle, AppString.Menu.Win10ClassicContextMenuStyle });
+                cmbDic.SelectionChangeCommitted += (sender, e) =>
+                {
+                    Focus();
+                    UseWin11ContextMenuStyle = cmbDic.SelectedIndex == 0;
+                };
+                // 判断注册表中是否存在registryKeyPath项：存在则为Win10经典右键菜单，不存在则为Win11默认右键菜单
+                RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(registryKeyPath);
+                useWin11ContextMenuStyle = registryKey == null;
+                cmbDic.SelectedIndex = useWin11ContextMenuStyle ? 0 : 1;
+            }
+
+            private bool useWin11ContextMenuStyle;
+            public bool UseWin11ContextMenuStyle
+            {
+                get => useWin11ContextMenuStyle;
+                set
+                {
+                    if (useWin11ContextMenuStyle == value) return;
+                    cmbDic.SelectedIndex = value ? 0 : 1;
+                    useWin11ContextMenuStyle = value;
+                    if (value)
+                    {
+                        // 切换Win11默认右键菜单样式
+                        // 删除注册表项目：HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}
+                        RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(registryKeyPath, true);
+                        if (registryKey != null)
+                        {
+                            Registry.CurrentUser.DeleteSubKeyTree(registryKeyPath);
+                        }
+                    }
+                    else
+                    {
+                        // 切换Win10经典右键菜单样式
+                        // 添加注册表项目：HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32
+                        RegistryKey registryKey = Registry.CurrentUser.CreateSubKey(registrySubKeyPath);
+                        if (registryKey != null)
+                        {
+                            registryKey.SetValue(null, "", RegistryValueKind.String);
+                        }
+                    }
+                    ExplorerRestarter.Show();
+                }
+            }
+
+            readonly ComboBox cmbDic = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Width = 180.DpiZoom()
+            };
         }
     }
 }

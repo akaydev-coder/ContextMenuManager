@@ -7,6 +7,7 @@ namespace BluePointLilac.Methods
     public static class WinOsVersion
     {
         public static readonly Version Current = Environment.OSVersion.Version;
+        public static readonly Version Win11 = new Version(10, 0, 22000);
         public static readonly Version Win10 = new Version(10, 0);
         public static readonly Version Win8_1 = new Version(6, 3);
         public static readonly Version Win8 = new Version(6, 2);

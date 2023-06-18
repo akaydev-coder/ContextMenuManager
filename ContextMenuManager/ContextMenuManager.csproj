@@ -406,6 +406,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Methods\Updater.cs" />
     <Compile Include="Methods\XmlDicHelper.cs" />
+    <None Include="Properties\Resources\Images\ContextMenuStyle.png" />
     <None Include="Properties\Resources\Images\BackupItem.png" />
     <None Include="App.config" />
     <None Include="Properties\App.manifest" />

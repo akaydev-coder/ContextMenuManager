@@ -11,7 +11,6 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows.Forms;
 using System.Xml;
-using static ContextMenuManager.Controls.ShellList;
 
 namespace ContextMenuManager.Controls
 {

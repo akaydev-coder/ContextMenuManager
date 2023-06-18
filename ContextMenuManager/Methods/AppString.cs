@@ -163,6 +163,9 @@ namespace ContextMenuManager.Methods
             public static string UnfoldAll { get; set; }
             public static string RestoreBackup { get; set; }
             public static string DeleteBackup { get; set; }
+            public static string SwitchUserContextMenuStyle { get; set; }
+            public static string Win11DefaultContextMenuStyle { get; set; }
+            public static string Win10ClassicContextMenuStyle { get; set; }
         }
 
         /// <summary>对话框子窗口</summary>
