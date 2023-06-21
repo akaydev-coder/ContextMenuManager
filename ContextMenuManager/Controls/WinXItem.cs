@@ -17,10 +17,7 @@ namespace ContextMenuManager.Controls
             InitializeComponents();
             FoldGroupItem = group;
             FilePath = filePath;
-            if (WinOsVersion.Current >= WinOsVersion.Win11)
-            {
-                keyPath = FilePath.Substring((ItemVisible ? WinXList.WinXPath : WinXList.BackupWinXPath).Length);
-            } 
+            RefreshKeyPath();
             Indent();
         }
 
@@ -37,7 +34,15 @@ namespace ContextMenuManager.Controls
             }
         }
 
-        private readonly string keyPath = null;
+        private string keyPath = null;
+        private void RefreshKeyPath()
+        {
+            if (WinOsVersion.Current >= WinOsVersion.Win11)
+            {
+                keyPath = FilePath.Substring((ItemVisible ? WinXList.WinXPath : WinXList.BackupWinXPath).Length);
+            }
+        }
+
         private string BackupPath => $@"{(ItemVisible ? WinXList.BackupWinXPath : WinXList.WinXPath)}{keyPath}";
         private string DefaultFilePath => $@"{WinXList.DefaultWinXPath}{keyPath}";
 
@@ -205,7 +210,6 @@ namespace ContextMenuManager.Controls
             };
         }
 
-        // TODO:适配Win11
         private void ChangeGroup()
         {
             using(SelectDialog dlg = new SelectDialog())
@@ -215,19 +219,15 @@ namespace ContextMenuManager.Controls
                 dlg.Selected = FoldGroupItem.Text;
                 if(dlg.ShowDialog() != DialogResult.OK) return;
                 if(dlg.Selected == FoldGroupItem.Text) return;
-                string dirPath = $@"{WinXList.WinXPath}\{dlg.Selected}";
-                int count = Directory.GetFiles(dirPath, "*.lnk").Length;
-                string num = (count + 1).ToString().PadLeft(2, '0');
-                string partName = FileName;
-                int index = partName.IndexOf(" - ");
-                if(index > 0) partName = partName.Substring(index + 3);
-                string lnkPath = $@"{dirPath}\{num} - {partName}";
-                lnkPath = ObjectPath.GetNewPathWithIndex(lnkPath, ObjectPath.PathType.File);
-                string text = DesktopIni.GetLocalizedFileNames(FilePath);
-                DesktopIni.DeleteLocalizedFileNames(FilePath);
-                if(text != string.Empty) DesktopIni.SetLocalizedFileNames(lnkPath, text);
-                File.Move(FilePath, lnkPath);
+
+                MoveFile(dlg.Selected, true, out string lnkPath);
+                if (WinOsVersion.Current >= WinOsVersion.Win11)
+                {
+                    MoveFile(dlg.Selected, false, out _);
+                }
                 FilePath = lnkPath;
+                RefreshKeyPath();
+
                 WinXList list = (WinXList)Parent;
                 list.Controls.Remove(this);
                 for(int i = 0; i < list.Controls.Count; i++)
@@ -244,7 +244,24 @@ namespace ContextMenuManager.Controls
                 ExplorerRestarter.Show();
             }
         }
+        private void MoveFile(string selectText, bool isWinX, out string lnkPath)
+        {
+            string dirPath = $@"{(isWinX ? WinXList.WinXPath : WinXList.DefaultWinXPath)}\{selectText}";
+            int count = Directory.GetFiles(dirPath, "*.lnk").Length;
+            string num = (count + 1).ToString().PadLeft(2, '0');    // TODO:修复本组内顺序的问题
+            string partName = FileName;
+            int index = partName.IndexOf(" - ");
+            if (index > 0) partName = partName.Substring(index + 3);
+            lnkPath = $@"{dirPath}\{num} - {partName}";
+            lnkPath = ObjectPath.GetNewPathWithIndex(lnkPath, ObjectPath.PathType.File);
+            string meFilePath = isWinX ? FilePath : DefaultFilePath;
+            string text = DesktopIni.GetLocalizedFileNames(meFilePath);
+            DesktopIni.DeleteLocalizedFileNames(meFilePath);
+            if (text != string.Empty) DesktopIni.SetLocalizedFileNames(lnkPath, text);
+            File.Move(meFilePath, lnkPath);
+        }
 
+        // TODO:适配Win11
         private void MoveItem(bool isUp)
         {
             WinXList list = (WinXList)Parent;
@@ -270,7 +287,9 @@ namespace ContextMenuManager.Controls
             if(name1 != string.Empty) DesktopIni.SetLocalizedFileNames(path1, name1);
             if(name1 != string.Empty) DesktopIni.SetLocalizedFileNames(path2, name2);
             FilePath = path1;
+            RefreshKeyPath();
             item.FilePath = path2;
+            item.RefreshKeyPath();
             list.SetItemIndex(this, index);
             ExplorerRestarter.Show();
         }

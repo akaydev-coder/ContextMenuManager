@@ -60,6 +60,45 @@ namespace ContextMenuManager.Controls
             }
         }
 
+        public static string[] GetSortedPaths(string groupPath, out bool sorted)
+        {
+            sorted = false;
+            List<string> sortedPaths = new List<string>();
+            string[] paths = Directory.GetFiles(groupPath, "*.lnk");
+            for (int i = paths.Length - 1; i >= 0; i--)
+            {
+                string srcPath = paths[i];
+                string name = Path.GetFileName(srcPath);
+                int index = name.IndexOf(" - ");
+                if (index >= 2 && int.TryParse(name.Substring(0, index), out int num) && num == i + 1)
+                {
+                    sortedPaths.Add(srcPath); continue;
+                }
+                if (index >= 0) name = name.Substring(index + 3);
+                string dstPath = $@"{groupPath}\{(i + 1).ToString().PadLeft(2, '0')} - {name}";
+                dstPath = ObjectPath.GetNewPathWithIndex(dstPath, ObjectPath.PathType.File);
+
+                string value;
+                using (ShellLink srcLnk = new ShellLink(srcPath))
+                {
+                    value = srcLnk.Description?.Trim();
+                }
+                if (string.IsNullOrEmpty(value)) value = DesktopIni.GetLocalizedFileNames(srcPath);
+                if (string.IsNullOrEmpty(value)) value = Path.GetFileNameWithoutExtension(name);
+                DesktopIni.DeleteLocalizedFileNames(srcPath);
+                DesktopIni.SetLocalizedFileNames(dstPath, value);
+                File.Move(srcPath, dstPath);
+                using (ShellLink dstLnk = new ShellLink(dstPath))
+                {
+                    dstLnk.Description = value;
+                    dstLnk.Save();
+                }
+                sortedPaths.Add(dstPath);
+                sorted = true;
+            }
+            return sortedPaths.ToArray();
+        }
+
         private void AddNewItem()
         {
             NewItem newItem = new NewItem();
@@ -124,6 +163,7 @@ namespace ContextMenuManager.Controls
             };
         }
 
+        // TODO:测试Win11下是否可用
         private void CreateNewGroup()
         {
             string dirPath = ObjectPath.GetNewPathWithIndex($@"{WinXPath}\Group", ObjectPath.PathType.Directory, 1);
@@ -142,45 +182,6 @@ namespace ContextMenuManager.Controls
             foreach(DirectoryInfo di in winxDi.GetDirectories()) items.Add(di.Name);
             items.Reverse();
             return items.ToArray();
-        }
-
-        public static string[] GetSortedPaths(string groupPath, out bool sorted)
-        {
-            sorted = false;
-            List<string> sortedPaths = new List<string>();
-            string[] paths = Directory.GetFiles(groupPath, "*.lnk");
-            for(int i = paths.Length - 1; i >= 0; i--)
-            {
-                string srcPath = paths[i];
-                string name = Path.GetFileName(srcPath);
-                int index = name.IndexOf(" - ");
-                if(index >= 2 && int.TryParse(name.Substring(0, index), out int num) && num == i + 1)
-                {
-                    sortedPaths.Add(srcPath); continue;
-                }
-                if(index >= 0) name = name.Substring(index + 3);
-                string dstPath = $@"{groupPath}\{(i + 1).ToString().PadLeft(2, '0')} - {name}";
-                dstPath = ObjectPath.GetNewPathWithIndex(dstPath, ObjectPath.PathType.File);
-
-                string value;
-                using(ShellLink srcLnk = new ShellLink(srcPath))
-                {
-                    value = srcLnk.Description?.Trim();
-                }
-                if(string.IsNullOrEmpty(value)) value = DesktopIni.GetLocalizedFileNames(srcPath);
-                if(string.IsNullOrEmpty(value)) value = Path.GetFileNameWithoutExtension(name);
-                DesktopIni.DeleteLocalizedFileNames(srcPath);
-                DesktopIni.SetLocalizedFileNames(dstPath, value);
-                File.Move(srcPath, dstPath);
-                using(ShellLink dstLnk = new ShellLink(dstPath))
-                {
-                    dstLnk.Description = value;
-                    dstLnk.Save();
-                }
-                sortedPaths.Add(dstPath);
-                sorted = true;
-            }
-            return sortedPaths.ToArray();
         }
     }
 }

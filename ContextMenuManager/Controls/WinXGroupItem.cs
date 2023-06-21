@@ -58,6 +58,7 @@ namespace ContextMenuManager.Controls
             TsiRestoreDefault.Click += (sender, e) => RestoreDefault();
         }
 
+        // TODO:适配Win11(Win11需要将Default也同时恢复)
         private void RestoreDefault()
         {
             if(AppMessageBox.Show(AppString.Message.RestoreDefault, MessageBoxButtons.OKCancel) == DialogResult.OK)
