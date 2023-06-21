@@ -12,12 +12,15 @@ namespace ContextMenuManager.Controls
     sealed class WinXList : MyList // 主页 Win+X
     {
         public static readonly string WinXPath = Environment.ExpandEnvironmentVariables(@"%LocalAppData%\Microsoft\Windows\WinX");
+        public static readonly string BackupWinXPath = Environment.ExpandEnvironmentVariables(@"%LocalAppData%\Microsoft\Windows\-WinX");
         public static readonly string DefaultWinXPath = Environment.ExpandEnvironmentVariables(@"%SystemDrive%\Users\Default\AppData\Local\Microsoft\Windows\WinX");
+        public static readonly string WinXDefaultPath = Environment.ExpandEnvironmentVariables(@"%LocalAppData%\Microsoft\Windows\WinXDefault");
 
         public void LoadItems()
         {
             if(WinOsVersion.Current >= WinOsVersion.Win8)
             {
+                AppConfig.BackupWinX();
                 AddNewItem();
                 LoadWinXItems();
             }
@@ -30,7 +33,6 @@ namespace ContextMenuManager.Controls
             bool sorted = false;
             foreach(string dirPath in dirPaths)
             {
-                // TODO:WinXGroupItem的备份
                 WinXGroupItem groupItem = new WinXGroupItem(dirPath);
                 AddItem(groupItem);
                 string[] lnkPaths;

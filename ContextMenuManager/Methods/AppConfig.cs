@@ -1,4 +1,5 @@
 ﻿using BluePointLilac.Methods;
+using ContextMenuManager.Controls;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -17,6 +18,7 @@ namespace ContextMenuManager.Methods
             CreateDirectory();
             ReloadConfig();
             LoadLanguage();
+            BackupWinX();
         }
 
 #if DEBUG
@@ -52,9 +54,9 @@ namespace ContextMenuManager.Methods
         public static readonly bool IsFirstRun = !Directory.Exists(ConfigDir);
         public static string ConfigIni = $@"{ConfigDir}\Config.ini";
         public static string ComputerHostName = Dns.GetHostName();
-        public static string RegBackupDir = $@"{ConfigDir}\RegBackup\" + ComputerHostName;
+        public static string RegBackupDir = $@"{ConfigDir}\RegBackup\{ComputerHostName}";
         public static string MenuBackupRootDir = $@"{AppConfigDir}\MenuBackup";
-        public static string MenuBackupDir = $@"{MenuBackupRootDir}\" + ComputerHostName;
+        public static string MenuBackupDir = $@"{MenuBackupRootDir}\{ComputerHostName}";
         public static string LangsDir = $@"{ConfigDir}\Languages";
         public static string ProgramsDir = $@"{ConfigDir}\Programs";
         public static string DicsDir = $@"{ConfigDir}\Dictionaries";
@@ -84,12 +86,31 @@ namespace ContextMenuManager.Methods
             { "Google", "https://www.google.com/search?q=%s" },
             { "Yandex", "https://yandex.com/search/?text=%s" },
             { "DuckDuckGo", "https://duckduckgo.com/?q=%s" },
-            { "Sogou", "https://www.sogou.com/web?query=%s" },
-            { "360", "https://www.so.com/s?q=%s" },
         };
 
         private static readonly IniReader ConfigReader = new IniReader(ConfigIni);
         private static readonly IniWriter ConfigWriter = new IniWriter(ConfigIni);
+
+        public static void BackupWinX()
+        {
+            if (WinOsVersion.Current >= WinOsVersion.Win11)
+            {
+                // 备份默认WinX项目
+                string DefaultWinXBackupDir = WinXList.WinXDefaultPath;
+                if (!Directory.Exists(DefaultWinXBackupDir))
+                {
+                    Directory.CreateDirectory(DefaultWinXBackupDir);
+                    foreach (string dirPath in Directory.GetDirectories(WinXList.DefaultWinXPath, "*", SearchOption.AllDirectories))
+                    {
+                        Directory.CreateDirectory(dirPath.Replace(WinXList.DefaultWinXPath, DefaultWinXBackupDir));
+                    }
+                    foreach (string filePath in Directory.GetFiles(WinXList.DefaultWinXPath, "*.*", SearchOption.AllDirectories))
+                    {
+                        File.Copy(filePath, filePath.Replace(WinXList.DefaultWinXPath, DefaultWinXBackupDir), true);
+                    }
+                }
+            }
+        }
 
         private static string GetGeneralValue(string key)
         {

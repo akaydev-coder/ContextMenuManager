@@ -1,4 +1,5 @@
-﻿using ContextMenuManager.Controls.Interfaces;
+﻿using BluePointLilac.Methods;
+using ContextMenuManager.Controls.Interfaces;
 using ContextMenuManager.Methods;
 using System.IO;
 using System.Windows.Forms;
@@ -7,6 +8,7 @@ namespace ContextMenuManager.Controls
 {
     sealed class WinXGroupItem : FoldGroupItem, IChkVisibleItem, ITsiDeleteItem, ITsiTextItem
     {
+        // TODO:适配Win11
         public WinXGroupItem(string groupPath) : base(groupPath, ObjectPath.PathType.Directory)
         {
             InitializeComponents();
@@ -42,7 +44,7 @@ namespace ContextMenuManager.Controls
         public ChangeTextMenuItem TsiChangeText { get; set; }
         readonly ToolStripMenuItem TsiRestoreDefault = new ToolStripMenuItem(AppString.Menu.RestoreDefault);
 
-        private string DefaultGroupPath => $@"{WinXList.DefaultWinXPath}\{ItemText}";
+        private string DefaultGroupPath => $@"{((WinOsVersion.Current >= WinOsVersion.Win11) ? WinXList.WinXDefaultPath : WinXList.DefaultWinXPath)}\{ItemText}";
 
         private void InitializeComponents()
         {

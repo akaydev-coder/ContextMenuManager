@@ -2,6 +2,7 @@
 using BluePointLilac.Methods;
 using ContextMenuManager.Controls.Interfaces;
 using ContextMenuManager.Methods;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -16,6 +17,10 @@ namespace ContextMenuManager.Controls
             InitializeComponents();
             FoldGroupItem = group;
             FilePath = filePath;
+            if (WinOsVersion.Current >= WinOsVersion.Win11)
+            {
+                keyPath = FilePath.Substring((ItemVisible ? WinXList.WinXPath : WinXList.BackupWinXPath).Length);
+            } 
             Indent();
         }
 
@@ -31,6 +36,10 @@ namespace ContextMenuManager.Controls
                 Image = ItemImage;
             }
         }
+
+        private readonly string keyPath = null;
+        private string BackupPath => $@"{(ItemVisible ? WinXList.BackupWinXPath : WinXList.WinXPath)}{keyPath}";
+        private string DefaultFilePath => $@"{WinXList.DefaultWinXPath}{keyPath}";
 
         public string ItemText
         {
@@ -51,15 +60,63 @@ namespace ContextMenuManager.Controls
             }
         }
 
+        // Win11需要改变两处快捷方式，Win10仅需要隐藏一处快捷方式
         public bool ItemVisible
         {
-            get => (File.GetAttributes(FilePath) & FileAttributes.Hidden) != FileAttributes.Hidden;
+            get
+            {
+                return (WinOsVersion.Current >= WinOsVersion.Win11) ? 
+                    FilePath.Substring(0, WinXList.WinXPath.Length).Equals(WinXList.WinXPath, StringComparison.OrdinalIgnoreCase) : 
+                    (File.GetAttributes(FilePath) & FileAttributes.Hidden) != FileAttributes.Hidden;
+            }
             set
             {
-                FileAttributes attributes = File.GetAttributes(FilePath);
-                if(value) attributes &= ~FileAttributes.Hidden;
-                else attributes |= FileAttributes.Hidden;
-                File.SetAttributes(FilePath, attributes);
+                if (WinOsVersion.Current >= WinOsVersion.Win11)
+                {
+                    // 处理用户WinX菜单目录
+                    string name = DesktopIni.GetLocalizedFileNames(FilePath);
+                    if (!Directory.Exists(Path.GetDirectoryName(BackupPath)))
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(BackupPath));
+                    }
+                    File.Move(FilePath, BackupPath);
+                    // 处理用户WinX菜单目录下的desktop.ini文件（确保移动后名称在本地化下相同）
+                    if (value)
+                    {
+                        DesktopIni.DeleteLocalizedFileNames(FilePath);
+                    }
+                    else
+                    {
+                        if (name != string.Empty) DesktopIni.SetLocalizedFileNames(BackupPath, name);
+                    }
+                    // 处理默认WinX菜单目录
+                    if (value)
+                    {
+                        File.Copy(BackupPath, DefaultFilePath, true);
+                    }
+                    else
+                    {
+                        if (File.Exists(DefaultFilePath))
+                        {
+                            File.Delete(DefaultFilePath);
+                        }
+                    }
+                    // 文件与备份文件目录交换
+                    FilePath = BackupPath;
+                }
+                else
+                {
+                    FileAttributes attributes = File.GetAttributes(FilePath);
+                    if (value)
+                    {
+                        attributes &= ~FileAttributes.Hidden;
+                    }
+                    else
+                    {
+                        attributes |= FileAttributes.Hidden;
+                    }
+                    File.SetAttributes(FilePath, attributes);
+                }
                 ExplorerRestarter.Show();
             }
         }
@@ -148,6 +205,7 @@ namespace ContextMenuManager.Controls
             };
         }
 
+        // TODO:适配Win11
         private void ChangeGroup()
         {
             using(SelectDialog dlg = new SelectDialog())
@@ -221,6 +279,11 @@ namespace ContextMenuManager.Controls
         {
             File.Delete(FilePath);
             DesktopIni.DeleteLocalizedFileNames(FilePath);
+            if (File.Exists(DefaultFilePath))
+            {
+                File.Delete(DefaultFilePath);
+                DesktopIni.DeleteLocalizedFileNames(DefaultFilePath);
+            }
             ExplorerRestarter.Show();
             ShellLink.Dispose();
         }
