@@ -43,7 +43,7 @@ namespace ContextMenuManager.Controls
             }
         }
 
-        private string BackupPath => $@"{(ItemVisible ? WinXList.BackupWinXPath : WinXList.WinXPath)}{keyPath}";
+        private string BackupFilePath => $@"{(ItemVisible ? WinXList.BackupWinXPath : WinXList.WinXPath)}{keyPath}";
         private string DefaultFilePath => $@"{WinXList.DefaultWinXPath}{keyPath}";
 
         public string ItemText
@@ -80,34 +80,27 @@ namespace ContextMenuManager.Controls
                 {
                     // 处理用户WinX菜单目录
                     string name = DesktopIni.GetLocalizedFileNames(FilePath);
-                    if (!Directory.Exists(Path.GetDirectoryName(BackupPath)))
+                    if (!Directory.Exists(Path.GetDirectoryName(BackupFilePath)))
                     {
-                        Directory.CreateDirectory(Path.GetDirectoryName(BackupPath));
+                        Directory.CreateDirectory(Path.GetDirectoryName(BackupFilePath));
                     }
-                    File.Move(FilePath, BackupPath);
+                    File.Move(FilePath, BackupFilePath);
                     // 处理用户WinX菜单目录下的desktop.ini文件（确保移动后名称在本地化下相同）
-                    if (value)
-                    {
-                        DesktopIni.DeleteLocalizedFileNames(FilePath);
-                    }
-                    else
-                    {
-                        if (name != string.Empty) DesktopIni.SetLocalizedFileNames(BackupPath, name);
-                    }
+                    DesktopIni.DeleteLocalizedFileNames(FilePath);
+                    if (name != string.Empty) DesktopIni.SetLocalizedFileNames(BackupFilePath, name);
                     // 处理默认WinX菜单目录
                     if (value)
                     {
-                        File.Copy(BackupPath, DefaultFilePath, true);
+                        File.Copy(BackupFilePath, DefaultFilePath, true);
+                        if (name != string.Empty) DesktopIni.SetLocalizedFileNames(DefaultFilePath, name);
                     }
                     else
                     {
-                        if (File.Exists(DefaultFilePath))
-                        {
-                            File.Delete(DefaultFilePath);
-                        }
+                        File.Delete(DefaultFilePath);
+                        DesktopIni.DeleteLocalizedFileNames(DefaultFilePath);
                     }
                     // 文件与备份文件目录交换
-                    FilePath = BackupPath;
+                    FilePath = BackupFilePath;
                 }
                 else
                 {
@@ -314,7 +307,7 @@ namespace ContextMenuManager.Controls
         {
             File.Delete(FilePath);
             DesktopIni.DeleteLocalizedFileNames(FilePath);
-            if (File.Exists(DefaultFilePath))
+            if (ItemVisible)
             {
                 File.Delete(DefaultFilePath);
                 DesktopIni.DeleteLocalizedFileNames(DefaultFilePath);

@@ -4,6 +4,7 @@ using ContextMenuManager.Methods;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -28,24 +29,45 @@ namespace ContextMenuManager.Controls
 
         private void LoadWinXItems()
         {
-            string[] dirPaths = Directory.GetDirectories(WinXPath);
-            Array.Reverse(dirPaths);
-            bool sorted = false;
-            foreach(string dirPath in dirPaths)
+            // 获取两处WinX目录下的所有文件夹路径
+            string[] dirPaths1 = Directory.Exists(WinXPath) ? Directory.GetDirectories(WinXPath) : new string[] { };
+            string[] dirPaths2 = Directory.Exists(BackupWinXPath) ? Directory.GetDirectories(BackupWinXPath) : new string[] { };
+            // 两处WinX目录下的文件夹名称合并，去重，排序，反序
+            List<string> dirKeyPaths = new List<string> { };
+            foreach (string dirPath in dirPaths1)
             {
-                WinXGroupItem groupItem = new WinXGroupItem(dirPath);
+                string keyName = Path.GetFileNameWithoutExtension(dirPath);
+                dirKeyPaths.Add(keyName);
+            }
+            foreach (string dirPath in dirPaths2)
+            {
+                string keyName = Path.GetFileNameWithoutExtension(dirPath);
+                if (!dirKeyPaths.Contains(keyName)) dirKeyPaths.Add(keyName);
+            }
+            dirKeyPaths.Sort();
+            dirKeyPaths.Reverse();
+
+            // 检查WinX项目是否排序并初始化界面
+            bool sorted = false;
+            foreach(string dirKeyPath in dirKeyPaths)
+            {
+                string dirPath1 = $@"{WinXPath}\{dirKeyPath}";
+                string dirPath2 = $@"{BackupWinXPath}\{dirKeyPath}";
+
+                WinXGroupItem groupItem = new WinXGroupItem(dirPath1);
                 AddItem(groupItem);
-                string[] lnkPaths;
+
+                List<string> lnkPaths;
                 if(AppConfig.WinXSortable)
                 {
-                    lnkPaths = GetSortedPaths(dirPath, out bool flag);
+                    lnkPaths = GetSortedPaths(dirKeyPath, out bool flag);
                     if(flag) sorted = true;
                 }
                 else
                 {
-                    lnkPaths = Directory.GetFiles(dirPath, "*.lnk");
-                    Array.Reverse(lnkPaths);
+                    lnkPaths = GetInkFiles(dirKeyPath);
                 }
+
                 foreach(string path in lnkPaths)
                 {
                     WinXItem winXItem = new WinXItem(path, groupItem);
@@ -60,45 +82,116 @@ namespace ContextMenuManager.Controls
             }
         }
 
-        public static string[] GetSortedPaths(string groupPath, out bool sorted)
+        private static List<string> GetInkFiles(string dirKeyPath)
         {
-            sorted = false;
-            List<string> sortedPaths = new List<string>();
-            string[] paths = Directory.GetFiles(groupPath, "*.lnk");
-            for (int i = paths.Length - 1; i >= 0; i--)
+            if (WinOsVersion.Current >= WinOsVersion.Win11)
             {
-                string srcPath = paths[i];
-                string name = Path.GetFileName(srcPath);
-                int index = name.IndexOf(" - ");
-                if (index >= 2 && int.TryParse(name.Substring(0, index), out int num) && num == i + 1)
-                {
-                    sortedPaths.Add(srcPath); continue;
-                }
-                if (index >= 0) name = name.Substring(index + 3);
-                string dstPath = $@"{groupPath}\{(i + 1).ToString().PadLeft(2, '0')} - {name}";
-                dstPath = ObjectPath.GetNewPathWithIndex(dstPath, ObjectPath.PathType.File);
+                List<string> lnkPaths = new List<string> { };
 
-                string value;
-                using (ShellLink srcLnk = new ShellLink(srcPath))
+                // 获取两处WinX目录下的所有lnk文件路径
+                string dirPath1 = $@"{WinXPath}\{dirKeyPath}";
+                string dirPath2 = $@"{BackupWinXPath}\{dirKeyPath}";
+                string[] lnkPaths1 = Directory.Exists(dirPath1) ? Directory.GetFiles(dirPath1, "*.lnk") : new string[] { };
+                string[] lnkPaths2 = Directory.Exists(dirPath2) ? Directory.GetFiles(dirPath2, "*.lnk") : new string[] { };
+
+                // 两处WinX目录下的lnk文件路径合并，排序，反序
+                List<string> editedlnkPaths = new List<string> { };
+                foreach (string filePath in lnkPaths1)
                 {
-                    value = srcLnk.Description?.Trim();
+                    editedlnkPaths.Add(filePath);
                 }
-                if (string.IsNullOrEmpty(value)) value = DesktopIni.GetLocalizedFileNames(srcPath);
-                if (string.IsNullOrEmpty(value)) value = Path.GetFileNameWithoutExtension(name);
-                DesktopIni.DeleteLocalizedFileNames(srcPath);
-                DesktopIni.SetLocalizedFileNames(dstPath, value);
-                File.Move(srcPath, dstPath);
-                using (ShellLink dstLnk = new ShellLink(dstPath))
+                foreach (string filePath in lnkPaths2)
                 {
-                    dstLnk.Description = value;
-                    dstLnk.Save();
+                    string editFilePath = filePath.Replace(BackupWinXPath, WinXPath);
+                    if (editedlnkPaths.Contains(editFilePath)) continue;
+                    editFilePath += "-";
+                    editedlnkPaths.Add(editFilePath);
                 }
-                sortedPaths.Add(dstPath);
-                sorted = true;
+                editedlnkPaths.Sort();
+                editedlnkPaths.Reverse();
+
+                // 获取之前的路径元素
+                foreach (string lnkKeyPath in editedlnkPaths)
+                {
+                    lnkPaths.Add(lnkKeyPath.EndsWith("-") ? lnkKeyPath.Remove(lnkKeyPath.Length - 1).Replace(WinXPath, BackupWinXPath) : lnkKeyPath);
+                }
+                return lnkPaths;
             }
-            return sortedPaths.ToArray();
+            else
+            {
+                string dirPath = $@"{WinXPath}\{dirKeyPath}";
+                string[] lnkPaths = Directory.GetFiles(dirPath, "*.lnk");
+                Array.Reverse(lnkPaths);
+                return lnkPaths.ToList();
+            }
         }
 
+        public static List<string> GetSortedPaths(string dirKeyPath, out bool resorted)
+        {
+            resorted = false;
+            List<string> sortedPaths = new List<string>();
+            List<string> lnkFilePaths = GetInkFiles(dirKeyPath);
+
+            int i = lnkFilePaths.Count - 1;
+            foreach (string lnkFilePath in lnkFilePaths)
+            {
+                string name = Path.GetFileName(lnkFilePath);
+                int index = name.IndexOf(" - ");
+
+                // 序号正确且为两位以上数字无需进行重新编号
+                if (index >= 2 && int.TryParse(name.Substring(0, index), out int num) && num == i + 1)
+                {
+                    sortedPaths.Add(lnkFilePath); i--;  continue;
+                }
+
+                // 序号不正确或数字位数不足则进行重新编号
+                if (index >= 0) name = name.Substring(index + 3);
+                ResortPaths(i, name, dirKeyPath, lnkFilePath, true, out string dstPath);
+                if (WinOsVersion.Current >= WinOsVersion.Win11)
+                {
+                    ResortPaths(i, name, dirKeyPath, lnkFilePath, false, out _);
+                }
+
+                sortedPaths.Add(dstPath);
+                resorted = true;
+                i--;
+            }
+            
+            return sortedPaths;
+        }
+        private static void ResortPaths(int i, string name, string dirKeyPath, string lnkFilePath, bool isWinX, out string dstPath)
+        {
+            bool itemVisible = lnkFilePath.Substring(0, WinXPath.Length).Equals(WinXPath, StringComparison.OrdinalIgnoreCase);
+            if (!isWinX && !itemVisible)    // Default处菜单且禁用无需重新编号
+            {
+                dstPath = null;
+                return;
+            }
+
+            string startPath = itemVisible ? WinXPath : BackupWinXPath;
+
+            string meFilePath = isWinX ? lnkFilePath : lnkFilePath.Replace(startPath, DefaultWinXPath);
+            dstPath = $@"{(isWinX ? startPath : DefaultWinXPath)}\{dirKeyPath}\{(i + 1).ToString().PadLeft(2, '0')} - {name}";
+            dstPath = ObjectPath.GetNewPathWithIndex(dstPath, ObjectPath.PathType.File);
+
+            string value;
+            using (ShellLink srcLnk = new ShellLink(meFilePath))
+            {
+                value = srcLnk.Description?.Trim();
+            }
+            if (string.IsNullOrEmpty(value)) value = DesktopIni.GetLocalizedFileNames(meFilePath);
+            if (string.IsNullOrEmpty(value)) value = Path.GetFileNameWithoutExtension(name);
+            DesktopIni.DeleteLocalizedFileNames(meFilePath);
+            DesktopIni.SetLocalizedFileNames(dstPath, value);
+            File.Move(meFilePath, dstPath);
+            using (ShellLink dstLnk = new ShellLink(dstPath))
+            {
+                dstLnk.Description = value;
+                dstLnk.Save();
+            }
+        }
+
+        // TODO:适配Win11
         private void AddNewItem()
         {
             NewItem newItem = new NewItem();
@@ -163,7 +256,7 @@ namespace ContextMenuManager.Controls
             };
         }
 
-        // TODO:测试Win11下是否可用
+        // TODO:适配Win11
         private void CreateNewGroup()
         {
             string dirPath = ObjectPath.GetNewPathWithIndex($@"{WinXPath}\Group", ObjectPath.PathType.Directory, 1);

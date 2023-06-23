@@ -1190,7 +1190,8 @@ namespace ContextMenuManager.Methods
 #endif
             if (WinOsVersion.Current >= WinOsVersion.Win8)
             {
-                string[] dirPaths = Directory.GetDirectories(WinXList.WinXPath);
+                // TODO
+                /*string[] dirPaths = Directory.GetDirectories(WinXList.WinXPath);
                 Array.Reverse(dirPaths);
                 bool sorted = false;
                 foreach (string dirPath in dirPaths)
@@ -1227,12 +1228,7 @@ namespace ContextMenuManager.Methods
 #endif
                     }
                     groupItem.Dispose();
-                }
-                if (sorted)
-                {
-                    ExplorerRestarter.Show();
-                    AppMessageBox.Show(AppString.Message.WinXSorted);
-                }
+                }*/
             }
         }
 

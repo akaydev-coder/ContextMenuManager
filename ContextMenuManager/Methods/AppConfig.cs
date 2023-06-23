@@ -95,7 +95,7 @@ namespace ContextMenuManager.Methods
         {
             if (WinOsVersion.Current >= WinOsVersion.Win11)
             {
-                // 备份默认WinX项目
+                // 备份默认WinX项目文件与desktop.ini
                 string DefaultWinXBackupDir = WinXList.WinXDefaultPath;
                 if (!Directory.Exists(DefaultWinXBackupDir))
                 {
@@ -106,7 +106,8 @@ namespace ContextMenuManager.Methods
                     }
                     foreach (string filePath in Directory.GetFiles(WinXList.DefaultWinXPath, "*.*", SearchOption.AllDirectories))
                     {
-                        File.Copy(filePath, filePath.Replace(WinXList.DefaultWinXPath, DefaultWinXBackupDir), true);
+                        string dstPath = filePath.Replace(WinXList.DefaultWinXPath, DefaultWinXBackupDir);
+                        File.Copy(filePath, dstPath, true);
                     }
                 }
             }
