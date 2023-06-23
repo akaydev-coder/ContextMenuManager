@@ -308,7 +308,7 @@ namespace ContextMenuManager.Controls
                 path1 = $@"{meDirPath1}\{fileName1}";
                 path1 = ObjectPath.GetNewPathWithIndex(path1, ObjectPath.PathType.File);
                 // 移动文件至新路径
-                File.Move(FilePath, path1);
+                File.Move(meFilePath1, path1);
                 // 创建新的本地化文件名
                 if (name1 != string.Empty) DesktopIni.SetLocalizedFileNames(path1, name1);
             }
@@ -326,7 +326,7 @@ namespace ContextMenuManager.Controls
                 string meDirPath2 = Path.GetDirectoryName(meFilePath2);
                 path2 = $@"{meDirPath2}\{fileName2}";
                 path2 = ObjectPath.GetNewPathWithIndex(path2, ObjectPath.PathType.File);
-                File.Move(item.FilePath, path2);
+                File.Move(meFilePath2, path2);
                 if (name2 != string.Empty) DesktopIni.SetLocalizedFileNames(path2, name2);
             }
         }
