@@ -5,6 +5,7 @@ using ContextMenuManager.Methods;
 using System;
 using System.Drawing;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 
 namespace ContextMenuManager.Controls
@@ -80,9 +81,16 @@ namespace ContextMenuManager.Controls
                 {
                     // 处理用户WinX菜单目录
                     string name = DesktopIni.GetLocalizedFileNames(FilePath);
-                    if (!Directory.Exists(Path.GetDirectoryName(BackupFilePath)))
+                    string dirPath = Path.GetDirectoryName(BackupFilePath);
+                    if (!Directory.Exists(dirPath))
                     {
-                        Directory.CreateDirectory(Path.GetDirectoryName(BackupFilePath));
+                        // 创建目录文件夹
+                        Directory.CreateDirectory(dirPath);
+
+                        // 初始化desktop.ini文件
+                        string iniPath = $@"{dirPath}\desktop.ini";
+                        File.WriteAllText(iniPath, string.Empty, Encoding.Unicode);
+                        File.SetAttributes(iniPath, File.GetAttributes(iniPath) | FileAttributes.Hidden | FileAttributes.System);
                     }
                     File.Move(FilePath, BackupFilePath);
                     // 处理用户WinX菜单目录下的desktop.ini文件（确保移动后名称在本地化下相同）

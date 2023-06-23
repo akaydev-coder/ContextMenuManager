@@ -82,7 +82,7 @@ namespace ContextMenuManager.Controls
             }
         }
 
-        private static List<string> GetInkFiles(string dirKeyPath)
+        public static List<string> GetInkFiles(string dirKeyPath)
         {
             if (WinOsVersion.Current >= WinOsVersion.Win11)
             {
@@ -191,7 +191,6 @@ namespace ContextMenuManager.Controls
             }
         }
 
-        // TODO:适配Win11
         private void AddNewItem()
         {
             NewItem newItem = new NewItem();
@@ -210,62 +209,80 @@ namespace ContextMenuManager.Controls
                         dlg2.Title = AppString.Dialog.SelectGroup;
                         dlg2.Items = GetGroupNames();
                         if(dlg2.ShowDialog() != DialogResult.OK) return;
-                        string dirName = dlg2.Selected;
-                        string dirPath = $@"{WinXPath}\{dirName}";
-                        string itemText = dlg1.ItemText;
-                        string targetPath = dlg1.ItemFilePath;
-                        string arguments = dlg1.Arguments;
-                        string workDir = Path.GetDirectoryName(targetPath);
-                        string extension = Path.GetExtension(targetPath).ToLower();
-                        string fileName = Path.GetFileNameWithoutExtension(targetPath);
-                        int count = Directory.GetFiles(dirPath, "*.lnk").Length;
-                        string index = (count + 1).ToString().PadLeft(2, '0');
-                        string lnkName = $"{index} - {fileName}.lnk";
-                        string lnkPath = $@"{dirPath}\{lnkName}";
-                        using(ShellLink shellLink = new ShellLink(lnkPath))
+
+                        AddNewLnkFile(dlg2.Selected, dlg1.ItemText, dlg1.ItemFilePath, dlg1.Arguments, true);
+                        if (WinOsVersion.Current >= WinOsVersion.Win11)
                         {
-                            if(extension == ".lnk")
-                            {
-                                File.Copy(targetPath, lnkPath);
-                                shellLink.Load();
-                            }
-                            else
-                            {
-                                shellLink.TargetPath = targetPath;
-                                shellLink.Arguments = arguments;
-                                shellLink.WorkingDirectory = workDir;
-                            }
-                            shellLink.Description = itemText;
-                            shellLink.Save();
+                            AddNewLnkFile(dlg2.Selected, dlg1.ItemText, dlg1.ItemFilePath, dlg1.Arguments, false);
                         }
-                        DesktopIni.SetLocalizedFileNames(lnkPath, itemText);
-                        foreach(MyListItem ctr in Controls)
-                        {
-                            if(ctr is WinXGroupItem groupItem && groupItem.Text == dirName)
-                            {
-                                WinXItem item = new WinXItem(lnkPath, groupItem) { Visible = !groupItem.IsFold };
-                                item.BtnMoveDown.Visible = item.BtnMoveUp.Visible = AppConfig.WinXSortable;
-                                InsertItem(item, GetItemIndex(groupItem) + 1);
-                                break;
-                            }
-                        }
-                        WinXHasher.HashLnk(lnkPath);
+                        
                         ExplorerRestarter.Show();
                     }
                 }
             };
         }
+        private void AddNewLnkFile(string dirName, string itemText, string targetPath, string arguments, bool isWinX)
+        {
+            string dirPath = $@"{(isWinX ? WinXPath : DefaultWinXPath)}\{dirName}";
+            string workDir = Path.GetDirectoryName(targetPath);
+            string extension = Path.GetExtension(targetPath).ToLower();
+            string fileName = Path.GetFileNameWithoutExtension(targetPath);
+            int count = Directory.GetFiles(dirPath, "*.lnk").Length;
+            string index = (count + 1).ToString().PadLeft(2, '0');
+            string lnkName = $"{index} - {fileName}.lnk";
+            string lnkPath = $@"{dirPath}\{lnkName}";
 
-        // TODO:适配Win11
+            using (ShellLink shellLink = new ShellLink(lnkPath))
+            {
+                if (extension == ".lnk")
+                {
+                    File.Copy(targetPath, lnkPath);
+                    shellLink.Load();
+                }
+                else
+                {
+                    shellLink.TargetPath = targetPath;
+                    shellLink.Arguments = arguments;
+                    shellLink.WorkingDirectory = workDir;
+                }
+                shellLink.Description = itemText;
+                shellLink.Save();
+            }
+            DesktopIni.SetLocalizedFileNames(lnkPath, itemText);
+            foreach (MyListItem ctr in Controls)
+            {
+                if (ctr is WinXGroupItem groupItem && groupItem.Text == dirName)
+                {
+                    WinXItem item = new WinXItem(lnkPath, groupItem) { Visible = !groupItem.IsFold };
+                    item.BtnMoveDown.Visible = item.BtnMoveUp.Visible = AppConfig.WinXSortable;
+                    InsertItem(item, GetItemIndex(groupItem) + 1);
+                    break;
+                }
+            }
+            WinXHasher.HashLnk(lnkPath);
+        }
+
         private void CreateNewGroup()
         {
             string dirPath = ObjectPath.GetNewPathWithIndex($@"{WinXPath}\Group", ObjectPath.PathType.Directory, 1);
+            CreateGroupPath(dirPath);
+            if (WinOsVersion.Current >= WinOsVersion.Win11)
+            {
+                string defaultDirPath = dirPath.Replace(WinXPath, DefaultWinXPath);
+                CreateGroupPath(defaultDirPath);
+            }
+            InsertItem(new WinXGroupItem(dirPath), 1);
+        }
+        private void CreateGroupPath(string dirPath)
+        {
+            // 创建目录文件夹
             Directory.CreateDirectory(dirPath);
+            File.SetAttributes(dirPath, File.GetAttributes(dirPath) | FileAttributes.ReadOnly);
+
+            // 初始化desktop.ini文件
             string iniPath = $@"{dirPath}\desktop.ini";
             File.WriteAllText(iniPath, string.Empty, Encoding.Unicode);
-            File.SetAttributes(dirPath, File.GetAttributes(dirPath) | FileAttributes.ReadOnly);
             File.SetAttributes(iniPath, File.GetAttributes(iniPath) | FileAttributes.Hidden | FileAttributes.System);
-            InsertItem(new WinXGroupItem(dirPath), 1);
         }
 
         public static string[] GetGroupNames()

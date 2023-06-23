@@ -12,6 +12,7 @@ using static ContextMenuManager.Methods.BackupList;
 using System.Xml.Serialization;
 using static ContextMenuManager.Controls.ShellNewList;
 using BluePointLilac.Controls;
+using System.Xml.Linq;
 
 namespace ContextMenuManager.Methods
 {
@@ -67,7 +68,7 @@ namespace ContextMenuManager.Methods
         /*******************************外部变量、函数************************************/
 
         // 目前备份版本号
-        public const int BackupVersion = 2;
+        public const int BackupVersion = 3;
 
         // 弃用备份版本号
         public const int DeprecatedBackupVersion = 1;
@@ -1190,29 +1191,49 @@ namespace ContextMenuManager.Methods
 #endif
             if (WinOsVersion.Current >= WinOsVersion.Win8)
             {
-                // TODO
-                /*string[] dirPaths = Directory.GetDirectories(WinXList.WinXPath);
-                Array.Reverse(dirPaths);
-                bool sorted = false;
-                foreach (string dirPath in dirPaths)
+                AppConfig.BackupWinX();
+                string[] dirPaths1 = Directory.Exists(WinXList.WinXPath) ? Directory.GetDirectories(WinXList.WinXPath) : new string[] { };
+                string[] dirPaths2 = Directory.Exists(WinXList.BackupWinXPath) ? Directory.GetDirectories(WinXList.BackupWinXPath) : new string[] { };
+                List<string> dirKeyPaths = new List<string> { };
+                foreach (string dirPath in dirPaths1)
                 {
-                    WinXGroupItem groupItem = new WinXGroupItem(dirPath);
-                    string[] lnkPaths;
+                    string keyName = Path.GetFileNameWithoutExtension(dirPath);
+                    dirKeyPaths.Add(keyName);
+                }
+                foreach (string dirPath in dirPaths2)
+                {
+                    string keyName = Path.GetFileNameWithoutExtension(dirPath);
+                    if (!dirKeyPaths.Contains(keyName)) dirKeyPaths.Add(keyName);
+                }
+                dirKeyPaths.Sort();
+                dirKeyPaths.Reverse();
+                bool sorted = false;
+                foreach (string dirKeyPath in dirKeyPaths)
+                {
+                    string dirPath1 = $@"{WinXList.WinXPath}\{dirKeyPath}";
+                    string dirPath2 = $@"{WinXList.BackupWinXPath}\{dirKeyPath}";
+
+                    WinXGroupItem groupItem = new WinXGroupItem(dirPath1);
+
+                    List<string> lnkPaths;
                     if (AppConfig.WinXSortable)
                     {
-                        lnkPaths = WinXList.GetSortedPaths(dirPath, out bool flag);
+                        lnkPaths = WinXList.GetSortedPaths(dirKeyPath, out bool flag);
                         if (flag) sorted = true;
                     }
                     else
                     {
-                        lnkPaths = Directory.GetFiles(dirPath, "*.lnk");
-                        Array.Reverse(lnkPaths);
+                        lnkPaths = WinXList.GetInkFiles(dirKeyPath);
                     }
+
                     foreach (string path in lnkPaths)
                     {
                         WinXItem item = new WinXItem(path, groupItem);
                         string filePath = item.FilePath;
                         string fileName = item.FileName;
+                        // 删除文件名称里的顺序索引
+                        int index = fileName.IndexOf(" - ");
+                        fileName = fileName.Substring(index + 3);
                         string itemName = item.Text;
                         bool ifItemInMenu = item.ItemVisible;
                         BackupRestoreItem(item, fileName, BackupItemType.WinXItem, ifItemInMenu, currentScene);
@@ -1228,7 +1249,12 @@ namespace ContextMenuManager.Methods
 #endif
                     }
                     groupItem.Dispose();
-                }*/
+                }
+                if (sorted)
+                {
+                    ExplorerRestarter.Show();
+                    AppMessageBox.Show(AppString.Message.WinXSorted);
+                }
             }
         }
 
