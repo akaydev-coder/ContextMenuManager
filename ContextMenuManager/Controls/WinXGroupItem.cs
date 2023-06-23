@@ -1,7 +1,9 @@
 ﻿using BluePointLilac.Methods;
 using ContextMenuManager.Controls.Interfaces;
 using ContextMenuManager.Methods;
+using System;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 
 namespace ContextMenuManager.Controls
@@ -20,23 +22,41 @@ namespace ContextMenuManager.Controls
         {
             if (WinOsVersion.Current >= WinOsVersion.Win11)
             {
-                keyPath = GroupPath.Substring((ItemVisible ? WinXList.WinXPath : WinXList.BackupWinXPath).Length);
+                keyPath = GroupPath.Substring(WinXList.WinXPath.Length);
             }
         }
 
-        private string BackupGroupPath => $@"{(ItemVisible ? WinXList.BackupWinXPath : WinXList.WinXPath)}{keyPath}";
+        private string BackupGroupPath => $@"{WinXList.BackupWinXPath}{keyPath}";
         private string DefaultGroupPath => $@"{WinXList.DefaultWinXPath}{keyPath}";
 
         public bool ItemVisible
         {
-            get => (File.GetAttributes(GroupPath) & FileAttributes.Hidden) != FileAttributes.Hidden;
+            get
+            {
+                return (WinOsVersion.Current >= WinOsVersion.Win11) ?
+                    Directory.GetFiles(GroupPath, "*.lnk").Length != 0 :
+                    (File.GetAttributes(GroupPath) & FileAttributes.Hidden) != FileAttributes.Hidden;
+            }
             set
             {
-                FileAttributes attributes = File.GetAttributes(GroupPath);
-                if(value) attributes &= ~FileAttributes.Hidden;
-                else attributes |= FileAttributes.Hidden;
-                File.SetAttributes(GroupPath, attributes);
-                if(Directory.GetFiles(GroupPath).Length > 0) ExplorerRestarter.Show();
+                if (WinOsVersion.Current >= WinOsVersion.Win11)
+                {
+                    // 处理用户WinX菜单目录
+                    if (value)
+                    {
+
+                    }   
+                    // 处理默认WinX菜单目录
+                    
+                }
+                else
+                {
+                    FileAttributes attributes = File.GetAttributes(GroupPath);
+                    if (value) attributes &= ~FileAttributes.Hidden;
+                    else attributes |= FileAttributes.Hidden;
+                    File.SetAttributes(GroupPath, attributes);
+                    if (Directory.GetFiles(GroupPath, "*.lnk").Length > 0) ExplorerRestarter.Show();
+                }
             }
         }
 
