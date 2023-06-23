@@ -45,7 +45,6 @@ namespace ContextMenuManager.Controls.Interfaces
                 MyListItem listItem = (MyListItem)item;
                 MyList list = (MyList)listItem.Parent;
                 int index = list.GetItemIndex(listItem);
-                if(index == list.Controls.Count - 1) index--;
                 try
                 {
                     item.DeleteMe();
@@ -56,7 +55,7 @@ namespace ContextMenuManager.Controls.Interfaces
                     return;
                 }
                 list.Controls.Remove(listItem);
-                list.Controls[index].Focus();
+                list.Controls[index < list.Controls.Count ? index : (list.Controls.Count - 1)].Focus();
                 listItem.Dispose();
             };
         }
