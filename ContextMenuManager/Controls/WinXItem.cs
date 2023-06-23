@@ -288,27 +288,47 @@ namespace ContextMenuManager.Controls
         }
         private void MoveFileItem(WinXItem item, bool isWinX, out string path1, out string path2)
         {
-            string meFilePath1 = isWinX ? FilePath : DefaultFilePath;
-            string meFilePath2 = isWinX ? item.FilePath : item.DefaultFilePath;
-            string meDirPath = isWinX ? Path.GetDirectoryName(FilePath) : Path.GetDirectoryName(DefaultFilePath);
+            bool itemVisible1 = ItemVisible;
+            bool itemVisible2 = item.ItemVisible;
 
-            string name1 = DesktopIni.GetLocalizedFileNames(meFilePath1);
-            string name2 = DesktopIni.GetLocalizedFileNames(meFilePath2);
-            DesktopIni.DeleteLocalizedFileNames(meFilePath1);
-            DesktopIni.DeleteLocalizedFileNames(meFilePath2);
+            if (!isWinX && !itemVisible1)
+            {
+                path1 = null;
+            }
+            else
+            {
+                // 获取旧路径
+                string meFilePath1 = isWinX ? FilePath : DefaultFilePath;
+                // 删除旧的本地化文件名
+                string name1 = DesktopIni.GetLocalizedFileNames(meFilePath1);
+                DesktopIni.DeleteLocalizedFileNames(meFilePath1);
+                // 获取新路径
+                string meDirPath1 = Path.GetDirectoryName(meFilePath1);
+                string fileName1 = $@"{item.FileName.Substring(0, 2)}{FileName.Substring(2)}";
+                path1 = $@"{meDirPath1}\{fileName1}";
+                path1 = ObjectPath.GetNewPathWithIndex(path1, ObjectPath.PathType.File);
+                // 移动文件至新路径
+                File.Move(FilePath, path1);
+                // 创建新的本地化文件名
+                if (name1 != string.Empty) DesktopIni.SetLocalizedFileNames(path1, name1);
+            }
 
-            string fileName1 = $@"{item.FileName.Substring(0, 2)}{FileName.Substring(2)}";
-            string fileName2 = $@"{FileName.Substring(0, 2)}{item.FileName.Substring(2)}";
-            
-            path1 = $@"{meDirPath}\{fileName1}";
-            path2 = $@"{meDirPath}\{fileName2}";
-            path1 = ObjectPath.GetNewPathWithIndex(path1, ObjectPath.PathType.File);
-            path2 = ObjectPath.GetNewPathWithIndex(path2, ObjectPath.PathType.File);
-
-            File.Move(FilePath, path1);
-            File.Move(item.FilePath, path2);
-            if (name1 != string.Empty) DesktopIni.SetLocalizedFileNames(path1, name1);
-            if (name2 != string.Empty) DesktopIni.SetLocalizedFileNames(path2, name2);
+            if (!isWinX && !itemVisible2)
+            {
+                path2 = null;
+            }
+            else
+            {
+                string meFilePath2 = isWinX ? item.FilePath : item.DefaultFilePath;
+                string name2 = DesktopIni.GetLocalizedFileNames(meFilePath2);
+                DesktopIni.DeleteLocalizedFileNames(meFilePath2);
+                string fileName2 = $@"{FileName.Substring(0, 2)}{item.FileName.Substring(2)}";
+                string meDirPath2 = Path.GetDirectoryName(meFilePath2);
+                path2 = $@"{meDirPath2}\{fileName2}";
+                path2 = ObjectPath.GetNewPathWithIndex(path2, ObjectPath.PathType.File);
+                File.Move(item.FilePath, path2);
+                if (name2 != string.Empty) DesktopIni.SetLocalizedFileNames(path2, name2);
+            }
         }
 
         public void DeleteMe()
