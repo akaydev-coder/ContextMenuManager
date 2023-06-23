@@ -1,7 +1,7 @@
 ﻿using BluePointLilac.Methods;
 using ContextMenuManager.Controls.Interfaces;
 using ContextMenuManager.Methods;
-using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -10,7 +10,6 @@ namespace ContextMenuManager.Controls
 {
     sealed class WinXGroupItem : FoldGroupItem, IChkVisibleItem, ITsiDeleteItem, ITsiTextItem
     {
-        // TODO:适配Win11
         public WinXGroupItem(string groupPath) : base(groupPath, ObjectPath.PathType.Directory)
         {
             InitializeComponents();
@@ -29,6 +28,8 @@ namespace ContextMenuManager.Controls
         private string BackupGroupPath => $@"{WinXList.BackupWinXPath}{keyPath}";
         private string DefaultGroupPath => $@"{WinXList.DefaultWinXPath}{keyPath}";
 
+        private string DefaultFolderPath => $@"{((WinOsVersion.Current >= WinOsVersion.Win11) ? WinXList.WinXDefaultPath : WinXList.DefaultWinXPath)}\{ItemText}";
+
         public bool ItemVisible
         {
             get
@@ -41,13 +42,12 @@ namespace ContextMenuManager.Controls
             {
                 if (WinOsVersion.Current >= WinOsVersion.Win11)
                 {
-                    // 处理用户WinX菜单目录
-                    if (value)
+                    foreach (WinXItem item in winXItems)
                     {
+                        item.ChkChecked = value;
+                    }
 
-                    }   
-                    // 处理默认WinX菜单目录
-                    
+                    if (Directory.GetFiles(value ? GroupPath : BackupGroupPath, "*.lnk").Length > 0) ExplorerRestarter.Show();
                 }
                 else
                 {
@@ -68,8 +68,16 @@ namespace ContextMenuManager.Controls
                 string newPath = $@"{WinXList.WinXPath}\{ObjectPath.RemoveIllegalChars(value)}";
                 Directory.Move(GroupPath, newPath);
                 GroupPath = newPath;
+                RefreshKeyPath();
                 ExplorerRestarter.Show();
             }
+        }
+
+        private List<WinXItem> winXItems = new List<WinXItem> { };
+        
+        public void AddWinXItem(WinXItem item)
+        {
+            winXItems.Add(item);
         }
 
         public VisibleCheckBox ChkVisible { get; set; }
@@ -77,7 +85,11 @@ namespace ContextMenuManager.Controls
         public ChangeTextMenuItem TsiChangeText { get; set; }
         readonly ToolStripMenuItem TsiRestoreDefault = new ToolStripMenuItem(AppString.Menu.RestoreDefault);
 
-        private string DefaultFolderPath => $@"{((WinOsVersion.Current >= WinOsVersion.Win11) ? WinXList.WinXDefaultPath : WinXList.DefaultWinXPath)}\{ItemText}";
+        public bool ChkChecked
+        {
+            get => ItemVisible;
+            set => ChkVisible.Checked = value;
+        }
 
         private void InitializeComponents()
         {
@@ -91,6 +103,13 @@ namespace ContextMenuManager.Controls
             TsiRestoreDefault.Click += (sender, e) => RestoreDefault();
         }
 
+        private void RefreshList()
+        {
+            WinXList list = (WinXList)Parent;
+            list.ClearItems();
+            list.LoadItems();
+        }
+
         private void RestoreDefault()
         {
             if(AppMessageBox.Show(AppString.Message.RestoreDefault, MessageBoxButtons.OKCancel) == DialogResult.OK)
@@ -100,16 +119,10 @@ namespace ContextMenuManager.Controls
                 {
                     // Win11需要将默认WinX菜单也恢复，同时删除备份WinX菜单
                     RestoreDefaultFolder(false);
-                    if (Directory.Exists(BackupGroupPath))
-                    {
-                        DirectoryInfo defaultWinXDir = new DirectoryInfo(BackupGroupPath);
-                        defaultWinXDir.Delete(true);
-                    }
+                    DeletePath(new string[] { BackupGroupPath });
                 }
 
-                WinXList list = (WinXList)Parent;
-                list.ClearItems();
-                list.LoadItems();
+                RefreshList();
                 ExplorerRestarter.Show();
             }
         }
@@ -129,19 +142,27 @@ namespace ContextMenuManager.Controls
             }
         }
 
-        // TODO:适配Win11()
         public void DeleteMe()
         {
             bool flag = Directory.GetFiles(GroupPath, "*.lnk").Length > 0;
             if(flag && AppMessageBox.Show(AppString.Message.DeleteGroup, MessageBoxButtons.OKCancel) != DialogResult.OK) return;
-            File.SetAttributes(GroupPath, FileAttributes.Normal);
-            Directory.Delete(GroupPath, true);
-            if(flag)
+            DeletePath(new string[] { GroupPath, BackupGroupPath, DefaultGroupPath });
+            if (flag)
             {
-                WinXList list = (WinXList)Parent;
-                list.ClearItems();
-                list.LoadItems();
+                RefreshList();
                 ExplorerRestarter.Show();
+            }
+        }
+
+        private void DeletePath(string[] paths)
+        {
+            foreach (string path in paths)
+            {
+                if (Directory.Exists(path))
+                {
+                    File.SetAttributes(path, FileAttributes.Normal);
+                    Directory.Delete(path, true);
+                }
             }
         }
     }

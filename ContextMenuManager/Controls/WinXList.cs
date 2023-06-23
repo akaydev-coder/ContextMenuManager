@@ -73,6 +73,7 @@ namespace ContextMenuManager.Controls
                     WinXItem winXItem = new WinXItem(path, groupItem);
                     winXItem.BtnMoveDown.Visible = winXItem.BtnMoveUp.Visible = AppConfig.WinXSortable;
                     AddItem(winXItem);
+                    groupItem.AddWinXItem(winXItem);
                 }
             }
             if(sorted)
@@ -256,6 +257,7 @@ namespace ContextMenuManager.Controls
                     WinXItem item = new WinXItem(lnkPath, groupItem) { Visible = !groupItem.IsFold };
                     item.BtnMoveDown.Visible = item.BtnMoveUp.Visible = AppConfig.WinXSortable;
                     InsertItem(item, GetItemIndex(groupItem) + 1);
+                    groupItem.AddWinXItem(item);
                     break;
                 }
             }

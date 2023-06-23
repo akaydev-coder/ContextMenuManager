@@ -47,6 +47,8 @@ namespace ContextMenuManager.Controls
         private string BackupFilePath => $@"{(ItemVisible ? WinXList.BackupWinXPath : WinXList.WinXPath)}{keyPath}";
         private string DefaultFilePath => $@"{WinXList.DefaultWinXPath}{keyPath}";
 
+        private string GroupPath => ((WinXGroupItem)FoldGroupItem).GroupPath;
+
         public string ItemText
         {
             get
@@ -97,15 +99,23 @@ namespace ContextMenuManager.Controls
                     DesktopIni.DeleteLocalizedFileNames(FilePath);
                     if (name != string.Empty) DesktopIni.SetLocalizedFileNames(BackupFilePath, name);
                     // 处理默认WinX菜单目录
-                    if (value)
+                    if (value)  // 从禁用变为启用
                     {
                         File.Copy(BackupFilePath, DefaultFilePath, true);
                         if (name != string.Empty) DesktopIni.SetLocalizedFileNames(DefaultFilePath, name);
+                        if (Directory.GetFiles(GroupPath, "*.lnk").Length == 1)
+                        {
+                            ((WinXGroupItem)FoldGroupItem).ChkChecked = true;
+                        }
                     }
-                    else
+                    else  // 从启用变为禁用
                     {
                         File.Delete(DefaultFilePath);
                         DesktopIni.DeleteLocalizedFileNames(DefaultFilePath);
+                        if (Directory.GetFiles(GroupPath, "*.lnk").Length == 0)
+                        {
+                            ((WinXGroupItem)FoldGroupItem).ChkChecked = false;
+                        }
                     }
                     // 文件与备份文件目录交换
                     FilePath = BackupFilePath;
@@ -160,6 +170,12 @@ namespace ContextMenuManager.Controls
         public string SearchText => $"{AppString.SideBar.WinX} {Text}";
         public string FileName => Path.GetFileName(FilePath);
         private Image ItemImage => ItemIcon?.ToBitmap() ?? AppImage.NotFound;
+
+        public bool ChkChecked
+        {
+            get => ItemVisible;
+            set => ChkVisible.Checked = value;
+        }
 
         public VisibleCheckBox ChkVisible { get; set; }
         public MenuButton BtnShowMenu { get; set; }
