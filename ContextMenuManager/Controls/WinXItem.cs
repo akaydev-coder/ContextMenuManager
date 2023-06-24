@@ -62,7 +62,20 @@ namespace ContextMenuManager.Controls
             {
                 ShellLink.Description = value;
                 ShellLink.Save();
-                DesktopIni.SetLocalizedFileNames(FilePath, value);
+                
+                if (WinOsVersion.Current >= WinOsVersion.Win11)
+                {
+                    DesktopIni.SetLocalizedFileNames(FilePath, value);
+
+                    if (ItemVisible)
+                    {
+                        DesktopIni.SetLocalizedFileNames(DefaultFilePath, value);
+                    }
+                }
+                else
+                {
+                    DesktopIni.SetLocalizedFileNames(FilePath, value);
+                }
                 Text = ResourceString.GetDirectString(value);
                 ExplorerRestarter.Show();
             }
@@ -79,11 +92,8 @@ namespace ContextMenuManager.Controls
             }
             set
             {
-                if (WinOsVersion.Current >= WinOsVersion.Win11)
+                void CreateGroupPath(string dirPath)
                 {
-                    // 处理用户WinX菜单目录
-                    string name = DesktopIni.GetLocalizedFileNames(FilePath);
-                    string dirPath = Path.GetDirectoryName(BackupFilePath);
                     if (!Directory.Exists(dirPath))
                     {
                         // 创建目录文件夹
@@ -94,6 +104,14 @@ namespace ContextMenuManager.Controls
                         File.WriteAllText(iniPath, string.Empty, Encoding.Unicode);
                         File.SetAttributes(iniPath, File.GetAttributes(iniPath) | FileAttributes.Hidden | FileAttributes.System);
                     }
+                }
+
+                if (WinOsVersion.Current >= WinOsVersion.Win11)
+                {
+                    // 处理用户WinX菜单目录
+                    string name = DesktopIni.GetLocalizedFileNames(FilePath);
+                    string dirPath = Path.GetDirectoryName(BackupFilePath);
+                    CreateGroupPath(dirPath);
                     File.Move(FilePath, BackupFilePath);
                     // 处理用户WinX菜单目录下的desktop.ini文件（确保移动后名称在本地化下相同）
                     DesktopIni.DeleteLocalizedFileNames(FilePath);
@@ -101,10 +119,13 @@ namespace ContextMenuManager.Controls
                     // 处理默认WinX菜单目录
                     if (value)  // 从禁用变为启用
                     {
+                        string defaultDirPath = Path.GetDirectoryName(DefaultFilePath);
+                        CreateGroupPath(defaultDirPath);
                         File.Copy(BackupFilePath, DefaultFilePath, true);
                         if (name != string.Empty) DesktopIni.SetLocalizedFileNames(DefaultFilePath, name);
                         if (Directory.GetFiles(GroupPath, "*.lnk").Length == 1)
                         {
+                            ((WinXGroupItem)FoldGroupItem).ignoreChange = true;
                             ((WinXGroupItem)FoldGroupItem).ChkChecked = true;
                         }
                     }
@@ -114,6 +135,7 @@ namespace ContextMenuManager.Controls
                         DesktopIni.DeleteLocalizedFileNames(DefaultFilePath);
                         if (Directory.GetFiles(GroupPath, "*.lnk").Length == 0)
                         {
+                            ((WinXGroupItem)FoldGroupItem).ignoreChange = true;
                             ((WinXGroupItem)FoldGroupItem).ChkChecked = false;
                         }
                     }
@@ -229,7 +251,25 @@ namespace ContextMenuManager.Controls
 
         private void ChangeGroup()
         {
-            using(SelectDialog dlg = new SelectDialog())
+            void ChangeFileGroup(string selectText, bool isWinX, out string lnkPath)
+            {
+                string meFilePath = isWinX ? FilePath : DefaultFilePath;
+                string meDirPath = $@"{(isWinX ? WinXList.WinXPath : WinXList.DefaultWinXPath)}\{selectText}";
+
+                int count = Directory.GetFiles(meDirPath, "*.lnk").Length;
+                string num = (count + 1).ToString().PadLeft(2, '0');    // TODO:修复本组内顺序的问题
+                string partName = FileName;
+                int index = partName.IndexOf(" - ");
+                if (index > 0) partName = partName.Substring(index + 3);
+                lnkPath = $@"{meDirPath}\{num} - {partName}";
+                lnkPath = ObjectPath.GetNewPathWithIndex(lnkPath, ObjectPath.PathType.File);
+                string text = DesktopIni.GetLocalizedFileNames(meFilePath);
+                DesktopIni.DeleteLocalizedFileNames(meFilePath);
+                if (text != string.Empty) DesktopIni.SetLocalizedFileNames(lnkPath, text);
+                File.Move(meFilePath, lnkPath);
+            }
+
+            using (SelectDialog dlg = new SelectDialog())
             {
                 dlg.Title = AppString.Dialog.SelectGroup;
                 dlg.Items = WinXList.GetGroupNames();
@@ -254,29 +294,14 @@ namespace ContextMenuManager.Controls
                         list.Controls.Add(this);
                         list.SetItemIndex(this, i + 1);
                         Visible = !groupItem.IsFold;
+                        ((WinXGroupItem)FoldGroupItem).RemoveWinXItem(this);
                         FoldGroupItem = groupItem;
+                        groupItem.AddWinXItem(this);
                         break;
                     }
                 }
                 ExplorerRestarter.Show();
             }
-        }
-        private void ChangeFileGroup(string selectText, bool isWinX, out string lnkPath)
-        {
-            string meFilePath = isWinX ? FilePath : DefaultFilePath;
-            string meDirPath = $@"{(isWinX ? WinXList.WinXPath : WinXList.DefaultWinXPath)}\{selectText}";
-
-            int count = Directory.GetFiles(meDirPath, "*.lnk").Length;
-            string num = (count + 1).ToString().PadLeft(2, '0');    // TODO:修复本组内顺序的问题
-            string partName = FileName;
-            int index = partName.IndexOf(" - ");
-            if (index > 0) partName = partName.Substring(index + 3);
-            lnkPath = $@"{meDirPath}\{num} - {partName}";
-            lnkPath = ObjectPath.GetNewPathWithIndex(lnkPath, ObjectPath.PathType.File);
-            string text = DesktopIni.GetLocalizedFileNames(meFilePath);
-            DesktopIni.DeleteLocalizedFileNames(meFilePath);
-            if (text != string.Empty) DesktopIni.SetLocalizedFileNames(lnkPath, text);
-            File.Move(meFilePath, lnkPath);
         }
 
         private void MoveItem(bool isUp)
@@ -356,6 +381,7 @@ namespace ContextMenuManager.Controls
                 File.Delete(DefaultFilePath);
                 DesktopIni.DeleteLocalizedFileNames(DefaultFilePath);
             }
+            ((WinXGroupItem)FoldGroupItem).RemoveWinXItem(this);
             ExplorerRestarter.Show();
             ShellLink.Dispose();
         }

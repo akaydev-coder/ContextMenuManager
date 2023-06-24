@@ -3,7 +3,6 @@ using ContextMenuManager.Controls.Interfaces;
 using ContextMenuManager.Methods;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 namespace ContextMenuManager.Controls
@@ -30,24 +29,40 @@ namespace ContextMenuManager.Controls
 
         private string DefaultFolderPath => $@"{((WinOsVersion.Current >= WinOsVersion.Win11) ? WinXList.WinXDefaultPath : WinXList.DefaultWinXPath)}\{ItemText}";
 
+        public bool ignoreChange = false;
+
         public bool ItemVisible
         {
             get
             {
                 return (WinOsVersion.Current >= WinOsVersion.Win11) ?
-                    Directory.GetFiles(GroupPath, "*.lnk").Length != 0 :
+                    Directory.Exists(GroupPath) && Directory.GetFiles(GroupPath, "*.lnk").Length != 0 :
                     (File.GetAttributes(GroupPath) & FileAttributes.Hidden) != FileAttributes.Hidden;
             }
             set
             {
                 if (WinOsVersion.Current >= WinOsVersion.Win11)
                 {
-                    foreach (WinXItem item in winXItems)
+                    if (ignoreChange)
                     {
-                        item.ChkChecked = value;
+                        // 在WinXItem的启用禁用导致的ItemVisible改变，不触发ItemVisible的set方法
+                        ignoreChange = false; return;
                     }
 
-                    if (Directory.GetFiles(value ? GroupPath : BackupGroupPath, "*.lnk").Length > 0) ExplorerRestarter.Show();
+                    bool flag = false;
+                    foreach (WinXItem item in winXItems)
+                    {
+                        if (item.ChkChecked != value)
+                        {
+                            item.ChkChecked = value;
+                            flag = true;
+                        }
+                    }
+                    if (value)
+                    {
+                        DeletePath(new string[] { BackupGroupPath });
+                    }
+                    if (flag) ExplorerRestarter.Show();
                 }
                 else
                 {
@@ -65,19 +80,49 @@ namespace ContextMenuManager.Controls
             get => Path.GetFileNameWithoutExtension(GroupPath);
             set
             {
-                string newPath = $@"{WinXList.WinXPath}\{ObjectPath.RemoveIllegalChars(value)}";
-                Directory.Move(GroupPath, newPath);
-                GroupPath = newPath;
-                RefreshKeyPath();
+                void MoveDirectory(string oldPath, string newPath)
+                {
+                    if (Directory.Exists(oldPath))
+                    {
+                        if (Directory.Exists(newPath)) Directory.Delete(newPath, true);
+                        Directory.Move(oldPath, newPath);
+                    }
+                }
+
+                string newKeyPath = $@"\{ObjectPath.RemoveIllegalChars(value)}";
+                string newGroupPath = $@"{WinXList.WinXPath}{newKeyPath}";
+                MoveDirectory(GroupPath, newGroupPath);
+
+                if (WinOsVersion.Current >= WinOsVersion.Win11)
+                {
+                    string newBackupGroupPath = $@"{WinXList.BackupWinXPath}{newKeyPath}";
+                    MoveDirectory(BackupGroupPath, newBackupGroupPath);
+
+                    string newDefaultGroupPath = $@"{WinXList.DefaultWinXPath}{newKeyPath}";
+                    MoveDirectory(DefaultGroupPath, newDefaultGroupPath);
+
+                    keyPath = newKeyPath;
+                }
+
+                GroupPath = newGroupPath;
+
+                RefreshList();
                 ExplorerRestarter.Show();
             }
         }
 
-        private List<WinXItem> winXItems = new List<WinXItem> { };
+        private readonly List<WinXItem> winXItems = new List<WinXItem> { };
         
         public void AddWinXItem(WinXItem item)
         {
             winXItems.Add(item);
+        }
+        public void RemoveWinXItem(WinXItem item)
+        {
+            if (winXItems.Contains(item))
+            {
+                winXItems.Remove(item);
+            }
         }
 
         public VisibleCheckBox ChkVisible { get; set; }
@@ -112,8 +157,24 @@ namespace ContextMenuManager.Controls
 
         private void RestoreDefault()
         {
-            if(AppMessageBox.Show(AppString.Message.RestoreDefault, MessageBoxButtons.OKCancel) == DialogResult.OK)
+            if (AppMessageBox.Show(AppString.Message.RestoreDefault, MessageBoxButtons.OKCancel) == DialogResult.OK)
             {
+                void RestoreDefaultFolder(bool isWinX)
+                {
+                    string meGroupPath = isWinX ? GroupPath : DefaultGroupPath;
+
+                    File.SetAttributes(meGroupPath, FileAttributes.Normal);
+                    Directory.Delete(meGroupPath, true);
+                    Directory.CreateDirectory(meGroupPath);
+                    File.SetAttributes(meGroupPath, File.GetAttributes(DefaultFolderPath));
+
+                    foreach (string srcPath in Directory.GetFiles(DefaultFolderPath))
+                    {
+                        string dstPath = $@"{meGroupPath}\{Path.GetFileName(srcPath)}";
+                        File.Copy(srcPath, dstPath);
+                    }
+                }
+
                 RestoreDefaultFolder(true);
                 if (WinOsVersion.Current >= WinOsVersion.Win11)
                 {
@@ -124,21 +185,6 @@ namespace ContextMenuManager.Controls
 
                 RefreshList();
                 ExplorerRestarter.Show();
-            }
-        }
-        private void RestoreDefaultFolder(bool isWinX)
-        {
-            string meGroupPath = isWinX ? GroupPath : DefaultGroupPath;
-
-            File.SetAttributes(meGroupPath, FileAttributes.Normal);
-            Directory.Delete(meGroupPath, true);
-            Directory.CreateDirectory(meGroupPath);
-            File.SetAttributes(meGroupPath, File.GetAttributes(DefaultFolderPath));
-
-            foreach (string srcPath in Directory.GetFiles(DefaultFolderPath))
-            {
-                string dstPath = $@"{meGroupPath}\{Path.GetFileName(srcPath)}";
-                File.Copy(srcPath, dstPath);
             }
         }
 
