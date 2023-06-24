@@ -45,7 +45,7 @@ namespace ContextMenuManager.Controls
                 {
                     if (ignoreChange)
                     {
-                        // 在WinXItem的启用禁用导致的ItemVisible改变，不触发ItemVisible的set方法
+                        // 在WinXItem的启用禁用导致的WinXGroupItem的启用禁用改变，不触发ItemVisible的set方法
                         ignoreChange = false; return;
                     }
 
@@ -58,6 +58,10 @@ namespace ContextMenuManager.Controls
                             flag = true;
                         }
                     }
+
+                    // 在WinXGroupItem的启用禁用导致的WinXItem的启用禁用改变，下一次会触发ItemVisible的set方法
+                    ignoreChange = false;
+
                     if (value)
                     {
                         DeletePath(new string[] { BackupGroupPath });
