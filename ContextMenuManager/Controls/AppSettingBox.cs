@@ -22,7 +22,6 @@ namespace ContextMenuManager.Controls
             mliTopMost.AddCtr(chkTopMost);
             mliProtect.AddCtr(chkProtect);
             mliEngine.AddCtr(cmbEngine);
-            mliWinXSortable.AddCtr(chkWinXSortable);
             mliShowFilePath.AddCtr(chkShowFilePath);
             mliOpenMoreRegedit.AddCtr(chkOpenMoreRegedit);
             mliOpenMoreExplorer.AddCtr(chkOpenMoreExplorer);
@@ -59,7 +58,6 @@ namespace ContextMenuManager.Controls
             btnBackupDir.MouseDown += (sender, e) => ExternalProgram.OpenDirectory(AppConfig.RegBackupDir);
             chkBackup.CheckChanged += () => AppConfig.AutoBackup = chkBackup.Checked;
             chkProtect.CheckChanged += () => AppConfig.ProtectOpenItem = chkProtect.Checked;
-            chkWinXSortable.CheckChanged += () => AppConfig.WinXSortable = chkWinXSortable.Checked;
             chkOpenMoreRegedit.CheckChanged += () => AppConfig.OpenMoreRegedit = chkOpenMoreRegedit.Checked;
             chkTopMost.CheckChanged += () => AppConfig.TopMost = FindForm().TopMost = chkTopMost.Checked;
             chkOpenMoreExplorer.CheckChanged += () => AppConfig.OpenMoreExplorer = chkOpenMoreExplorer.Checked;
@@ -142,13 +140,6 @@ namespace ContextMenuManager.Controls
         };
         readonly MyCheckBox chkHideDisabledItems = new MyCheckBox();
 
-        readonly MyListItem mliWinXSortable = new MyListItem
-        {
-            Text = AppString.Other.WinXSortable,
-            Visible = WinOsVersion.Current >= WinOsVersion.Win8
-        };
-        readonly MyCheckBox chkWinXSortable = new MyCheckBox();
-
         readonly MyListItem mliHideSysStoreItems = new MyListItem
         {
             Text = AppString.Other.HideSysStoreItems,
@@ -164,7 +155,7 @@ namespace ContextMenuManager.Controls
         public void LoadItems()
         {
             AddItems(new[] { mliConfigDir, mliUpdate, mliRepo, mliEngine, mliBackup, mliTopMost, mliProtect, mliShowFilePath,
-                mliHideDisabledItems, mliHideSysStoreItems, mliOpenMoreRegedit, mliOpenMoreExplorer, mliWinXSortable });
+                mliHideDisabledItems, mliHideSysStoreItems, mliOpenMoreRegedit, mliOpenMoreExplorer });
             foreach(MyListItem item in Controls) item.HasImage = false;
             cmbConfigDir.SelectedIndex = AppConfig.SaveToAppDir ? 1 : 0;
             cmbRepo.SelectedIndex = AppConfig.RequestUseGithub ? 0 : 1;
@@ -173,7 +164,6 @@ namespace ContextMenuManager.Controls
             chkBackup.Checked = AppConfig.AutoBackup;
             chkTopMost.Checked = FindForm().TopMost;
             chkProtect.Checked = AppConfig.ProtectOpenItem;
-            chkWinXSortable.Checked = AppConfig.WinXSortable;
             chkShowFilePath.Checked = AppConfig.ShowFilePath;
             chkOpenMoreRegedit.Checked = AppConfig.OpenMoreRegedit;
             chkOpenMoreExplorer.Checked = AppConfig.OpenMoreExplorer;

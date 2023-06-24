@@ -12,7 +12,6 @@ using static ContextMenuManager.Methods.BackupList;
 using System.Xml.Serialization;
 using static ContextMenuManager.Controls.ShellNewList;
 using BluePointLilac.Controls;
-using System.Xml.Linq;
 
 namespace ContextMenuManager.Methods
 {
@@ -1207,7 +1206,7 @@ namespace ContextMenuManager.Methods
                 }
                 dirKeyPaths.Sort();
                 dirKeyPaths.Reverse();
-                bool sorted = false;
+
                 foreach (string dirKeyPath in dirKeyPaths)
                 {
                     string dirPath1 = $@"{WinXList.WinXPath}\{dirKeyPath}";
@@ -1216,15 +1215,7 @@ namespace ContextMenuManager.Methods
                     WinXGroupItem groupItem = new WinXGroupItem(dirPath1);
 
                     List<string> lnkPaths;
-                    if (AppConfig.WinXSortable)
-                    {
-                        lnkPaths = WinXList.GetSortedPaths(dirKeyPath, out bool flag);
-                        if (flag) sorted = true;
-                    }
-                    else
-                    {
-                        lnkPaths = WinXList.GetInkFiles(dirKeyPath);
-                    }
+                    lnkPaths = WinXList.GetInkFiles(dirKeyPath);
 
                     foreach (string path in lnkPaths)
                     {
@@ -1249,11 +1240,6 @@ namespace ContextMenuManager.Methods
 #endif
                     }
                     groupItem.Dispose();
-                }
-                if (sorted)
-                {
-                    ExplorerRestarter.Show();
-                    AppMessageBox.Show(AppString.Message.WinXSorted);
                 }
             }
         }

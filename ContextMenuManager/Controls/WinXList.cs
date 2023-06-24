@@ -22,6 +22,7 @@ namespace ContextMenuManager.Controls
             if(WinOsVersion.Current >= WinOsVersion.Win8)
             {
                 AppConfig.BackupWinX();
+                AddItem(new WinXSortableItem(this));
                 AddNewItem();
                 LoadWinXItems();
             }
@@ -129,6 +130,38 @@ namespace ContextMenuManager.Controls
 
         public static List<string> GetSortedPaths(string dirKeyPath, out bool resorted)
         {
+            void ResortPaths(int index, string name, string path, string lnkFilePath, bool isWinX, out string dstPath)
+            {
+                bool itemVisible = lnkFilePath.Substring(0, WinXPath.Length).Equals(WinXPath, StringComparison.OrdinalIgnoreCase);
+                if (!isWinX && !itemVisible)    // Default处菜单且禁用无需重新编号
+                {
+                    dstPath = null;
+                    return;
+                }
+
+                string startPath = itemVisible ? WinXPath : BackupWinXPath;
+
+                string meFilePath = isWinX ? lnkFilePath : lnkFilePath.Replace(startPath, DefaultWinXPath);
+                dstPath = $@"{(isWinX ? startPath : DefaultWinXPath)}\{path}\{(index + 1).ToString().PadLeft(2, '0')} - {name}";
+                dstPath = ObjectPath.GetNewPathWithIndex(dstPath, ObjectPath.PathType.File);
+
+                string value;
+                using (ShellLink srcLnk = new ShellLink(meFilePath))
+                {
+                    value = srcLnk.Description?.Trim();
+                }
+                if (string.IsNullOrEmpty(value)) value = DesktopIni.GetLocalizedFileNames(meFilePath);
+                if (string.IsNullOrEmpty(value)) value = Path.GetFileNameWithoutExtension(name);
+                DesktopIni.DeleteLocalizedFileNames(meFilePath);
+                DesktopIni.SetLocalizedFileNames(dstPath, value);
+                File.Move(meFilePath, dstPath);
+                using (ShellLink dstLnk = new ShellLink(dstPath))
+                {
+                    dstLnk.Description = value;
+                    dstLnk.Save();
+                }
+            }
+
             resorted = false;
             List<string> sortedPaths = new List<string>();
             List<string> lnkFilePaths = GetInkFiles(dirKeyPath);
@@ -160,37 +193,6 @@ namespace ContextMenuManager.Controls
             
             return sortedPaths;
         }
-        private static void ResortPaths(int i, string name, string dirKeyPath, string lnkFilePath, bool isWinX, out string dstPath)
-        {
-            bool itemVisible = lnkFilePath.Substring(0, WinXPath.Length).Equals(WinXPath, StringComparison.OrdinalIgnoreCase);
-            if (!isWinX && !itemVisible)    // Default处菜单且禁用无需重新编号
-            {
-                dstPath = null;
-                return;
-            }
-
-            string startPath = itemVisible ? WinXPath : BackupWinXPath;
-
-            string meFilePath = isWinX ? lnkFilePath : lnkFilePath.Replace(startPath, DefaultWinXPath);
-            dstPath = $@"{(isWinX ? startPath : DefaultWinXPath)}\{dirKeyPath}\{(i + 1).ToString().PadLeft(2, '0')} - {name}";
-            dstPath = ObjectPath.GetNewPathWithIndex(dstPath, ObjectPath.PathType.File);
-
-            string value;
-            using (ShellLink srcLnk = new ShellLink(meFilePath))
-            {
-                value = srcLnk.Description?.Trim();
-            }
-            if (string.IsNullOrEmpty(value)) value = DesktopIni.GetLocalizedFileNames(meFilePath);
-            if (string.IsNullOrEmpty(value)) value = Path.GetFileNameWithoutExtension(name);
-            DesktopIni.DeleteLocalizedFileNames(meFilePath);
-            DesktopIni.SetLocalizedFileNames(dstPath, value);
-            File.Move(meFilePath, dstPath);
-            using (ShellLink dstLnk = new ShellLink(dstPath))
-            {
-                dstLnk.Description = value;
-                dstLnk.Save();
-            }
-        }
 
         private void AddNewItem()
         {
@@ -204,7 +206,49 @@ namespace ContextMenuManager.Controls
             {
                 using(NewLnkFileDialog dlg1 = new NewLnkFileDialog())
                 {
-                    if(dlg1.ShowDialog() != DialogResult.OK) return;
+                    void AddNewLnkFile(string dirName, string itemText, string targetPath, string arguments, bool isWinX)
+                    {
+                        string dirPath = $@"{(isWinX ? WinXPath : DefaultWinXPath)}\{dirName}";
+                        string workDir = Path.GetDirectoryName(targetPath);
+                        string extension = Path.GetExtension(targetPath).ToLower();
+                        string fileName = Path.GetFileNameWithoutExtension(targetPath);
+                        int count = Directory.GetFiles(dirPath, "*.lnk").Length;
+                        string index = (count + 1).ToString().PadLeft(2, '0');
+                        string lnkName = $"{index} - {fileName}.lnk";
+                        string lnkPath = $@"{dirPath}\{lnkName}";
+
+                        using (ShellLink shellLink = new ShellLink(lnkPath))
+                        {
+                            if (extension == ".lnk")
+                            {
+                                File.Copy(targetPath, lnkPath);
+                                shellLink.Load();
+                            }
+                            else
+                            {
+                                shellLink.TargetPath = targetPath;
+                                shellLink.Arguments = arguments;
+                                shellLink.WorkingDirectory = workDir;
+                            }
+                            shellLink.Description = itemText;
+                            shellLink.Save();
+                        }
+                        DesktopIni.SetLocalizedFileNames(lnkPath, itemText);
+                        foreach (MyListItem ctr in Controls)
+                        {
+                            if (ctr is WinXGroupItem groupItem && groupItem.Text == dirName)
+                            {
+                                WinXItem item = new WinXItem(lnkPath, groupItem) { Visible = !groupItem.IsFold };
+                                item.BtnMoveDown.Visible = item.BtnMoveUp.Visible = AppConfig.WinXSortable;
+                                InsertItem(item, GetItemIndex(groupItem) + 1);
+                                groupItem.AddWinXItem(item);
+                                break;
+                            }
+                        }
+                        WinXHasher.HashLnk(lnkPath);
+                    }
+
+                    if (dlg1.ShowDialog() != DialogResult.OK) return;
                     using(SelectDialog dlg2 = new SelectDialog())
                     {
                         dlg2.Title = AppString.Dialog.SelectGroup;
@@ -222,50 +266,21 @@ namespace ContextMenuManager.Controls
                 }
             };
         }
-        private void AddNewLnkFile(string dirName, string itemText, string targetPath, string arguments, bool isWinX)
-        {
-            string dirPath = $@"{(isWinX ? WinXPath : DefaultWinXPath)}\{dirName}";
-            string workDir = Path.GetDirectoryName(targetPath);
-            string extension = Path.GetExtension(targetPath).ToLower();
-            string fileName = Path.GetFileNameWithoutExtension(targetPath);
-            int count = Directory.GetFiles(dirPath, "*.lnk").Length;
-            string index = (count + 1).ToString().PadLeft(2, '0');
-            string lnkName = $"{index} - {fileName}.lnk";
-            string lnkPath = $@"{dirPath}\{lnkName}";
-
-            using (ShellLink shellLink = new ShellLink(lnkPath))
-            {
-                if (extension == ".lnk")
-                {
-                    File.Copy(targetPath, lnkPath);
-                    shellLink.Load();
-                }
-                else
-                {
-                    shellLink.TargetPath = targetPath;
-                    shellLink.Arguments = arguments;
-                    shellLink.WorkingDirectory = workDir;
-                }
-                shellLink.Description = itemText;
-                shellLink.Save();
-            }
-            DesktopIni.SetLocalizedFileNames(lnkPath, itemText);
-            foreach (MyListItem ctr in Controls)
-            {
-                if (ctr is WinXGroupItem groupItem && groupItem.Text == dirName)
-                {
-                    WinXItem item = new WinXItem(lnkPath, groupItem) { Visible = !groupItem.IsFold };
-                    item.BtnMoveDown.Visible = item.BtnMoveUp.Visible = AppConfig.WinXSortable;
-                    InsertItem(item, GetItemIndex(groupItem) + 1);
-                    groupItem.AddWinXItem(item);
-                    break;
-                }
-            }
-            WinXHasher.HashLnk(lnkPath);
-        }
 
         private void CreateNewGroup()
         {
+            void CreateGroupPath(string path)
+            {
+                // 创建目录文件夹
+                Directory.CreateDirectory(path);
+                File.SetAttributes(path, File.GetAttributes(path) | FileAttributes.ReadOnly);
+
+                // 初始化desktop.ini文件
+                string iniPath = $@"{path}\desktop.ini";
+                File.WriteAllText(iniPath, string.Empty, Encoding.Unicode);
+                File.SetAttributes(iniPath, File.GetAttributes(iniPath) | FileAttributes.Hidden | FileAttributes.System);
+            }
+
             string dirPath = ObjectPath.GetNewPathWithIndex($@"{WinXPath}\Group", ObjectPath.PathType.Directory, 1);
             CreateGroupPath(dirPath);
             if (WinOsVersion.Current >= WinOsVersion.Win11)
@@ -275,17 +290,6 @@ namespace ContextMenuManager.Controls
             }
             InsertItem(new WinXGroupItem(dirPath), 1);
         }
-        private void CreateGroupPath(string dirPath)
-        {
-            // 创建目录文件夹
-            Directory.CreateDirectory(dirPath);
-            File.SetAttributes(dirPath, File.GetAttributes(dirPath) | FileAttributes.ReadOnly);
-
-            // 初始化desktop.ini文件
-            string iniPath = $@"{dirPath}\desktop.ini";
-            File.WriteAllText(iniPath, string.Empty, Encoding.Unicode);
-            File.SetAttributes(iniPath, File.GetAttributes(iniPath) | FileAttributes.Hidden | FileAttributes.System);
-        }
 
         public static string[] GetGroupNames()
         {
@@ -294,6 +298,21 @@ namespace ContextMenuManager.Controls
             foreach(DirectoryInfo di in winxDi.GetDirectories()) items.Add(di.Name);
             items.Reverse();
             return items.ToArray();
+        }
+
+        sealed class WinXSortableItem : MyListItem
+        {
+            readonly MyCheckBox chkWinXSortable = new MyCheckBox();
+
+            public WinXSortableItem(WinXList list)
+            {
+                Text = AppString.Other.WinXSortable;
+                Image = AppImage.Sort;
+                AddCtr(chkWinXSortable);
+                chkWinXSortable.Checked = AppConfig.WinXSortable;
+                chkWinXSortable.CheckChanged += () => { AppConfig.WinXSortable = chkWinXSortable.Checked; list.ClearItems(); list.LoadItems();
+                };
+            }
         }
     }
 }
