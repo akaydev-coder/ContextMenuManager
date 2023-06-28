@@ -9,8 +9,8 @@
   [GitHub Releases][GitHub Releases]<br>
   [Gitee Releases][Gitee Releases]<br>
 * 下载说明：在Assets文件列表里面下载zip（建议）或者直接下载exe
-* .NET版本说明：程序基于.NET4.8，适用于Win10、8.1、8、7、Vista系统<br>
-  win8、win8.1、win10自带.NET4.8，Vista、win7系统不自带.NET4.8<br>
+* .NET版本说明：程序基于.NET4.8，适用于Win11、10、8.1、8、7、Vista系统<br>
+  win8、win8.1、win10、win11自带.NET4.8，Vista、win7系统不自带.NET4.8<br>
   自带.NET可直接运行程序，不自带则需要安装对应版本的[.NET Framework运行库][.NET Framework]
 
 ## 主要功能
@@ -19,7 +19,7 @@
 * 对上述场景右键菜单自定义添加项目，自定义菜单命令
 
 ## 兼容性能
-* 适用于Win10、8.1、8、7、Vista
+* 适用于Win11、10、8.1、8、7、Vista
 * 适用于 64bit、32bit CPU 操作系统
 * 适用于高分屏，最佳显示缩放比为150%
 * 程序支持国际化多语言显示，欢迎为此程序制作语言字典
