@@ -421,6 +421,7 @@
     <Content Include="Properties\Resources\Images\DownLoad.png" />
     <Content Include="Properties\Resources\Images\Enhance.png" />
     <Content Include="Properties\Resources\Images\Jump.png" />
+    <Content Include="Properties\Resources\Images\Sort.png" />
     <Content Include="Properties\Resources\Images\Translate.png" />
     <Content Include="Properties\Resources\Images\User.png" />
     <Content Include="Properties\Resources\Images\Web.png" />
