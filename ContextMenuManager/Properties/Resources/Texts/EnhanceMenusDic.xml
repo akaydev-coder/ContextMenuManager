@@ -2,25 +2,25 @@
 <!--Diese Datei ist ein allgemeines Kontextmenü-Wörterbuch. Sie können diesem Wörterbuch eine mehrsprachige Übersetzung hinzufügen, einen Unterpunkt „Kultur“ hinzufügen und ihn auf „en-US“, „ja-JP“ usw. einstellen.
 Das Tip-Attribut ist die Eingabeaufforderungsinformation, wenn sich die Maus über dem Schalter befindet. Ausgehend von jedem Elementknoten stellt das Unterelement Value den Registrierungsschlüsselwert des Elements dar. Derzeit sind nur die Schlüsselwerttypen REG_SZ, REG_DWORD, REG_EXPAND_SZ und verfügbar REG_BINARY werden unterstützt.
 Alle Unterelemente des Unterelements SubKey sind Unterelemente dieses Elements, und der Elementname ist der Elementname. Das Attribut Default jedes Elementelements und aller Unterelemente von SubKey ist der Standardwert des Registrierungsschlüssels. der nicht im Element Value\\REG_SZ platziert wird, soll Konflikte mit möglichen Schlüsseln namens Default verhindern
-Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz nur anhand des Namens des Registrierungselements und aktiviert es dann. Daher sind Shell-Elemente mit demselben KeyName-Attribut in derselben Szene nicht zulässig und das ShellEx-Element ist solange aktiviert wie die Guid übereinstimmt-->
+Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz nur anhand des Namens des Registrierungselements und aktiviert es. Daher sind Shell-Elemente mit demselben KeyName-Attribut in derselben Szene nicht zulässig. Solange die Guid mit dem ShellEx-Element übereinstimmt , es ist aktiviert-->
 
 <Data>
   <Group>
-    <Text Value='Datei'/>
-    <Text Value='File'>
+    <Text Value='文件'/>
+    <Text Value='Datei'>
       <Culture>de-DE</Culture>
     </Text>
     <Icon>imageres.dll,-19</Icon>
     <RegPath>HKEY_CLASSES_ROOT\*</RegPath>
     <Shell>
       <Item KeyName='CopyContent'>
-        <Tip Value='Kopieren Sie den Textinhalt der Datei direkt, ohne die Datei zu öffnen &#x000A; Nicht-Unicode-kodierte Dateien können verstümmelt sein'/>
-        <Tip Value='You do not need to open the file directly copy the file text content, not Unicode encoding may be garbled'>
+        <Tip Value='不需打开文件直接复制文件文本内容&#x000A;非Unicode编码文件可能会乱码'/>
+        <Tip Value='Sie müssen die Datei nicht direkt öffnen und den Textinhalt der Datei kopieren, da die Unicode-Codierung möglicherweise verstümmelt ist'>
           <Culture>de-DE</Culture>
         </Tip>
         <Value>
-          <REG_SZ MUIVerb='Inhalte in die Zwischenablage kopieren' Icon='DxpTaskSync.dll,-52'/>
-          <REG_SZ MUIVerb='Copy Content to Clipboard'>
+          <REG_SZ MUIVerb='复制内容到剪切板' Icon='DxpTaskSync.dll,-52'/>
+          <REG_SZ MUIVerb='Inhalt in die Zwischenablage kopieren.'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -34,8 +34,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='TakeOwnerShip'>
         <Value>
-          <REG_SZ MUIVerb='Der Administrator erhält alle Berechtigungen' HasLUAShield='' NoWorkingDirectory=''/>
-          <REG_SZ MUIVerb='Take Ownership'>
+          <REG_SZ MUIVerb='管理员取得所有权限' HasLUAShield='' NoWorkingDirectory=''/>
+          <REG_SZ MUIVerb='In Besitz nehmen'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -50,8 +50,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       <Item KeyName='GetHash'>
         <OSVersion Compare="&gt;=">6.3</OSVersion>
         <Value>
-          <REG_SZ MUIVerb='Hashwert erhalten' Icon='imageres.dll,-5372'/>
-          <REG_SZ MUIVerb='Get Hash'>
+          <REG_SZ MUIVerb='获取哈希值' Icon='imageres.dll,-5372'/>
+          <REG_SZ MUIVerb='Hol dir Hash'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -67,7 +67,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
   </Group>
 
   <Group>
-    <Text Value='Inhaltsverzeichnis'/>
+    <Text Value='目录'/>
     <Text Value='Directory'>
       <Culture>de-DE</Culture>
     </Text>
@@ -76,10 +76,10 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
     <Shell>
       <Item KeyName='TakeOwnerShip'>
         <Value>
-          <!--Enthält keinen Papierkorb-->
-          <REG_SZ MUIVerb='Der Administrator erhält alle Berechtigungen' HasLUAShield='' NoWorkingDirectory=''
+          <!--不包括回收站-->
+          <REG_SZ MUIVerb='管理员取得所有权限' HasLUAShield='' NoWorkingDirectory=''
                   AppliesTo='System.ParsingName:&lt;>"::{645FF040-5081-101B-9F08-00AA002F954E}"'/>
-          <REG_SZ MUIVerb='Take Ownership'>
+          <REG_SZ MUIVerb='In Besitz nehmen'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -95,7 +95,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
   </Group>
 
   <Group>
-    <Text Value='Verzeichnishintergrund'/>
+    <Text Value='目录背景'/>
     <Text Value='Background'>
       <Culture>de-DE</Culture>
     </Text>
@@ -105,7 +105,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       <Item KeyName='Windows.NewFolder'>
         <OSVersion Compare="&gt;=">6.1</OSVersion>
         <Value>
-          <!--neuer Ordner-->
+          <!--新建文件夹-->
           <REG_SZ MUIVerb='@shell32.dll,-31236' Icon='shell32.dll,-319' Position='top' CommandStateSync=''
                   CommandStateHandler='{3756e7f5-e514-4776-a32b-eb24bc1efe7a}' CanonicalName='{E44616AD-6DF1-4B94-85A4-E465AE8A19DB}'/>
           <REG_DWORD ImpliedSelectionModel='4' InvokeCommandOnSelection='0'/>
@@ -113,7 +113,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='OpenNewWindow'>
         <Value>
-          <!--in einem neuen Fenster öffnen-->
+          <!--在新窗口中打开-->
           <REG_SZ MUIVerb='@windows.storage.dll,-8517'/>
         </Value>
         <SubKey>
@@ -123,7 +123,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       <Item KeyName='Windows.RecycleBin.Empty'>
         <OSVersion Compare="&gt;=">6.1</OSVersion>
         <Value>
-          <!--leerer Müll-->
+          <!--清空回收站-->
           <REG_SZ MUIVerb='@shell32.dll,-10564' Icon='imageres.dll,-54' CommandStateHandler='{c9298eef-69dd-4cdd-b153-bdbc38486781}'/>
         </Value>
         <SubKey>
@@ -136,8 +136,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='SuperHidden'>
         <Value>
-          <REG_SZ MUIVerb='super versteckt' SubCommands='' Position='bottom'/>
-          <REG_SZ MUIVerb='Super Hidden'>
+          <REG_SZ MUIVerb='超级隐藏' SubCommands='' Position='bottom'/>
+          <REG_SZ MUIVerb='Super versteckt.'>
             <Culture>de-DE</Culture>
           </REG_SZ>
           <REG_SZ Icon='imageres.dll,-5314'>
@@ -150,8 +150,9 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               <Item0>
                 <OSVersion Compare="&gt;=">6.2</OSVersion>
                 <Value>
-                  <REG_SZ MUIVerb='zeigen/verstecken Erweiterungsname' CommandStateSync=''
+                  <REG_SZ MUIVerb='显示/隐藏 扩展名' CommandStateSync=''
                           ExplorerCommandHandler='{4ac6c205-2853-4bf5-b47c-919a42a48a16}'/>
+                  <REG_SZ MUIVerb='Dateierweiterungen anzeigen oder ausblenden'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -159,8 +160,9 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               <Item1>
                 <OSVersion Compare="&gt;=">6.2</OSVersion>
                 <Value>
-                  <REG_SZ MUIVerb='zeigen/verstecken versteckte Dateien' CommandStateSync=''
+                  <REG_SZ MUIVerb='显示/隐藏 隐藏文件' CommandStateSync=''
                           ExplorerCommandHandler='{f7300245-1f4b-41ba-8948-6fd392064494}'/>
+                  <REG_SZ MUIVerb='Versteckte Dateien anzeigen oder ausblenden'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -168,7 +170,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               <Item0>
                 <OSVersion Compare="&lt;">6.2</OSVersion>
                 <Value>
-                  <REG_SZ MUIVerb='zeigen/verstecken Erweiterungsname'/>
+                  <REG_SZ MUIVerb='显示/隐藏 扩展名'/>
+                  <REG_SZ MUIVerb='Dateierweiterungen anzeigen oder ausblenden'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -195,7 +198,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               <Item1>
                 <OSVersion Compare="&lt;">6.2</OSVersion>
                 <Value>
-                  <REG_SZ MUIVerb='zeigen/verstecken versteckte Dateien'/>
+                  <REG_SZ MUIVerb='显示/隐藏 隐藏文件'/>
+                  <REG_SZ MUIVerb='Versteckte Dateien anzeigen oder ausblenden'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -221,7 +225,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item1>
               <Item2>
                 <Value>
-                  <REG_SZ MUIVerb='zeigen/verstecken Systemversteckte Dateien'/>
+                  <REG_SZ MUIVerb='显示/隐藏 系统隐藏文件'/>
+                  <REG_SZ MUIVerb='Versteckte Systemdateien anzeigen oder ausblenden.'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -251,7 +256,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='RunasCmd'>
         <Value>
-          <!--Öffnen Sie die Eingabeaufforderung als Administrator-->
+          <!--以管理员身份打开命令提示符-->
           <REG_SZ MUIVerb='@shell32.dll,-37444' Icon='imageres.dll,-5324' NoWorkingDirectory=''/>
         </Value>
         <SubKey>
@@ -264,7 +269,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='Windows.PowershellAsAdmin'>
         <Value>
-          <!--als Administrator öffnenPowershell-->
+          <!--以管理员身份打开Powershell-->
           <REG_SZ MUIVerb='@shell32.dll,-37448' Icon='imageres.dll,-5373' Description='@shell32.dll,-37449' CommandStateSync=''
                   CanonicalName='{ADB73FFC-1568-4D7D-BCD5-6D11A417AF64}' ExplorerCommandHandler='{BF0AC53F-D51C-419F-92E3-2298E125F004}'/>
           <REG_DWORD ImpliedSelectionModel='1' ResolveLinksInvokeBehavior='3' ResolveLinksQueryBehavior='0'/>
@@ -273,7 +278,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       <Item KeyName='ExplorerUWP'>
         <OSVersion Compare="&gt;=">10.0</OSVersion>
         <Value>
-          <REG_SZ MUIVerb='Ressourcenmanager UWP' Icon='explorer.exe,0'/>
+          <REG_SZ MUIVerb='资源管理器 UWP' Icon='explorer.exe,0'/>
           <REG_SZ MUIVerb='Explorer UWP'>
             <Culture>de-DE</Culture>
           </REG_SZ>
@@ -285,7 +290,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
     </Shell>
     <ShellEx>
       <Item>
-        <!--Fensterschalter-->
+        <!--窗口转换程序-->
         <Text>@shell32.dll,-12715</Text>
         <Icon>imageres.dll,0</Icon>
         <KeyName>Flip3D</KeyName>
@@ -295,7 +300,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
   </Group>
 
   <Group>
-    <Text Value='Desktop-Hintergrund'/>
+    <Text Value='桌面背景'/>
     <Text Value='Desktop Background'>
       <Culture>de-DE</Culture>
     </Text>
@@ -304,7 +309,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
     <Shell>
       <Item KeyName='OpenThisPC'>
         <Value>
-          <!--dieser Computer-->
+          <!--此电脑-->
           <REG_SZ MUIVerb='@shell32.dll,-9216' Icon='imageres.dll,-109'/>
         </Value>
         <SubKey>
@@ -313,7 +318,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='OpenControlPanel'>
         <Value>
-          <!--Bedienfeld-->
+          <!--控制面板-->
           <REG_SZ MUIVerb='@shell32.dll,-4161' Icon='imageres.dll,-27'/>
         </Value>
         <SubKey>
@@ -322,8 +327,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='RestartExplorer'>
         <Value>
-          <REG_SZ MUIVerb='Explorer neu starten' Icon='shell32.dll,238'/>
-          <REG_SZ MUIVerb='Restart Explorer'>
+          <REG_SZ MUIVerb='重启资源管理器' Icon='shell32.dll,238'/>
+          <REG_SZ MUIVerb='Explorer neu starten'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -343,8 +348,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='OpenMoreRegedit'>
         <Value>
-          <REG_SZ MUIVerb='Mehrere Registrierungseditoren' Icon='regedit.exe,0'/>
-          <REG_SZ MUIVerb='Open Multiple Regedit'>
+          <REG_SZ MUIVerb='多开注册表编辑器' Icon='regedit.exe,0'/>
+          <REG_SZ MUIVerb='Öffnen Sie mehrere Registrierungseditoren'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -355,8 +360,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       <Item KeyName='SnippingTool'>
         <OSVersion Compare="&gt;=">6.1</OSVersion>
         <Value>
-          <REG_SZ MUIVerb='Screenshot-Tool' Icon='snippingTool.exe,0'/>
-          <REG_SZ MUIVerb='Snipping Tool'>
+          <REG_SZ MUIVerb='截图工具' Icon='snippingTool.exe,0'/>
+          <REG_SZ MUIVerb='Schnittwerkzeug'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -365,14 +370,14 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
         </SubKey>
       </Item>
       <Item KeyName='SnipToClipboard'>
-        <Tip Value='Nachdem Sie einen Screenshot erstellt haben, können Sie direktCtrl+VBild einfügen&#x000A;Anwendbarer Standort:Word、QQ、PSWarten&#x000A;Hotkey:Win+Shift+S'/>
-        <Tip Value='After taking a screenshot, you can directly press Ctrl+V to paste the picture.&#x000A;It is suitable for Word, PS and other programs. The shortcut key is Win+Shift+S'>
+        <Tip Value='截屏后可直接Ctrl+V粘贴图片&#x000A;适用位置:Word、QQ、PS等&#x000A;快捷键:Win+Shift+S'/>
+        <Tip Value='Nachdem Sie einen Screenshot erstellt haben, können Sie direkt Strg+V drücken, um das Bild einzufügen. Es ist für Word, PS und andere Programme geeignet. Die Tastenkombination ist Win+Umschalt+S'>
           <Culture>de-DE</Culture>
         </Tip>
         <OSVersion Compare="&gt;=">10.0</OSVersion>
         <Value>
-          <REG_SZ MUIVerb='Screenshot in die Zwischenablage kopieren' Icon='snippingTool.exe,0'/>
-          <REG_SZ MUIVerb='Snip to Clipboard'>
+          <REG_SZ MUIVerb='截屏到剪贴板' Icon='snippingTool.exe,0'/>
+          <REG_SZ MUIVerb='In die Zwischenablage kopieren.'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -382,8 +387,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='ScreenKeyboard'>
         <Value>
-          <REG_SZ MUIVerb='Bildschirmtastatur' Icon='osk.exe,0'/>
-          <REG_SZ MUIVerb='Screen Keyboard'>
+          <REG_SZ MUIVerb='屏幕键盘' Icon='osk.exe,0'/>
+          <REG_SZ MUIVerb='Bildschirmtastatur'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -393,8 +398,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='ShutdownOptions'>
         <Value>
-          <REG_SZ MUIVerb='Optionen zum Herunterfahren' Icon='shell32.dll,-28' SubCommands='' Position='bottom'/>
-          <REG_SZ MUIVerb='Shutdown Options'>
+          <REG_SZ MUIVerb='关机选项' Icon='shell32.dll,-28' SubCommands='' Position='bottom'/>
+          <REG_SZ MUIVerb='Abschaltoptionen'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -403,7 +408,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
             <SubKey>
               <Item0>
                 <Value>
-                  <REG_SZ MUIVerb='Verriegelung'/>
+                  <REG_SZ MUIVerb='锁定'/>
+                  <REG_SZ MUIVerb='Sperren'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -413,7 +419,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item0>
               <Item1>
                 <Value>
-                  <REG_SZ MUIVerb='Ausloggen'/>
+                  <REG_SZ MUIVerb='注销'/>
+                  <REG_SZ MUIVerb='Abmelden'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -423,7 +430,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item1>
               <Item2>
                 <Value>
-                  <REG_SZ MUIVerb='Benutzer wechseln'/>
+                  <REG_SZ MUIVerb='切换账户'/>
+                  <REG_SZ MUIVerb='Benutzer wechseln'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -433,7 +441,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item2>
               <Item3>
                 <Value>
-                  <REG_SZ MUIVerb='schlafen'/>
+                  <REG_SZ MUIVerb='睡眠'/>
+                  <REG_SZ MUIVerb='Schlafen'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -443,7 +452,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item3>
               <Item4>
                 <Value>
-                  <REG_SZ MUIVerb='schlafen'/>
+                  <REG_SZ MUIVerb='休眠'/>
+                  <REG_SZ MUIVerb='Überwintern'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -453,7 +463,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item4>
               <Item5>
                 <Value>
-                  <REG_SZ MUIVerb='neu starten'/>
+                  <REG_SZ MUIVerb='重启'/>
+                  <REG_SZ MUIVerb='Neu starten'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -463,7 +474,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item5>
               <Item6>
                 <Value>
-                  <REG_SZ MUIVerb='abschalten'/>
+                  <REG_SZ MUIVerb='关机'/>
+                  <REG_SZ MUIVerb='Abschalten'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -478,8 +490,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       <Item KeyName='SlideToShutDown'>
         <OSVersion Compare="&gt;=">6.3</OSVersion>
         <Value>
-          <REG_SZ MUIVerb='Zum Herunterfahren schieben' Icon='shell32.dll,-28'/>
-          <REG_SZ MUIVerb='Slide to ShutDown'>
+          <REG_SZ MUIVerb='滑动关机' Icon='shell32.dll,-28'/>
+          <REG_SZ MUIVerb='Zum Herunterfahren schieben.'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -489,8 +501,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='PowerPlan'>
         <Value>
-          <REG_SZ MUIVerb='Energieplan' Icon='powercpl.dll,0' SubCommands='' Position='bottom'/>
-          <REG_SZ MUIVerb='Power Plan'>
+          <REG_SZ MUIVerb='电源计划' Icon='powercpl.dll,0' SubCommands='' Position='bottom'/>
+          <REG_SZ MUIVerb='Energieplan'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -499,7 +511,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
             <SubKey>
               <Item0>
                 <Value>
-                  <REG_SZ MUIVerb='Energie sparen'/>
+                  <REG_SZ MUIVerb='节能'/>
+                  <REG_SZ MUIVerb='Energiesparer'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -513,7 +526,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item0>
               <Item1>
                 <Value>
-                  <REG_SZ MUIVerb='Gleichgewicht'/>
+                  <REG_SZ MUIVerb='平衡'/>
+                  <REG_SZ MUIVerb='Ausgewogen'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -527,7 +541,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item1>
               <Item2>
                 <Value>
-                  <REG_SZ MUIVerb='Hochleistung'/>
+                  <REG_SZ MUIVerb='高性能'/>
+                  <REG_SZ MUIVerb='Hochleistung'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -546,8 +561,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       <Item KeyName='AppColorMode'>
         <OSVersion Compare="&gt;=">10.0.17763</OSVersion>
         <Value>
-          <REG_SZ MUIVerb='Farbmodus' Icon='themecpl.dll,-1' SubCommands='' Position='bottom'/>
-          <REG_SZ MUIVerb='App Color Mode'>
+          <REG_SZ MUIVerb='颜色模式' Icon='themecpl.dll,-1' SubCommands='' Position='bottom'/>
+          <REG_SZ MUIVerb='App-Farbmodus'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -556,7 +571,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
             <SubKey>
               <Item0>
                 <Value>
-                  <REG_SZ MUIVerb='leichte Anwendung' Icon='imageres.dll,-5411'/>
+                  <REG_SZ MUIVerb='浅色应用' Icon='imageres.dll,-5411'/>
+                  <REG_SZ MUIVerb='Lichtmodus'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -566,7 +582,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item0>
               <Item1>
                 <Value>
-                  <REG_SZ MUIVerb='dunkle Anwendung' Icon='imageres.dll,-5412'/>
+                  <REG_SZ MUIVerb='深色应用' Icon='imageres.dll,-5412'/>
+                  <REG_SZ MUIVerb='Dunkler Modus.'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -580,8 +597,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='WallPaperLocation'>
         <Value>
-          <REG_SZ MUIVerb='Tapetenposition' Icon='imageres.dll,-5346' Position='bottom'/>
-          <REG_SZ MUIVerb='WallPaper Location'>
+          <REG_SZ MUIVerb='壁纸位置' Icon='imageres.dll,-5346' Position='bottom'/>
+          <REG_SZ MUIVerb='WallPaper-Standort'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -604,8 +621,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='DesktopIcon'>
         <Value>
-          <REG_SZ MUIVerb='Einstellungen für Desktop-Symbole' Icon='desk.cpl,0'/>
-          <REG_SZ MUIVerb='Desktop Icon Settings'>
+          <REG_SZ MUIVerb='桌面图标设置' Icon='desk.cpl,0'/>
+          <REG_SZ MUIVerb='Desktop-Symboleinstellungen'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -615,8 +632,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='ScreenSaver'>
         <Value>
-          <REG_SZ MUIVerb='Bildschirmschonereinstellungen' Icon='desk.cpl,0'/>
-          <REG_SZ MUIVerb='Screen saver Settings'>
+          <REG_SZ MUIVerb='屏幕保护设置' Icon='desk.cpl,0'/>
+          <REG_SZ MUIVerb='Bildschirmschoner-Einstellungen'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -626,8 +643,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='WebSearch'>
         <Value>
-          <REG_SZ MUIVerb='Web-Suche' Icon='Windows.Storage.Search.dll,0' SubCommands=''/>
-          <REG_SZ MUIVerb='Web Search'>
+          <REG_SZ MUIVerb='网页搜索' Icon='Windows.Storage.Search.dll,0' SubCommands=''/>
+          <REG_SZ MUIVerb='Web-Suche'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -674,7 +691,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
   </Group>
 
   <Group>
-    <Text Value='Festplattenpartition'/>
+    <Text Value='磁盘分区'/>
     <Text Value='Drive'>
       <Culture>de-DE</Culture>
     </Text>
@@ -683,7 +700,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
     <Shell>
       <Item KeyName='OptimizeDrives'>
         <Value>
-          <!--Antrieb optimieren-->
+          <!--优化驱动器-->
           <REG_SZ MUIVerb='@dfrgui.exe,-106' Icon='dfrgui.exe,0'/>
         </Value>
         <SubKey>
@@ -692,7 +709,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='Windows.CleanUp'>
         <Value>
-          <!--Datenträgerbereinigung-->
+          <!--磁盘清理-->
           <REG_SZ MUIVerb='@shell32.dll,-22026' Icon='cleanmgr.exe,-104' CommandStateSync=''
                   ExplorerCommandHandler='{9cca66bb-9c78-4e59-a76f-a5e9990b8aa0}'/>
           <REG_DWORD ImpliedSelectionModel='0x1'/>
@@ -700,8 +717,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='ShowDriveLetters'>
         <Value>
-          <REG_SZ MUIVerb='zeigen/verstecken Laufwerksbuchstabe' Position='bottom'/>
-          <REG_SZ MUIVerb='Show or hide Drive Letters'>
+          <REG_SZ MUIVerb='显示/隐藏 盘符' Position='bottom'/>
+          <REG_SZ MUIVerb='Laufwerksbuchstaben anzeigen oder ausblenden.'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -727,8 +744,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='ShowVolumeStrips'>
         <Value>
-          <REG_SZ MUIVerb='zeigen/verstecken Kapazitätsbalken' Position='bottom'/>
-          <REG_SZ MUIVerb='Show or hide Drive Volume'>
+          <REG_SZ MUIVerb='显示/隐藏 容量条' Position='bottom'/>
+          <REG_SZ MUIVerb='Laufwerkslautstärke anzeigen oder ausblenden.'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -759,7 +776,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
   </Group>
 
   <Group>
-    <Text Value='alle Objekte'/>
+    <Text Value='所有对象'/>
     <Text Value='All File system Objects'>
       <Culture>de-DE</Culture>
     </Text>
@@ -769,18 +786,18 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       <Item KeyName='Windows.PermanentDelete'>
         <OSVersion Compare="&gt;=">6.2</OSVersion>
         <Value>
-          <!--Dauerhaft löschen-->
+          <!--永久删除-->
           <REG_SZ MUIVerb='@shell32.dll,-37394' Icon='shell32.dll,-240' Position='bottom' CommandStateSync=''
                   ExplorerCommandHandler='{E9571AB2-AD92-4ec6-8924-4E5AD33790F5}'/>
         </Value>
       </Item>
       <Item KeyName='CopyAsPath'>
-        <Tip Value='Systemeigene Menüelemente müssen gedrückt werdenShiftzeigen,&#x000A;Dieser Artikel kann direkt angezeigt werden, Pfad ohne doppelte Anführungszeichen'/>
-        <Tip Value='The system raw lettuce item needs to hold down Shift display,&#x000A;this item can be displayed directly, path without double quotation marks'>
+        <Tip Value='系统原生菜单项需按住Shift显示,&#x000A;此项可以直接显示, 路径不带双引号'/>
+        <Tip Value='Der rohe Salat des Systems muss die Umschalttaste gedrückt halten, Dieses Element kann direkt angezeigt werden, Pfad ohne doppelte Anführungszeichen'>
           <Culture>de-DE</Culture>
         </Tip>
         <Value>
-          <!--Pfad kopieren-->
+          <!--复制路径-->
           <REG_SZ MUIVerb='@shell32.dll,-30329' Icon='imageres.dll,-5302'/>
         </Value>
         <SubKey>
@@ -789,12 +806,12 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='Windows.CopyAsPath'>
         <OSVersion Compare="&gt;=">6.2</OSVersion>
-        <Tip Value='Systemeigene Menüelemente müssen gedrückt werdenShiftzeigen,&#x000A;Dieser Artikel kann direkt angezeigt werden, Pfad mit doppelten Anführungszeichen'/>
-        <Tip Value='The system raw lettuce item needs to hold down Shift display,&#x000A;this item can be displayed directly, path with double quotation marks'>
+        <Tip Value='系统原生菜单项需按住Shift显示,&#x000A;此项可以直接显示, 路径带双引号'/>
+        <Tip Value='Der rohe Salat des Systems muss die Umschalttaste gedrückt halten, Dieses Element kann direkt angezeigt werden, Pfad mit doppelten Anführungszeichen'>
           <Culture>de-DE</Culture>
         </Tip>
         <Value>
-          <!--Pfad kopieren-->
+          <!--复制路径-->
           <REG_SZ MUIVerb='@shell32.dll,-30329' Icon='imageres.dll,-5302' CommandStateHandler='{3B1599F9-E00A-4BBF-AD3E-B3F99FA87779}'
                   CanonicalName='{707C7BC6-685A-4A4D-A275-3966A5A3EFAA}' CommandStateSync='' VerbHandler='{f3d06e7c-1e45-4a26-847e-f9fcdee59be0}'
                   VerbName='copyaspath' Description='@shell32.dll,-30336'/>
@@ -803,7 +820,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='Windows.SlideShow'>
         <Value>
-          <!--Diashow-->
+          <!--幻灯片放映-->
           <REG_SZ MUIVerb='@shell32.dll,-31287' Icon='imageres.dll,-5347' CommandStateHandler='{880ac964-2e34-4425-8cf2-86ada2c3a019}'
                   CanonicalName='{73BCE053-3BBC-4AD7-9FE7-7A7C212C98E6}' CommandStateSync='' Description='@shell32.dll,-31288' VerbToInvoke='slideshow'/>
           <REG_DWORD MediaTypeFlags='5'/>
@@ -818,8 +835,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='HideAttributes'>
         <Value>
-          <REG_SZ MUIVerb='verstecktes Attribut' SubCommands='' Position='bottom'/>
-          <REG_SZ MUIVerb='File Visibility'>
+          <REG_SZ MUIVerb='隐藏属性' SubCommands='' Position='bottom'/>
+          <REG_SZ MUIVerb='Dateisichtbarkeit'>
             <Culture>de-DE</Culture>
           </REG_SZ>
           <REG_SZ Icon='imageres.dll,-5314'>
@@ -831,7 +848,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
             <SubKey>
               <Item0>
                 <Value>
-                  <REG_SZ MUIVerb='zeigen'/>
+                  <REG_SZ MUIVerb='显示'/>
+                  <REG_SZ MUIVerb='Normal'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -841,7 +859,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item0>
               <Item1>
                 <Value>
-                  <REG_SZ MUIVerb='verstecken'/>
+                  <REG_SZ MUIVerb='隐藏'/>
+                  <REG_SZ MUIVerb='Versteckt'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -851,7 +870,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item1>
               <Item2>
                 <Value>
-                  <REG_SZ MUIVerb='System ausgeblendet'/>
+                  <REG_SZ MUIVerb='系统隐藏'/>
+                  <REG_SZ MUIVerb='System ausgeblendet.'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -865,8 +885,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='CreateDesktopShortcut'>
         <Value>
-          <REG_SZ MUIVerb='Erstellen Sie eine Verknüpfung auf dem Desktop' Icon='imageres.dll,-110' Position='bottom'/>
-          <REG_SZ MUIVerb='Create a Desktop Shortcut'>
+          <REG_SZ MUIVerb='创建桌面快捷方式' Icon='imageres.dll,-110' Position='bottom'/>
+          <REG_SZ MUIVerb='Erstellen Sie eine Verknüpfung auf dem Desktop'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -883,24 +903,24 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
                 Set fso = CreateObject("Scripting.FileSystemObject")
                 desktop = wsh.SpecialFolders("Desktop")
                 For i = 0 To paths.Count - 1
-	              path = paths(i)
-	              index1 = InstrRev(path, "\")
-	              dir = Mid(path, 1, index1 - 1)
-	              name = Mid(path, index1 + 1)
-	              index2 = InstrRev(name, ".")
-	              If index2 > 0 Then name = Mid(name, 1, index2 - 1)
-	              lnkPath = ""
-	              j = 1
-	              Do
-	                  lnkPath = desktop &amp; "\" &amp; name
-	                  If j > 1 Then lnkPath = lnkPath &amp; " (" &amp; j &amp; ")"
-	                  lnkPath = lnkPath &amp; ".lnk"
-	                  j = j + 1
-	              Loop While fso.FileExists(lnkPath)
-	              Set shortcut = wsh.CreateShortcut(lnkPath)  
-	              shortcut.TargetPath = path 
-	              shortcut.WorkingDirectory = dir
-	              shortcut.Save
+                path = paths(i)
+                index1 = InstrRev(path, "\")
+                dir = Mid(path, 1, index1 - 1)
+                name = Mid(path, index1 + 1)
+                index2 = InstrRev(name, ".")
+                If index2 > 0 Then name = Mid(name, 1, index2 - 1)
+                lnkPath = ""
+                j = 1
+                Do
+                    lnkPath = desktop &amp; "\" &amp; name
+                    If j > 1 Then lnkPath = lnkPath &amp; " (" &amp; j &amp; ")"
+                    lnkPath = lnkPath &amp; ".lnk"
+                    j = j + 1
+                Loop While fso.FileExists(lnkPath)
+                Set shortcut = wsh.CreateShortcut(lnkPath)  
+                shortcut.TargetPath = path 
+                shortcut.WorkingDirectory = dir
+                shortcut.Save
                 Next
                 Set shortcut = Nothing
                 Set wsh = Nothing
@@ -912,14 +932,14 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
     </Shell>
     <ShellEx>
       <Item>
-        <!--in Ordner kopieren-->
+        <!--复制到文件夹-->
         <Text>@shell32.dll,-30304</Text>
         <Icon>imageres.dll,-5304</Icon>
         <KeyName>CopyTo</KeyName>
         <Guid>c2fbb630-2971-11d1-a18c-00c04fd75d13</Guid>
       </Item>
       <Item>
-        <!--in den Ordner verschieben-->
+        <!--移动到文件夹-->
         <Text>@shell32.dll,-30305</Text>
         <Icon>imageres.dll,-5303</Icon>
         <KeyName>MoveTo</KeyName>
@@ -929,7 +949,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
   </Group>
 
   <Group>
-    <Text Value='dieser Computer'/>
+    <Text Value='此电脑'/>
     <Text Value='This PC'>
       <Culture>de-DE</Culture>
     </Text>
@@ -938,8 +958,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
     <Shell>
       <Item KeyName='SystemInfo'>
         <Value>
-          <REG_SZ MUIVerb='Systemnachricht' Icon='msinfo32.exe,0'/>
-          <REG_SZ MUIVerb='System Info'>
+          <REG_SZ MUIVerb='系统信息' Icon='msinfo32.exe,0'/>
+          <REG_SZ MUIVerb='Systeminformationen'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -949,8 +969,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='UserAccountControlSettings'>
         <Value>
-          <REG_SZ MUIVerb='Einstellungen zur Benutzerkontensteuerung'/>
-          <REG_SZ MUIVerb='User Account Control Settings'>
+          <REG_SZ MUIVerb='用户账户控制设置'/>
+          <REG_SZ MUIVerb='Benutzerkontensteuerungseinstellungen'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -961,8 +981,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       <Item KeyName='Gpedit'>
         <FileExists>%SystemRoot%\System32\gpedit.msc</FileExists>
         <Value>
-          <REG_SZ MUIVerb='Gruppenrichtlinien-Editor'/>
-          <REG_SZ MUIVerb='Group Policy Editor'>
+          <REG_SZ MUIVerb='组策略编辑器'/>
+          <REG_SZ MUIVerb='Gruppenrichtlinien-Editor'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -971,14 +991,14 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
         </SubKey>
       </Item>
       <Item KeyName='VirtualMode'>
-        <Tip Value='lösen Hyper-V Und VirtualBox inkompatibles Problem'/>
-        <Tip Value='Fixed an issue where Hyper-V and VirtualBox could not coexist'>
+        <Tip Value='解决 Hyper-V 和 VirtualBox 不能共存的问题'/>
+        <Tip Value='Es wurde ein Problem behoben, bei dem Hyper-V und VirtualBox nicht koexistieren konnten'>
           <Culture>de-DE</Culture>
         </Tip>
         <OSVersion Compare="&gt;=">10.0</OSVersion>
         <Value>
-          <REG_SZ MUIVerb='virtueller Modus' Icon='imageres.dll,-109' SubCommands='' Position='bottom'/>
-          <REG_SZ MUIVerb='Virtual Mode'>
+          <REG_SZ MUIVerb='虚拟模式' Icon='imageres.dll,-109' SubCommands='' Position='bottom'/>
+          <REG_SZ MUIVerb='Virtueller Modus'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -999,12 +1019,12 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
                         Dim sap, wsh
                         Set sap = CreateObject("Shell.Application")
                         sap.ShellExecute "bcdedit", "/set hypervisorlaunchtype auto", "" ,"runas", 0
-                        msg = "Ihr aktueller Schaltmodus ist Hyper-V，" &amp; VbCrlf
-                        msg = msg &amp; "Dieser Modus kann verwendet werden Windows SandBox Und Hyper-V，" &amp; VbCrlf
-                        msg = msg &amp; "nicht verfügbar VirtualBox Und VMware und andere virtuelle Maschinenprogramme，" &amp; VbCrlf
-                        msg = msg &amp; "Ob der Computer sofort neu gestartet werden soll, um den Modus anzuwenden？" &amp; VbCrlf
-                        msg = msg &amp; "Sie können sich auch später selbst neu starten，Bitte speichern Sie Ihre Arbeit！"
-                        If Msgbox(msg, VbYesNo + VbInformation, "virtueller Modus") = VbYes Then
+                        msg = "你当前切换的模式为 Hyper-V，" &amp; VbCrlf
+                        msg = msg &amp; "该模式可使用 Windows SandBox 和 Hyper-V，" &amp; VbCrlf
+                        msg = msg &amp; "不可使用 VirtualBox 和 VMware 等虚拟机程序，" &amp; VbCrlf
+                        msg = msg &amp; "是否立即重启计算机应用该模式？" &amp; VbCrlf
+                        msg = msg &amp; "你也可稍后自行重启，请保存好工作！"
+                        If Msgbox(msg, VbYesNo + VbInformation, "虚拟模式") = VbYes Then
                             Set wsh = CreateObject("WScript.Shell")
                             wsh.Run("shutdown -r -f -t 00")
                             Set wsh = Nothing
@@ -1026,6 +1046,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
                             wsh.Run("shutdown -r -f -t 00")
                             Set wsh = Nothing
                         End If
+                        Set sap = Nothing'>
                         <Culture>de-DE</Culture>
                       </CreateFile>
                     </Arguments>
@@ -1046,12 +1067,12 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
                         Dim sap, wsh
                         Set sap = CreateObject("Shell.Application")
                         sap.ShellExecute "bcdedit", "/set hypervisorlaunchtype off", "", "runas", 0
-                        msg = "Ihr aktueller Schaltmodus ist VirtualBox，" &amp; VbCrlf
-                        msg = msg &amp; "Dieser Modus kann verwendet werden VirtualBox Und VMware und andere virtuelle Maschinenprogramme，" &amp; VbCrlf
-                        msg = msg &amp; "nicht verfügbar Windows SandBox Und Hyper-V，" &amp; VbCrlf
-                        msg = msg &amp; "Ob der Computer sofort neu gestartet werden soll, um den Modus anzuwenden？" &amp; VbCrlf
-                        msg = msg &amp; "Sie können sich auch später selbst neu starten，Bitte speichern Sie Ihre Arbeit！"
-                        If Msgbox(msg, VbYesNo + VbInformation, "virtueller Modus") = VbYes Then
+                        msg = "你当前切换的模式为 VirtualBox，" &amp; VbCrlf
+                        msg = msg &amp; "该模式可使用 VirtualBox 和 VMware 等虚拟机程序，" &amp; VbCrlf
+                        msg = msg &amp; "不可使用 Windows SandBox 和 Hyper-V，" &amp; VbCrlf
+                        msg = msg &amp; "是否立即重启计算机应用该模式？" &amp; VbCrlf
+                        msg = msg &amp; "你也可稍后自行重启，请保存好工作！"
+                        If Msgbox(msg, VbYesNo + VbInformation, "虚拟模式") = VbYes Then
                             Set wsh = CreateObject("WScript.Shell")
                             wsh.Run("shutdown -r -f -t 00")
                             Set wsh = Nothing
@@ -1073,6 +1094,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
                             wsh.Run("shutdown -r -f -t 00")
                             Set wsh = Nothing
                         End If
+                        Set sap = Nothing'>
                         <Culture>de-DE</Culture>
                       </CreateFile>
                     </Arguments>
@@ -1085,8 +1107,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='EditHosts'>
         <Value>
-          <REG_SZ MUIVerb='bearbeiten Hosts'/>
-          <REG_SZ MUIVerb='Edit Hosts'>
+          <REG_SZ MUIVerb='编辑 Hosts'/>
+          <REG_SZ MUIVerb='Hosts bearbeiten'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -1100,8 +1122,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='FlushDNS'>
         <Value>
-          <REG_SZ MUIVerb='erneuernDNSZwischenspeicher' Icon='shell32.dll,238'/>
-          <REG_SZ MUIVerb='Flush DNS'>
+          <REG_SZ MUIVerb='刷新DNS缓存' Icon='shell32.dll,238'/>
+          <REG_SZ MUIVerb='DNS leeren'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -1112,8 +1134,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       <Item KeyName='BatteryReport'>
         <Value>
           <OSVersion Compare="&gt;=">10.0</OSVersion>
-          <REG_SZ MUIVerb='Batterieverbrauchsbericht' Icon='powercpl.dll,0'/>
-          <REG_SZ MUIVerb='Battery Report'>
+          <REG_SZ MUIVerb='电池使用报告' Icon='powercpl.dll,0'/>
+          <REG_SZ MUIVerb='Batteriebericht'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -1129,7 +1151,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
   </Group>
 
   <Group>
-    <Text Value='Papierkorb'/>
+    <Text Value='回收站'/>
     <Text Value='RecycleBin'>
       <Culture>de-DE</Culture>
     </Text>
@@ -1138,8 +1160,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
     <Shell>
       <Item KeyName='CleanThumbCache'>
         <Value>
-          <REG_SZ MUIVerb='Miniaturbild-Cache leeren'/>
-          <REG_SZ MUIVerb='Clean Thumb Cache'>
+          <REG_SZ MUIVerb='清理缩略图缓存'/>
+          <REG_SZ MUIVerb='Thumb-Cache leeren.'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -1166,7 +1188,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
   </Group>
 
   <Group>
-    <Text Value='Exe dokumentieren'/>
+    <Text Value='Exe文件'/>
     <Text Value='Exe Files'>
       <Culture>de-DE</Culture>
     </Text>
@@ -1175,8 +1197,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
     <Shell>
       <Item KeyName='FirewallRules'>
         <Value>
-          <REG_SZ MUIVerb='Firewall-Regeln' Icon='FirewallControlPanel.dll,0' SubCommands=''/>
-          <REG_SZ MUIVerb='Firewall Rules'>
+          <REG_SZ MUIVerb='防火墙规则' Icon='FirewallControlPanel.dll,0' SubCommands=''/>
+          <REG_SZ MUIVerb='Firewall-Regeln'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -1185,7 +1207,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
             <SubKey>
               <Item0>
                 <Value>
-                  <REG_SZ MUIVerb='kein Inbound' Icon='imageres.dll,-105'/>
+                  <REG_SZ MUIVerb='禁止入站' Icon='imageres.dll,-105'/>
+                  <REG_SZ MUIVerb='Nicht hereinlassen.'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -1199,7 +1222,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item0>
               <Item1>
                 <Value>
-                  <REG_SZ MUIVerb='Ausgehend verboten' Icon='imageres.dll,-105'/>
+                  <REG_SZ MUIVerb='禁止出站' Icon='imageres.dll,-105'/>
+                  <REG_SZ MUIVerb='Nicht rauslassen.'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -1213,7 +1237,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item1>
               <Item2>
                 <Value>
-                  <REG_SZ MUIVerb='Eingehend zulassen' Icon='imageres.dll,-106'/>
+                  <REG_SZ MUIVerb='允许入站' Icon='imageres.dll,-106'/>
+                  <REG_SZ MUIVerb='Einlassen'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -1227,7 +1252,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
               </Item2>
               <Item3>
                 <Value>
-                  <REG_SZ MUIVerb='ausgehenden Verkehr zulassen' Icon='imageres.dll,-106'/>
+                  <REG_SZ MUIVerb='允许出站' Icon='imageres.dll,-106'/>
+                  <REG_SZ MUIVerb='Lass es raus.'>
                     <Culture>de-DE</Culture>
                   </REG_SZ>
                 </Value>
@@ -1247,7 +1273,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
   </Group>
 
   <Group>
-    <Text Value='DLL dokumentieren'/>
+    <Text Value='DLL文件'/>
     <Text Value='DLL Files'>
       <Culture>de-DE</Culture>
     </Text>
@@ -1256,8 +1282,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
     <Shell>
       <Item KeyName='Register'>
         <Value>
-          <REG_SZ MUIVerb='registriere DLL'/>
-          <REG_SZ MUIVerb='Register the DLL'>
+          <REG_SZ MUIVerb='注册 DLL'/>
+          <REG_SZ MUIVerb='Registrieren Sie die DLL'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -1271,8 +1297,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='UnRegister'>
         <Value>
-          <REG_SZ MUIVerb='Ausloggen DLL'/>
-          <REG_SZ MUIVerb='UnRegister the DLL'>
+          <REG_SZ MUIVerb='注销 DLL'/>
+          <REG_SZ MUIVerb='Deregistrieren Sie die DLL'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -1288,7 +1314,7 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
   </Group>
 
   <Group>
-    <Text Value='OCX dokumentieren'/>
+    <Text Value='OCX文件'/>
     <Text Value='OCX Files'>
       <Culture>de-DE</Culture>
     </Text>
@@ -1297,8 +1323,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
     <Shell>
       <Item KeyName='Register'>
         <Value>
-          <REG_SZ MUIVerb='registriere OCX'/>
-          <REG_SZ MUIVerb='Register the OCX'>
+          <REG_SZ MUIVerb='注册 OCX'/>
+          <REG_SZ MUIVerb='Registrieren Sie das OCX'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
@@ -1312,8 +1338,8 @@ Da das Shell-Element zu kompliziert ist, beurteilt das Programm seine Existenz n
       </Item>
       <Item KeyName='UnRegister'>
         <Value>
-          <REG_SZ MUIVerb='Ausloggen OCX'/>
-          <REG_SZ MUIVerb='UnRegister the OCX'>
+          <REG_SZ MUIVerb='注销 OCX'/>
+          <REG_SZ MUIVerb='Registrieren Sie die OCX'>
             <Culture>de-DE</Culture>
           </REG_SZ>
         </Value>
